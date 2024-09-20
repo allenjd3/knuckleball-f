@@ -10,6 +10,18 @@ class Player extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'team_id',
+    ];
+
+    protected static function booted()
+    {
+        static::saving(function (Player $player) {
+            $player->slug = str($player->name)->slug()->toString();
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

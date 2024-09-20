@@ -3,7 +3,13 @@
 namespace App\Livewire;
 
 use App\Models\Player;
+use App\Models\Team;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\CreateAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -15,8 +21,9 @@ use Filament\Tables\Table;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class ViewPlayers extends Component implements HasForms, HasTable
+class ViewPlayers extends Component implements HasActions, HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -39,7 +46,19 @@ class ViewPlayers extends Component implements HasForms, HasTable
                         TextInput::make('name'),
                         TextInput::make('slug'),
                         DatePicker::make('published_at'),
-                    ]),
+                    ])
+                    ->visible(fn (Player $player) => auth()->user()?->can('update', $player)),
+            ]);
+    }
+
+    public function createAction(): Action
+    {
+        return CreateAction::make()
+            ->model(Player::class)
+            ->form([
+                TextInput::make('name'),
+                Select::make('team_id')
+                    ->options(fn () => Team::get()->flatMap(fn ($team) => [$team->id => $team->name])->toArray()),
             ]);
     }
 
