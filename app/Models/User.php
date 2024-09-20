@@ -51,6 +51,11 @@ class User extends Authenticatable
         'profile_photo_url',
     ];
 
+    public function teams(): HasMany
+    {
+        return $this->hasMany(Team::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -62,10 +67,5 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function teams(): HasMany
-    {
-        return $this->hasMany(Team::class);
     }
 }

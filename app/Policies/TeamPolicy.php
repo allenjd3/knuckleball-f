@@ -10,32 +10,17 @@ class TeamPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny (User $user): bool
-    {
+    public function viewAny(User $user): bool {}
 
-    }
+    public function view(User $user, Team $team): bool {}
 
-    public function view (User $user, Team $team): bool
-    {
-    }
+    public function create(User $user): bool {}
 
-    public function create (User $user): bool
-    {
-    }
+    public function update(User $user, Team $team): bool {}
 
-    public function update (User $user, Team $team): bool
-    {
-    }
+    public function delete(User $user, Team $team): bool {}
 
-    public function delete (User $user, Team $team): bool
-    {
-    }
+    public function restore(User $user, Team $team): bool {}
 
-    public function restore (User $user, Team $team): bool
-    {
-    }
-
-    public function forceDelete (User $user, Team $team): bool
-    {
-    }
+    public function forceDelete(User $user, Team $team): bool {}
 }

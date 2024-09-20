@@ -11,13 +11,6 @@ class Team extends Model
 {
     use HasFactory;
 
-    protected function casts (): array
-    {
-        return [
-            'published_at' => 'timestamp',
-        ];
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -26,5 +19,12 @@ class Team extends Model
     public function players(): HasMany
     {
         return $this->hasMany(Player::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'timestamp',
+        ];
     }
 }

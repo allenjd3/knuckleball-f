@@ -10,13 +10,6 @@ class Player extends Model
 {
     use HasFactory;
 
-    protected function casts (): array
-    {
-        return [
-            'published_at' => 'timestamp',
-        ];
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -30,5 +23,12 @@ class Player extends Model
     public function getMedia()
     {
         return '#';
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'timestamp',
+        ];
     }
 }

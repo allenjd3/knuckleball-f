@@ -7,7 +7,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -16,10 +15,10 @@ use Filament\Tables\Table;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class ViewPlayers extends Component implements HasTable, HasForms
+class ViewPlayers extends Component implements HasForms, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithForms;
+    use InteractsWithTable;
 
     public function render()
     {
@@ -40,7 +39,7 @@ class ViewPlayers extends Component implements HasTable, HasForms
                         TextInput::make('name'),
                         TextInput::make('slug'),
                         DatePicker::make('published_at'),
-                    ])
+                    ]),
             ]);
     }
 

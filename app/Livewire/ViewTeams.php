@@ -8,7 +8,7 @@ use Livewire\Component;
 
 class ViewTeams extends Component
 {
-    public function render ()
+    public function render()
     {
         return view('livewire.view-teams');
     }
