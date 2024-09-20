@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -21,9 +22,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'james@example.com',
         ]);
 
-        Team::factory(10)
+        $teams = Team::factory(10)
             ->for($user)
             ->create();
 
+        $teams->each(fn ($team) => Player::factory(12)->for($team)->create());
     }
 }
