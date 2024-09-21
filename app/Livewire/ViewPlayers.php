@@ -21,6 +21,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -48,10 +49,26 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 EditAction::make()
                     ->form([
                         TextInput::make('name'),
-                        TextInput::make('slug'),
-                        DatePicker::make('published_at'),
+                        Select::make('team_id')
+                            ->label('Team')
+                            ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
+                            ->default(fn (Player $record) => $record->team_id),
+                        DatePicker::make('published_at')
+                            ->default(fn (Player $record) => $record->published_at),
+                        FileUpload::make('url')
+                            ->directory('avatars')
+                            ->avatar(),
                     ])
-                    ->visible(fn (Player $player) => auth()->user()?->can('update', $player)),
+                    ->visible(fn (Player $player) => auth()->user()?->can('update', $player))
+                    ->using(function (array $data, Player $record) {
+                        $data = collect($data);
+                        $record->update($data->only('name', 'team_id', 'published_at')->toArray());
+
+                        if ($url = $data->get('url')) {
+                            defer(fn () => Storage::delete($record->media->url));
+                            $record->media()->update(['url' => $url]);
+                        }
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
@@ -64,7 +81,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('name'),
                 Select::make('team_id')
                     ->label('Team')
-                    ->options(fn () => Team::get()->flatMap(fn ($team) => [$team->id => $team->name])->toArray()),
+                    ->options(fn () => Team::get()->pluck('name', 'id')->toArray()),
                 FileUpload::make('url')
                     ->directory('avatars')
                     ->avatar(),

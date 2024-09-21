@@ -14,6 +14,7 @@ class Player extends Model
     protected $fillable = [
         'name',
         'team_id',
+        'published_at',
     ];
 
     protected static function booted()
