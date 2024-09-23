@@ -35,8 +35,14 @@
             <div>
                 <h3 class="font-bold px-2">Fees:</h3>
                 <div class="flex divide-x divide-black">
-                    <p class="px-2">Cards $1.00 per card</p>
-                    <p class="px-2">Baseballs $3.00 per ball</p>
+                    @forelse($this->fees as $fee)
+                        <p class="px-2">{{ str($fee->feeMaterial->name)->plural() }} {{ $fee->amount }} per {{ str($fee->feeMaterial->name) }}</p>
+                    @empty
+                        <p class="px-2">No fees yet!</p>
+                    @endforelse
+                </div>
+                <div class="flex gap-4">
+                    {{ $this->createFee }}
                 </div>
             </div>
         </div>

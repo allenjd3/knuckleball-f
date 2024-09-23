@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -60,5 +61,10 @@ class Player extends Model
     public function path(): string
     {
         return route('players.show', $this->id);
+    }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(Fee::class);
     }
 }
