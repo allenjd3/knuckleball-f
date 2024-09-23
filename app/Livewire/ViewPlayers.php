@@ -42,7 +42,10 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ->query(Player::query()->with(['team', 'media']))
             ->columns([
                 ImageColumn::make('media.url')->circular(),
-                TextColumn::make('name')->searchable()->sortable(),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable()
+                    ->url(fn (Player $player) => $player->path()),
                 TextColumn::make('team.name')->sortable(),
             ])
             ->actions([

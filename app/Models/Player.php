@@ -56,4 +56,9 @@ class Player extends Model
     {
         return $this->hasOne(Address::class);
     }
+
+    public function path(): string
+    {
+        return route('players.show', $this->id);
+    }
 }
