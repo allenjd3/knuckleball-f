@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Fee;
 use App\Models\FeeMaterial;
 use App\Models\Player;
+use App\Models\PostalMail;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -16,13 +17,18 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class ShowPlayer extends Component implements HasForms, HasActions
+class ShowPlayer extends Component implements HasForms, HasActions, HasTable
 {
     use InteractsWithForms;
     use InteractsWithActions;
+    use InteractsWithTable;
 
     public Player $player;
 
@@ -66,18 +72,43 @@ class ShowPlayer extends Component implements HasForms, HasActions
             ->using(fn (array $data) => $this->player->fees()->create($data));
     }
 
-    public function createFeeMaterialAction(): Action
-    {
-        return CreateAction::make('createFeeMaterial')
-            ->model(FeeMaterial::class)
-            ->form([
-                TextInput::make('name')
-            ]);
-    }
-
     #[Computed]
     public function fees()
     {
         return $this->player->fees()->with('feeMaterial')->get();
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user'))
+            ->emptyStateHeading('No TTM yet!')
+            ->columns([
+                TextColumn::make('user.name'),
+                TextColumn::make('date_sent')->date(),
+                TextColumn::make('returned_date')->date(),
+                TextColumn::make('feeMaterials.name'),
+            ])
+            ->headerActions([
+                \Filament\Tables\Actions\CreateAction::make()
+                    ->form([
+                        DatePicker::make('date_sent'),
+                        DatePicker::make('returned_date'),
+                        Select::make('fee_material_id')
+                            ->label('Material')
+                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                    ])
+                    ->using(function (array $data) {
+                        DB::transaction(function () use ($data) {
+                            $postalMail = auth()->user()
+                                ->postalMails()
+                                ->create(array_merge($data, ['player_id' => $this->player->id]));
+
+                            $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
+
+                            return $postalMail;
+                        });
+                    })
+            ]);
     }
 }

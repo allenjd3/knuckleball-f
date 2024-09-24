@@ -41,10 +41,15 @@
                         <p class="px-2">No fees yet!</p>
                     @endforelse
                 </div>
-                <div class="flex gap-4">
-                    {{ $this->createFee }}
-                </div>
+                @can('update', $player)
+                    <div class="flex gap-4">
+                        {{ $this->createFee }}
+                    </div>
+                @endcan
             </div>
         </div>
+    </div>
+    <div class="mt-4">
+        {{ $this->table }}
     </div>
 </div>

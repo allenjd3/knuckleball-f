@@ -68,4 +68,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function postalMails(): HasMany
+    {
+        return $this->hasMany(PostalMail::class);
+    }
 }
