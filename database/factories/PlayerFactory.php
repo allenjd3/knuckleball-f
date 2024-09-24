@@ -19,7 +19,7 @@ class PlayerFactory extends Factory
             'updated_at' => Carbon::now(),
             'name' => $this->faker->name(),
             'team_id' => Team::factory(),
-            'user_id' => User::factory(),
+            'user_id' => null,
             'slug' => $this->faker->slug(),
             'published_at' => Carbon::now(),
         ];

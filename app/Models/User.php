@@ -73,4 +73,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(PostalMail::class);
     }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->super_admin;
+    }
 }

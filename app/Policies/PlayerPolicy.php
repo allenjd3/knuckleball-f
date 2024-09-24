@@ -10,7 +10,9 @@ class PlayerPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool {}
+    public function viewAny(User $user): bool {
+        return true;
+    }
 
     public function view(User $user, Player $player): bool {}
 
@@ -24,7 +26,9 @@ class PlayerPolicy
         return (bool) $user;
     }
 
-    public function delete(User $user, Player $player): bool {}
+    public function delete(User $user, Player $player): bool {
+        return $user->isSuperAdmin();
+    }
 
     public function restore(User $user, Player $player): bool {}
 

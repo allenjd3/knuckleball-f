@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\PlayerResource\Pages;
+use App\Filament\Resources\PlayerResource\RelationManagers;
+use App\Models\Player;
+use Faker\Provider\Text;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +14,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class PlayerResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Player::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -23,17 +24,17 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                //
+
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->query(User::query())
+            ->query(Player::query())
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('created_at')->date(),
+                Tables\Columns\TextColumn::make('team.name'),
                 Tables\Columns\TextColumn::make('published_at')->date(),
             ])
             ->filters([
@@ -42,7 +43,6 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn (User $record) => ! auth()->user()->is($record))
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -62,9 +62,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListPlayers::route('/'),
+            'create' => Pages\CreatePlayer::route('/create'),
+            'edit' => Pages\EditPlayer::route('/{record}/edit'),
         ];
     }
 }
