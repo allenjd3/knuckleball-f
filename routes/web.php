@@ -11,5 +11,5 @@ Route::get('/', function () {
 });
 
 Route::get('teams', ViewTeams::class);
-Route::get('players', ViewPlayers::class);
+Route::get('players', ViewPlayers::class)->name('players.index');
 Route::get('players/{player}', ShowPlayer::class)->name('players.show');
