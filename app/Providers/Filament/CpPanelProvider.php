@@ -26,7 +26,6 @@ class CpPanelProvider extends PanelProvider
             ->default()
             ->id('cp')
             ->path('cp')
-            ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
