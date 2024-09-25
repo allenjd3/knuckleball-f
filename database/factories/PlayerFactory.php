@@ -21,7 +21,7 @@ class PlayerFactory extends Factory
             'team_id' => Team::factory(),
             'user_id' => null,
             'slug' => $this->faker->slug(),
-            'published_at' => Carbon::now(),
+            'published_at' => $this->faker->numberBetween(0, 1) ? Carbon::now() : null,
         ];
     }
 }

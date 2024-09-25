@@ -18,7 +18,7 @@ class PlayerPolicy
 
     public function create(User $user): bool
     {
-        return (bool) $user;
+        return $user->isPublished();
     }
 
     public function update(User $user, Player $player): bool

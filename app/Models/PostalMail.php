@@ -22,8 +22,8 @@ class PostalMail extends Model
     protected function casts (): array
     {
         return [
-            'date_sent' => 'timestamp',
-            'returned_date' => 'timestamp',
+            'date_sent' => 'datetime',
+            'returned_date' => 'datetime',
         ];
     }
 

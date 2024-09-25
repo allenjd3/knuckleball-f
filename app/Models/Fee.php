@@ -20,7 +20,7 @@ class Fee extends Model
     protected function casts (): array
     {
         return [
-            'published_at' => 'timestamp',
+            'published_at' => 'datetime',
         ];
     }
 

@@ -10,23 +10,31 @@
             @csrf
 
             <div>
-                <x-label for="name" value="{{ __('Name') }}" />
-                <x-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                <x-label for="name" value="{{ __('Name') }}" class="mb-1" />
+                <x-filament::input.wrapper>
+                    <x-filament::input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                </x-filament::input.wrapper>
             </div>
 
             <div class="mt-4">
-                <x-label for="email" value="{{ __('Email') }}" />
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                <x-label for="email" value="{{ __('Email') }}" class="mb-1" />
+                <x-filament::input.wrapper>
+                    <x-filament::input id="email" type="email" name="email" :value="old('email')" required autocomplete="username" />
+                </x-filament::input.wrapper>
             </div>
 
             <div class="mt-4">
-                <x-label for="password" value="{{ __('Password') }}" />
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+                <x-label for="password" value="{{ __('Password') }}" class="mb-1" />
+                <x-filament::input.wrapper>
+                    <x-filament::input id="password" type="password" name="password" required autocomplete="new-password" />
+                </x-filament::input.wrapper>
             </div>
 
             <div class="mt-4">
-                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" />
-                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
+                <x-label for="password_confirmation" value="{{ __('Confirm Password') }}" class="mb-1" />
+                <x-filament::input.wrapper>
+                    <x-filament::input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" />
+                </x-filament::input.wrapper>
             </div>
 
             @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
@@ -46,14 +54,14 @@
                 </div>
             @endif
 
-            <div class="flex items-center justify-end mt-4">
+            <div class="flex items-center justify-end mt-4 gap-4">
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                     {{ __('Already registered?') }}
                 </a>
 
-                <x-button class="ms-4">
+                <x-filament::button type="submit">
                     {{ __('Register') }}
-                </x-button>
+                </x-filament::button>
             </div>
         </form>
     </x-authentication-card>

@@ -66,6 +66,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'published_at' => 'datetime',
         ];
     }
 
@@ -77,5 +78,10 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->super_admin;
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->published_at?->isPast() ?? false;
     }
 }

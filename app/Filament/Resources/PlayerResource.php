@@ -33,9 +33,10 @@ class PlayerResource extends Resource
         return $table
             ->query(Player::query())
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('team.name'),
-                Tables\Columns\TextColumn::make('published_at')->date(),
+                Tables\Columns\TextColumn::make('published_at')->sortable()->date(),
+                Tables\Columns\TextColumn::make('user.name')->searchable(),
             ])
             ->filters([
                 //
@@ -49,7 +50,8 @@ class PlayerResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('published_at');
     }
 
     public static function getRelations(): array
