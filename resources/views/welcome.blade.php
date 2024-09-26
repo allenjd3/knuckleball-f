@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<x-layouts.app>
+    <div class="max-w-7xl mx-auto my-12">
+        <h1 class="text-3xl">Knuckleball</h1>
 
-        <title>{{ config('app.name') }}</title>
+        <p>yeah... login</p>
 
-        <!-- Fonts -->
-    </head>
-    <body>
-        <div>
-            <h1 class="text-3xl">Knuckleball</h1>
+        <div class="flex gap-4 mt-6">
+            <x-filament::button
+                :href="route('login')"
+                tag="a"
+            >Login</x-filament::button>
 
-            <p>yeah... login</p>
-
+            <x-filament::button
+                :href="route('register')"
+                tag="a"
+                outlined
+            >Register</x-filament::button>
         </div>
-    </body>
-</html>
+    </div>
+</x-layouts.app>
