@@ -39,7 +39,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Player::query()->with(['team', 'media']))
+            ->query(Player::query()->with(['team', 'media'])->where('published_at', '<', now()->endOfDay()))
             ->columns([
                 ImageColumn::make('media.url')->circular(),
                 TextColumn::make('name')

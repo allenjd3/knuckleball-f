@@ -3,12 +3,14 @@
 namespace App\Filament\Resources\PlayerResource\Pages;
 
 use App\Filament\Resources\PlayerResource;
+use App\Models\Player;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditPlayer extends EditRecord
 {
@@ -21,17 +23,16 @@ class EditPlayer extends EditRecord
         ];
     }
 
-    public function form(Form $form): Form
+    protected function handleRecordUpdate (Model $record, array $data): Model
     {
-        return $form
-            ->schema([
-                TextInput::make('name'),
-                DatePicker::make('published_at'),
-                Select::make('team_id')
-                    ->relationship(name: 'team', titleAttribute: 'name'),
-                Select::make('user_id')
-                    ->relationship(name: 'user', titleAttribute: 'name')
-                    ->searchable(),
-            ]);
+        $data = collect($data);
+
+        $record->update($data->only(['name', 'team_id', 'published_at'])->toArray());
+
+        if ($url = data_get($data, 'url')) {
+            $record->media()->create(['url' => $url]);
+        }
+
+        return $record;
     }
 }

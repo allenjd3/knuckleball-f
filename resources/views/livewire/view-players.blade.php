@@ -4,11 +4,18 @@
         {{ $this->table }}
 
         @can('create', \App\Models\Player::class)
-            <div class="my-4">
+            <div class="flex my-4 gap-4">
                 {{ $this->createAction }}
+                @can('manage', \App\Models\Player::class)
+                    <x-filament::button
+                        outlined
+                        href="/cp/players"
+                        tag="a"
+                    >Manage Players</x-filament::button>
+                @endcan
 
-                <x-filament-actions::modals />
             </div>
+            <x-filament-actions::modals />
         @endcan
     </div>
 </div>

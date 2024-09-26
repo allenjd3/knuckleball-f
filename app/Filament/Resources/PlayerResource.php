@@ -7,11 +7,18 @@ use App\Filament\Resources\PlayerResource\RelationManagers;
 use App\Models\Player;
 use Faker\Provider\Text;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PlayerResource extends Resource
@@ -24,16 +31,35 @@ class PlayerResource extends Resource
     {
         return $form
             ->schema([
-
+                TextInput::make('name')->required(),
+                DatePicker::make('published_at'),
+                Select::make('team_id')
+                    ->relationship(name: 'team', titleAttribute: 'name')
+                    ->required(),
+                Select::make('user_id')
+                    ->relationship(name: 'user', titleAttribute: 'name')
+                    ->nullable(),
+                FileUpload::make('url')
+                    ->directory('avatars')
+                    ->avatar(),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Player::query())
+            ->query(Player::query()->with(['team', 'user', 'media']))
+            ->headerActions([
+                Action::make('View Players')
+                    ->outlined()
+                    ->url(route('players.index'))
+            ])
             ->columns([
-                Tables\Columns\TextColumn::make('name')->sortable()->searchable(),
+                ImageColumn::make('media.url')->circular(),
+                Tables\Columns\TextColumn::make('name')
+                    ->url(fn (Player $player) => $player->path())
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('team.name'),
                 Tables\Columns\TextColumn::make('published_at')->sortable()->date(),
                 Tables\Columns\TextColumn::make('user.name')->searchable(),

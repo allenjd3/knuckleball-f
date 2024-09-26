@@ -11,6 +11,11 @@ class Team extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'published_at',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
