@@ -68,7 +68,6 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                         $record->update($data->only('name', 'team_id', 'published_at')->toArray());
 
                         if ($url = $data->get('url')) {
-                            defer(fn () => Storage::delete($record->media->url));
                             $record->media()->update(['url' => $url]);
                         }
                     }),
