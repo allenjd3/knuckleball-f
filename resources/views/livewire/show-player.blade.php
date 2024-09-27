@@ -2,7 +2,7 @@
     <div class="flex flex-col md:flex-row gap-8 justify-center max-w-3xl mx-auto">
         <div class="mx-auto">
             @if ($this->player->media?->url)
-                <img src="{{ url($this->player->media?->url ?? '#') }}" alt="{{ $player->name }}" class="size-44 rounded-full" />
+                <img src="{{ Storage::url($this->player->media?->url) }}" alt="{{ $player->name }}" class="size-44 rounded-full" />
             @else
                 <div class="flex size-44 border-4 border-dashed border-gray-200 rounded-full text-center text-gray-500 justify-center items-center">
                     <p class="">No photo</p>
