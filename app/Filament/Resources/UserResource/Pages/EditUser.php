@@ -8,6 +8,7 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditUser extends EditRecord
 {
@@ -29,5 +30,13 @@ class EditUser extends EditRecord
         return [
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function handleRecordUpdate (Model $record, array $data): Model
+    {
+        collect($data)->each(fn (mixed $value, string $key) => $record->{$key} = $value);
+        $record->save();
+
+        return $record;
     }
 }
