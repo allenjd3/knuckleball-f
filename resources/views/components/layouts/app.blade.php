@@ -8,7 +8,7 @@
     @endif
 
     <!-- Page Content -->
-    <main>
+    <main class="mx-4">
         {{ $slot }}
     </main>
 </x-app-layout>
