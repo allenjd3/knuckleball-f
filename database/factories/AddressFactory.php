@@ -10,7 +10,7 @@ class AddressFactory extends Factory
 {
     protected $model = Address::class;
 
-    public function definition (): array
+    public function definition(): array
     {
         return [
             'created_at' => Carbon::now(),

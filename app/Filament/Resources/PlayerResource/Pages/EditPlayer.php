@@ -3,12 +3,7 @@
 namespace App\Filament\Resources\PlayerResource\Pages;
 
 use App\Filament\Resources\PlayerResource;
-use App\Models\Player;
 use Filament\Actions;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,7 +18,7 @@ class EditPlayer extends EditRecord
         ];
     }
 
-    protected function handleRecordUpdate (Model $record, array $data): Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $data = collect($data);
 

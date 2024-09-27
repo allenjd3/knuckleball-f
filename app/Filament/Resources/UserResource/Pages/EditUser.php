@@ -13,13 +13,6 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\DeleteAction::make(),
-        ];
-    }
-
     public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
     {
         return $form
@@ -29,5 +22,12 @@ class EditUser extends EditRecord
                 DatePicker::make('published_at'),
                 Checkbox::make('super_admin')->columnSpan(2),
             ]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\DeleteAction::make(),
+        ];
     }
 }

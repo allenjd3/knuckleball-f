@@ -30,7 +30,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'published_at'
+        'published_at',
     ];
 
     /**
@@ -59,20 +59,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Team::class);
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'published_at' => 'datetime',
-        ];
-    }
-
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);
@@ -88,8 +74,22 @@ class User extends Authenticatable implements FilamentUser
         return $this->published_at?->isPast() ?? false;
     }
 
-    public function canAccessPanel (Panel $panel): bool
+    public function canAccessPanel(Panel $panel): bool
     {
         return $this->isSuperAdmin();
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'published_at' => 'datetime',
+        ];
     }
 }

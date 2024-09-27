@@ -6,7 +6,6 @@ use App\Models\Address;
 use App\Models\Fee;
 use App\Models\FeeMaterial;
 use App\Models\Player;
-use App\Models\PostalMail;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -24,10 +23,10 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class ShowPlayer extends Component implements HasForms, HasActions, HasTable
+class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 {
-    use InteractsWithForms;
     use InteractsWithActions;
+    use InteractsWithForms;
     use InteractsWithTable;
 
     public Player $player;
@@ -36,7 +35,8 @@ class ShowPlayer extends Component implements HasForms, HasActions, HasTable
     {
         $this->player = $player->load('address');
     }
-    public function render ()
+
+    public function render()
     {
         return view('livewire.show-player');
     }
@@ -96,7 +96,7 @@ class ShowPlayer extends Component implements HasForms, HasActions, HasTable
                         DatePicker::make('returned_date'),
                         Select::make('fee_material_id')
                             ->label('Material')
-                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
                     ])
                     ->using(function (array $data) {
                         DB::transaction(function () use ($data) {
@@ -108,7 +108,7 @@ class ShowPlayer extends Component implements HasForms, HasActions, HasTable
 
                             return $postalMail;
                         });
-                    })
+                    }),
             ]);
     }
 }

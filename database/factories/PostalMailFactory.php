@@ -12,7 +12,7 @@ class PostalMailFactory extends Factory
 {
     protected $model = PostalMail::class;
 
-    public function definition (): array
+    public function definition(): array
     {
         return [
             'created_at' => Carbon::now(),

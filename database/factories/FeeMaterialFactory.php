@@ -10,7 +10,7 @@ class FeeMaterialFactory extends Factory
 {
     protected $model = FeeMaterial::class;
 
-    public function definition (): array
+    public function definition(): array
     {
         return [
             'created_at' => Carbon::now(),

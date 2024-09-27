@@ -41,13 +41,6 @@ class Player extends Model
         return '#';
     }
 
-    protected function casts(): array
-    {
-        return [
-            'published_at' => 'datetime',
-        ];
-    }
-
     public function media(): MorphOne
     {
         return $this->morphOne(Media::class, 'imageable');
@@ -71,5 +64,12 @@ class Player extends Model
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'datetime',
+        ];
     }
 }

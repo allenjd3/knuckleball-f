@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class PostalMail extends Model
 {
@@ -19,14 +18,6 @@ class PostalMail extends Model
         'player_id',
     ];
 
-    protected function casts (): array
-    {
-        return [
-            'date_sent' => 'datetime',
-            'returned_date' => 'datetime',
-        ];
-    }
-
     public function feeMaterials(): BelongsToMany
     {
         return $this->belongsToMany(FeeMaterial::class);
@@ -35,5 +26,13 @@ class PostalMail extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'date_sent' => 'datetime',
+            'returned_date' => 'datetime',
+        ];
     }
 }

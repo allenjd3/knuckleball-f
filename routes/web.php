@@ -1,6 +1,5 @@
 <?php
 
-use App\Livewire\CreateAddress;
 use App\Livewire\ShowPlayer;
 use App\Livewire\ViewPlayers;
 use App\Livewire\ViewTeams;

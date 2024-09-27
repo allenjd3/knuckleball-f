@@ -10,7 +10,8 @@ class PlayerPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool {
+    public function viewAny(User $user): bool
+    {
         return true;
     }
 
@@ -26,11 +27,13 @@ class PlayerPolicy
         return $user->isPublished();
     }
 
-    public function delete(User $user, Player $player): bool {
+    public function delete(User $user, Player $player): bool
+    {
         return $user->isSuperAdmin();
     }
 
-    public function manage(User $user): bool {
+    public function manage(User $user): bool
+    {
         return $user->isSuperAdmin();
     }
 

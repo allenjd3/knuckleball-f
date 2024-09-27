@@ -3,10 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PlayerResource\Pages;
-use App\Filament\Resources\PlayerResource\RelationManagers;
 use App\Models\Player;
-use Faker\Provider\Text;
-use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -17,9 +14,6 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PlayerResource extends Resource
 {
@@ -52,7 +46,7 @@ class PlayerResource extends Resource
             ->headerActions([
                 Action::make('View Players')
                     ->outlined()
-                    ->url(route('players.index'))
+                    ->url(route('players.index')),
             ])
             ->columns([
                 ImageColumn::make('media.url')->circular(),

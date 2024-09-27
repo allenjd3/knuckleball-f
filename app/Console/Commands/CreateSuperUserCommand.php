@@ -11,7 +11,7 @@ class CreateSuperUserCommand extends Command
 
     protected $description = 'Command description';
 
-    public function handle (): void
+    public function handle(): void
     {
         $name = $this->ask('Enter name');
         $email = $this->ask('Enter email');
