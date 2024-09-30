@@ -141,6 +141,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             return $postalMail;
                         });
                     }),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 }

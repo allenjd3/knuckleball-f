@@ -50,6 +50,7 @@
         </div>
     </div>
     <div class="mt-4">
+        <h2 class="text-3xl">Recent TTM</h2>
         {{ $this->table }}
     </div>
 </div>
