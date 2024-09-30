@@ -97,17 +97,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             ->label('Material')
                             ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
                         Textarea::make('comment'),
-                    ])
-                    ->using(function (array $data): Model {
-                        return DB::transaction(function () use ($data) {
-                            $postalMail = auth()->user()
-                                ->postalMails()
-                                ->create(array_merge($data, ['player_id' => $this->player->id]));
+                    ])->using(function (array $data, Model $record) {
+                        $record->update($data);
+                        $record->feeMaterials()->sync(data_get($data, 'fee_material_id'));
 
-                            $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
-
-                            return $postalMail;
-                        });
+                        return $record;
                     }),
                 DeleteAction::make('delete')
                     ->visible(fn (Model $record) => auth()->user()->can('delete', $record))
