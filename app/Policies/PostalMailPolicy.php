@@ -10,15 +10,25 @@ class PostalMailPolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool {}
+    public function viewAny(User $user): bool {
+        return true;
+    }
 
-    public function view(User $user, PostalMail $postalMail): bool {}
+    public function view(User $user, PostalMail $postalMail): bool {
+        return $user->id === $postalMail->user_id || $user->isSuperAdmin();
+    }
 
-    public function create(User $user): bool {}
+    public function create(User $user): bool {
+        return $user->isPublished();
+    }
 
-    public function update(User $user, PostalMail $postalMail): bool {}
+    public function update(User $user, PostalMail $postalMail): bool {
+        return $user->id === $postalMail->user_id || $user->isSuperAdmin();
+    }
 
-    public function delete(User $user, PostalMail $postalMail): bool {}
+    public function delete(User $user, PostalMail $postalMail): bool {
+        return $user->isSuperAdmin();
+    }
 
     public function restore(User $user, PostalMail $postalMail): bool {}
 

@@ -16,6 +16,7 @@ class PostalMail extends Model
         'returned_date',
         'fee_material_id',
         'player_id',
+        'comment',
     ];
 
     public function feeMaterials(): BelongsToMany

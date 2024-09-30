@@ -12,13 +12,17 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -83,11 +87,38 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return $table
             ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user'))
             ->emptyStateHeading('No TTM yet!')
+            ->actions([
+                EditAction::make()
+                    ->visible(fn (Model $record) => auth()->user()->can('update', $record))
+                    ->form([
+                        DatePicker::make('date_sent'),
+                        DatePicker::make('returned_date'),
+                        Select::make('fee_material_id')
+                            ->label('Material')
+                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
+                        Textarea::make('comment'),
+                    ])
+                    ->using(function (array $data): Model {
+                        return DB::transaction(function () use ($data) {
+                            $postalMail = auth()->user()
+                                ->postalMails()
+                                ->create(array_merge($data, ['player_id' => $this->player->id]));
+
+                            $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
+
+                            return $postalMail;
+                        });
+                    }),
+                DeleteAction::make('delete')
+                    ->visible(fn (Model $record) => auth()->user()->can('delete', $record))
+                    ->requiresConfirmation(),
+            ])
             ->columns([
                 TextColumn::make('user.name'),
                 TextColumn::make('date_sent')->date(),
                 TextColumn::make('returned_date')->date(),
                 TextColumn::make('feeMaterials.name'),
+                TextColumn::make('comment'),
             ])
             ->headerActions([
                 \Filament\Tables\Actions\CreateAction::make()
@@ -97,9 +128,10 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         Select::make('fee_material_id')
                             ->label('Material')
                             ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
+                        Textarea::make('comment'),
                     ])
-                    ->using(function (array $data) {
-                        DB::transaction(function () use ($data) {
+                    ->using(function (array $data): Model {
+                        return DB::transaction(function () use ($data) {
                             $postalMail = auth()->user()
                                 ->postalMails()
                                 ->create(array_merge($data, ['player_id' => $this->player->id]));
