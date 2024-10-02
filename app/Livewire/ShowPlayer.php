@@ -95,7 +95,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         DatePicker::make('returned_date'),
                         Select::make('fee_material_id')
                             ->label('Material')
-                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
+                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                            ->createOptionForm([
+                                TextInput::make('name'),
+                            ])
+                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
@@ -121,7 +125,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         DatePicker::make('returned_date'),
                         Select::make('fee_material_id')
                             ->label('Material')
-                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray()),
+                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                            ->createOptionForm([
+                                TextInput::make('name'),
+                            ])
+                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)),
                         Textarea::make('comment'),
                     ])
                     ->using(function (array $data): Model {
