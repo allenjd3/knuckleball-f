@@ -89,7 +89,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->emptyStateHeading('No TTM yet!')
             ->actions([
                 EditAction::make()
-                    ->visible(fn (Model $record) => auth()->user()->can('update', $record))
+                    ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
                     ->form([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
@@ -104,7 +104,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         return $record;
                     }),
                 DeleteAction::make('delete')
-                    ->visible(fn (Model $record) => auth()->user()->can('delete', $record))
+                    ->visible(fn (Model $record) => auth()->user()?->can('delete', $record))
                     ->requiresConfirmation(),
             ])
             ->columns([
