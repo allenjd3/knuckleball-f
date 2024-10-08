@@ -16,6 +16,8 @@ class Player extends Model
     protected $fillable = [
         'name',
         'team_id',
+        'last_team_id',
+        'retired_at',
         'published_at',
     ];
 
@@ -34,6 +36,11 @@ class Player extends Model
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
+    }
+
+    public function lastTeam(): BelongsTo
+    {
+        return $this->belongsTo(Team::class, 'last_team_id');
     }
 
     public function getMedia()
@@ -70,6 +77,7 @@ class Player extends Model
     {
         return [
             'published_at' => 'datetime',
+            'retired_at' => 'datetime',
         ];
     }
 }

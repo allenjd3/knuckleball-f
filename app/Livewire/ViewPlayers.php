@@ -39,14 +39,25 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Player::query()->with(['team', 'media'])->where('published_at', '<', now()->endOfDay()))
+            ->query(Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay()))
             ->columns([
                 ImageColumn::make('media.url')->circular(),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->url(fn (Player $player) => $player->path()),
-                TextColumn::make('team.name')->sortable(),
+                TextColumn::make('retired_at_status')
+                    ->label('Player Status')
+                    ->state(fn ($record) => ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active')
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'Retired' => 'warning',
+                        'Active' => 'success',
+                    }),
+                TextColumn::make('team.name')->label('Current Team')->sortable(),
+                TextColumn::make('lastTeam.name')->label('Last Team')->sortable(),
+                TextColumn::make('retired_at')
+                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? 'NULL'),
             ])
             ->actions([
                 EditAction::make()
@@ -56,8 +67,14 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                             ->label('Team')
                             ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
                             ->default(fn (Player $record) => $record->team_id),
+                        Select::make('last_team_id')
+                            ->label('Last Played For')
+                            ->options(fn (Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === $record->team_id )->toArray())
+                            ->default(fn (Player $record) => $record->last_team_id),
                         DatePicker::make('published_at')
                             ->default(fn (Player $record) => $record->published_at),
+                        DatePicker::make('retired_at')
+                            ->default(fn (Player $record) => $record->retired_at),
                         FileUpload::make('url')
                             ->directory('avatars')
                             ->avatar(),
@@ -65,7 +82,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->visible(fn (Player $player) => auth()->user()?->can('update', $player))
                     ->using(function (array $data, Player $record) {
                         $data = collect($data);
-                        $record->update($data->only('name', 'team_id', 'published_at')->toArray());
+                        $record->update($data->toArray());
 
                         if ($url = $data->get('url')) {
                             $record->media()->update(['url' => $url]);

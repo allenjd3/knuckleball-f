@@ -22,7 +22,7 @@ class EditPlayer extends EditRecord
     {
         $data = collect($data);
 
-        $record->update($data->only(['name', 'team_id', 'published_at'])->toArray());
+        $record->update($data->toArray());
 
         if ($url = data_get($data, 'url')) {
             $record->media()->create(['url' => $url]);
