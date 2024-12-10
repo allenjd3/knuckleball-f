@@ -100,7 +100,17 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('name'),
                 Select::make('team_id')
                     ->label('Team')
-                    ->options(fn () => Team::get()->pluck('name', 'id')->toArray()),
+                    ->relationship('team')
+                    ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
+                    ->createOptionModalHeading('Create Team')
+                    ->createOptionForm(function () {
+                        return [
+                            TextInput::make('name'),
+                            DatePicker::make('published_at'),
+                        ];
+                    })
+                    ->searchable()
+                    ->preload(),
                 FileUpload::make('url')
                     ->directory('avatars')
                     ->avatar(),
