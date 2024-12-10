@@ -69,6 +69,9 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 Select::make('fee_material_id')
                     ->label('Material')
                     ->relationship(name: 'feeMaterial', titleAttribute: 'name')
+                    ->preload()
+                    ->searchable()
+                    ->createOptionModalHeading('Create Item')
                     ->createOptionForm([
                         TextInput::make('name'),
                     ]),
@@ -96,10 +99,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         Select::make('fee_material_id')
                             ->label('Material')
                             ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                            ->relationship(name: 'feeMaterial', titleAttribute: 'name')
+                            ->preload()
+                            ->searchable()
+                            ->createOptionModalHeading('Create Item')
                             ->createOptionForm([
                                 TextInput::make('name'),
-                            ])
-                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)),
+                            ]),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
@@ -115,7 +121,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('user.name'),
                 TextColumn::make('date_sent')->date(),
                 TextColumn::make('returned_date')->date(),
-                TextColumn::make('feeMaterials.name'),
+                TextColumn::make('feeMaterials.name')->label('Item'),
                 TextColumn::make('comment'),
             ])
             ->headerActions([
@@ -126,6 +132,9 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         Select::make('fee_material_id')
                             ->label('Material')
                             ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
+                            ->preload()
+                            ->searchable()
+                            ->createOptionModalHeading('Create Item')
                             ->createOptionForm([
                                 TextInput::make('name'),
                             ])
