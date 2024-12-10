@@ -41,23 +41,22 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
         return $table
             ->query(Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay()))
             ->columns([
-                ImageColumn::make('media.url')->circular(),
                 TextColumn::make('name')
                     ->searchable()
                     ->sortable()
                     ->url(fn (Player $player) => $player->path()),
                 TextColumn::make('retired_at_status')
-                    ->label('Player Status')
+                    ->label('Status')
                     ->state(fn ($record) => ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active')
                     ->badge()
                     ->color(fn ($state) => match($state) {
                         'Retired' => 'warning',
                         'Active' => 'success',
                     }),
-                TextColumn::make('team.name')->label('Current Team')->sortable(),
-                TextColumn::make('lastTeam.name')->label('Last Team')->sortable(),
+                TextColumn::make('team.name')->label('Team')->sortable(),
                 TextColumn::make('retired_at')
-                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? 'NULL'),
+                    ->label('Retired Year')
+                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? ''),
             ])
             ->actions([
                 EditAction::make()
