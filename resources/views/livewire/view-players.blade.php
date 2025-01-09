@@ -6,6 +6,13 @@
         @can('create', \App\Models\Player::class)
             <div class="flex my-4 gap-4">
                 {{ $this->createAction }}
+                @if (Route::is('teams.show'))
+                    <x-filament::button
+                        outlined
+                        href="{{ route('players.index') }}"
+                        tag="a"
+                    >All Players</x-filament::button>
+                @endif
                 @can('manage', \App\Models\Player::class)
                     <x-filament::button
                         outlined
@@ -13,7 +20,6 @@
                         tag="a"
                     >Manage Players</x-filament::button>
                 @endcan
-
             </div>
             <x-filament-actions::modals />
         @endcan
