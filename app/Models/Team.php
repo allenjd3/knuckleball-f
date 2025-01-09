@@ -16,13 +16,6 @@ class Team extends Model
         'published_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'published_at' => 'datetime',
-        ];
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -36,5 +29,12 @@ class Team extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'datetime',
+        ];
     }
 }

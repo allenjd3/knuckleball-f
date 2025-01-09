@@ -5,9 +5,12 @@ namespace App\Livewire;
 use App\Models\Player;
 use App\Models\Team;
 
-class ViewPlayersFromTeam extends ViewPlayers {
-    protected int $teamId;
+class ViewPlayersFromTeam extends ViewPlayers
+{
     public string $teamName;
+
+    protected int $teamId;
+
     public function mount(
         int $team
     ) {

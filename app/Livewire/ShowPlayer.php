@@ -16,6 +16,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\CreateAction as CreateTableAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -125,7 +126,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('comment'),
             ])
             ->headerActions([
-                \Filament\Tables\Actions\CreateAction::make()
+                CreateTableAction::make()
                     ->form([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),

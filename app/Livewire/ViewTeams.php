@@ -16,16 +16,17 @@ use Livewire\Component;
 
 class ViewTeams extends Component implements HasActions, HasForms, HasTable
 {
+    use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
-    use InteractsWithActions;
 
     public function render()
     {
         return view('livewire.view-teams');
     }
 
-    public function table(Table $table) {
+    public function table(Table $table)
+    {
         return $table
             ->query(fn () => Team::query())
             ->columns([

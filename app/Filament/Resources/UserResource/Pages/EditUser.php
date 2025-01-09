@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -28,11 +28,11 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 
-    protected function handleRecordUpdate (Model $record, array $data): Model
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
         collect($data)->each(fn (mixed $value, string $key) => $record->{$key} = $value);
         $record->save();
