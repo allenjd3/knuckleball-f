@@ -93,6 +93,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     {
         return CreateAction::make()
             ->model(Player::class)
+            ->label(__('New Player'))
             ->form([
                 TextInput::make('name'),
                 Select::make('team_id')

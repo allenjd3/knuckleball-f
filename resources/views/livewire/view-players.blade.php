@@ -1,6 +1,6 @@
 <div>
     <div class="max-w-7xl py-16 mx-auto">
-        <h1 class="text-3xl mb-6">Players @if(isset($teamName)) for {{ $teamName }} @endif</h1>
+        <h1 class="text-3xl mb-6">{{ __('Players') . (isset($teamName) ? ': ' . $teamName : '') }}</h1>
         {{ $this->table }}
 
         @can('create', \App\Models\Player::class)
@@ -11,14 +11,14 @@
                         outlined
                         href="{{ route('players.index') }}"
                         tag="a"
-                    >All Players</x-filament::button>
+                    >{{ __('All Players') }}</x-filament::button>
                 @endif
                 @can('manage', \App\Models\Player::class)
                     <x-filament::button
                         outlined
                         href="/cp/players"
                         tag="a"
-                    >Manage Players</x-filament::button>
+                    >{{ __('Manage Players') }}</x-filament::button>
                 @endcan
             </div>
             <x-filament-actions::modals />

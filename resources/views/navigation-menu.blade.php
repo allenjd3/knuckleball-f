@@ -5,8 +5,9 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('players.index') }}">
-                        <x-application-mark class="block h-9 w-auto" />
+                    <a href="{{ route('players.index') }}" class="text-xl font-bold">
+                        {{-- <x-application-mark class="block h-9 w-auto" /> --}}
+                        Knuckleball
                     </a>
                 </div>
 
@@ -14,6 +15,9 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('players.index') }}" :active="request()->routeIs('players.index')">
                         {{ __('Players') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
+                        {{ __('Teams') }}
                     </x-nav-link>
                 </div>
             </div>
