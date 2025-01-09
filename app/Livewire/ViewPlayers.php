@@ -15,13 +15,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -39,7 +37,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay()))
+            ->query(fn () => $this->query())
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
@@ -53,7 +51,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                         'Retired' => 'warning',
                         'Active' => 'success',
                     }),
-                TextColumn::make('team.name')->label('Team')->sortable(),
+                TextColumn::make('team.name')->url(fn (Player $record) => route('teams.show', $record->team))->label('Team')->sortable(),
                 TextColumn::make('retired_at')
                     ->label('Retired Year')
                     ->state(fn ($record) => $record->retired_at?->format('Y') ?? ''),
@@ -124,6 +122,11 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
 
                 return $player;
             });
+    }
+
+    public function query()
+    {
+        return Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
     }
 
     #[Computed]

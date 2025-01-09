@@ -1,7 +1,5 @@
 <div class="max-w-7xl py-16 mx-auto">
-    <h1 class="text-3xl">Teams</h1>
-    @foreach ($this->teams as $team)
-        <div>{{ $team->name }}</div>
-    @endforeach
+    <h1 class="text-3xl mb-6">Teams</h1>
+    {{ $this->table }}
 
 </div>

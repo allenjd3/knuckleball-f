@@ -6,9 +6,11 @@ use App\Filament\Resources\TeamResource\Pages;
 use App\Models\Team;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class TeamResource extends Resource
@@ -22,6 +24,9 @@ class TeamResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name'),
+                Select::make('category_id')
+                    ->relationship(name: 'category', titleAttribute: 'name')
+                    ->nullable(),
                 DatePicker::make('published_at'),
             ]);
     }
@@ -32,6 +37,7 @@ class TeamResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('published_at')->date(),
+                Tables\Columns\TextColumn::make('category.name'),
             ])
             ->filters([
                 //

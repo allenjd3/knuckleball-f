@@ -16,6 +16,13 @@ class Team extends Model
         'published_at',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'published_at' => 'datetime',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -26,10 +33,8 @@ class Team extends Model
         return $this->hasMany(Player::class);
     }
 
-    protected function casts(): array
+    public function category(): BelongsTo
     {
-        return [
-            'published_at' => 'datetime',
-        ];
+        return $this->belongsTo(Category::class);
     }
 }
