@@ -26,6 +26,11 @@ class Team extends Model
         return $this->hasMany(Player::class);
     }
 
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     protected function casts(): array
     {
         return [

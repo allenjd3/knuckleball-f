@@ -2,46 +2,41 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages\CreateUser;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Models\User;
+use App\Filament\Resources\CategoryResource\Pages\CreateCategory;
+use App\Filament\Resources\CategoryResource\Pages\EditCategory;
+use App\Filament\Resources\CategoryResource\Pages\ListCategories;
+use App\Models\Category;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
-class UserResource extends Resource
+class CategoryResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([]);
+            ->schema([
+                TextInput::make('name')->required(),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->query(User::query())
             ->columns([
-                TextColumn::make('name')->searchable(),
-                TextColumn::make('created_at')->date(),
-                TextColumn::make('published_at')->date(),
+                TextColumn::make('name'),
             ])
-            ->filters([])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make()
-                    ->visible(fn (User $record) => ! auth()->user()->is($record))
-                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -58,9 +53,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListUsers::route('/'),
-            'create' => CreateUser::route('/create'),
-            'edit' => EditUser::route('/{record}/edit'),
+            'index' => ListCategories::route('/'),
+            'create' => CreateCategory::route('/create'),
+            'edit' => EditCategory::route('/{record}/edit'),
         ];
     }
 }

@@ -8,18 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('teams', function (Blueprint $table) {
+        Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedBigInteger('category_id')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->timestamp('published_at');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('teams');
+        Schema::dropIfExists('categories');
     }
 };

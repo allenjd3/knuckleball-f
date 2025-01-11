@@ -15,13 +15,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -39,7 +37,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay()))
+            ->query(fn () => $this->query())
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
@@ -49,11 +47,11 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->label('Status')
                     ->state(fn ($record) => ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'Retired' => 'warning',
                         'Active' => 'success',
                     }),
-                TextColumn::make('team.name')->label('Team')->sortable(),
+                TextColumn::make('team.name')->url(fn (Player $record) => route('teams.show', $record->team))->label('Team')->sortable(),
                 TextColumn::make('retired_at')
                     ->label('Retired Year')
                     ->state(fn ($record) => $record->retired_at?->format('Y') ?? ''),
@@ -68,7 +66,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                             ->default(fn (Player $record) => $record->team_id),
                         Select::make('last_team_id')
                             ->label('Last Played For')
-                            ->options(fn (Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === $record->team_id )->toArray())
+                            ->options(fn (Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === $record->team_id)->toArray())
                             ->default(fn (Player $record) => $record->last_team_id),
                         DatePicker::make('published_at')
                             ->default(fn (Player $record) => $record->published_at),
@@ -95,6 +93,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     {
         return CreateAction::make()
             ->model(Player::class)
+            ->label(__('New Player'))
             ->form([
                 TextInput::make('name'),
                 Select::make('team_id')
@@ -124,6 +123,11 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
 
                 return $player;
             });
+    }
+
+    public function query()
+    {
+        return Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
     }
 
     #[Computed]

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\TeamResource\Pages;
+namespace App\Filament\Resources\CategoryResource\Pages;
 
-use App\Filament\Resources\TeamResource;
+use App\Filament\Resources\CategoryResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditTeam extends EditRecord
+class EditCategory extends EditRecord
 {
-    protected static string $resource = TeamResource::class;
+    protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array
     {
