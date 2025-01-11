@@ -72,6 +72,7 @@ class PlayerResource extends Resource
                         if (is_null($record->published_at)) {
                             return 'Unpublished';
                         }
+
                         return ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active';
                     })
                     ->badge()
