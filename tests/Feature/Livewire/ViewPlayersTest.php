@@ -31,8 +31,6 @@ test('Unpublished players don\'t show up', function () {
 test('Players can be sorted by name', function () {
     $players = Player::factory(10)->published()->create();
 
-    Player::factory()->published()->create();
-
     Livewire::test('ViewPlayers')
         ->sortTable('title')
         ->assertCanSeeTableRecords($players->sortBy('title'), inOrder: true);

@@ -30,7 +30,10 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
         return $table
             ->query(fn () => Team::query())
             ->columns([
-                TextColumn::make('name')->url(fn (Team $record) => route('teams.show', $record))->searchable(),
+            TextColumn::make('name')
+                    ->url(fn (Team $record) => route('teams.show', $record))
+                    ->sortable()
+                    ->searchable(),
                 TextColumn::make('category.name'),
             ]);
     }
