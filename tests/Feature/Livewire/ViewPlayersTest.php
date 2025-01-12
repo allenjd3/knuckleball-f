@@ -8,7 +8,7 @@ test('Unauthenticated users can view players', function () {
 
 test('Players are visible in the livewire component', function () {
 
-    $player = Player::factory()->create();
+    $player = Player::factory()->published()->create();
 
     $viewPlayers = Livewire::test('ViewPlayers')
         ->assertCountTableRecords(1);

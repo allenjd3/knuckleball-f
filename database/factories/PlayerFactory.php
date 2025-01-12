@@ -23,4 +23,11 @@ class PlayerFactory extends Factory
             'published_at' => $this->faker->numberBetween(0, 1) ? Carbon::now() : null,
         ];
     }
+
+    public function published()
+    {
+        return $this->state([
+            'published_at' => now()->subMonth(),
+        ]);
+    }
 }
