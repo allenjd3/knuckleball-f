@@ -30,4 +30,11 @@ class PlayerFactory extends Factory
             'published_at' => now()->subMonth(),
         ]);
     }
+
+    public function unPublished()
+    {
+        return $this->state([
+            'published_at' => null,
+        ]);
+    }
 }
