@@ -21,11 +21,6 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
     use TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -33,11 +28,6 @@ class User extends Authenticatable implements FilamentUser
         'published_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
@@ -45,14 +35,21 @@ class User extends Authenticatable implements FilamentUser
         'two_factor_secret',
     ];
 
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public static function generateSlug(string $name): string
+    {
+        return str()->slug($name . ' ' . substr(str()->random(), 0, 5), '-');
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            $user->slug = User::generateSlug($user->name);
+        });
+    }
 
     public function teams(): HasMany
     {
@@ -79,11 +76,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->isSuperAdmin();
     }
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
