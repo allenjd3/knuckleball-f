@@ -52,10 +52,10 @@ test('Players can be updated by super admins', function ($superAdmin) {
     $player = Player::factory()->create($oldData);
 
     $updatedData = [
-            'name' => 'Joe DePoopio',
-            'team_id' => $team2->id,
-            'last_team_id' => $team->id,
-        ];
+        'name' => 'Joe DePoopio',
+        'team_id' => $team2->id,
+        'last_team_id' => $team->id,
+    ];
 
     $livewireTest = Livewire::actingAs($user)->test('ViewPlayers');
 
