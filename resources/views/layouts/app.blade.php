@@ -18,9 +18,7 @@
         <x-banner />
 
         <div class="min-h-screen">
-            @if (auth()->check())
-                @livewire('navigation-menu')
-            @endif
+            @livewire('navigation-menu')
 
             <!-- Page Heading -->
 
