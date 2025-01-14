@@ -3,8 +3,8 @@
         <a href="{{ auth()->check() ? route('users.feed', auth()->user()) : route('login') }}">My Feed</a>
     </aside>
     <main class="divide-y w-full">
-    @foreach($this->feeds as $feed)
-        <div class="p-4 cursor-pointer" @click="window.location.href='{{route("players.show", $feed->player_id )}}'">
+    @foreach ($this->feeds as $feed)
+        <div class="p-4 cursor-pointer" @click="window.location.href='{{ route("players.show", $feed->player_id ) }}'">
             <div class="flex items-center gap-4">
                 <div class="size-12 inline-block rounded-full overflow-hidden">
                     <img src="{{ $feed->user->profile_photo_url }}" alt="{{ $feed->user->name }}" class="object-cover w-full h-full" />
@@ -15,7 +15,7 @@
                     </a>
                     <div>
                         <a href='{{ route("players.show", $feed->player_id) }}' class="font-bold">
-                            {{ $feed->date_sent->format('M d, Y') }}: {{ $feed->feeMaterials->pluck('name')->join(", ")  }}
+                            {{ $feed->date_sent->format('M d, Y') }}: {{ $feed->feeMaterials->pluck('name')->join(", ") }}
                         </a>
                     </div>
                     <div>{{ $feed->comment }}</div>

@@ -132,7 +132,7 @@
                 </div>
                 @else
                 <div>
-                    <a href="{{route('login')}}" class="font-bold">{{ __('Login') }}</a>
+                    <a href="{{ route('login') }}" class="font-bold">{{ __('Login') }}</a>
                 </div>
                 @endif
             </div>
