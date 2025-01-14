@@ -8,9 +8,12 @@
             <div class="flex items-center gap-4">
                 <div class="size-12 inline-block rounded-full border-4 border-dashed border-gray-400">&nbsp;</div>
                 <div>
-                    <a href="{{ route("players.show", $feed->player_id) }}" class="font-bold">
-                        {{ $feed->user->name }} - {{ $feed->date_sent->format('M d, Y') }}: {{ $feed->feeMaterials->pluck('name')->join(", ")  }}
-                    </a>
+                        <a href='{{ route("users.profile", $feed->user) }}' @click.stop="" class="font-bold underline">
+                            {{ $feed->user->name }}
+                        </a> -
+                        <a href='{{ route("players.show", $feed->player_id) }}' class="font-bold">
+                            {{ $feed->date_sent->format('M d, Y') }}: {{ $feed->feeMaterials->pluck('name')->join(", ")  }}
+                        </a>
                     <div>{{ $feed->comment }}</div>
                 </div>
             </div>
