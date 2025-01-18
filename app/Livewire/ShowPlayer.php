@@ -97,16 +97,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->form([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
-                        Select::make('fee_material_id')
-                            ->label('Material')
-                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
-                            ->relationship(name: 'feeMaterial', titleAttribute: 'name')
-                            ->preload()
-                            ->searchable()
-                            ->createOptionModalHeading('Create Item')
-                            ->createOptionForm([
-                                TextInput::make('name'),
-                            ]),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -17,11 +18,20 @@ class PostalMailFactory extends Factory
         return [
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
+            'user_id' => User::factory(),
             'fee_material_id' => FeeMaterial::factory(),
             'player_id' => Player::factory(),
             'date_sent' => Carbon::now(),
-            'returned_date' => Carbon::now(),
+            'returned_date' => rand(0, 1) ? Carbon::now() : null,
             'comment' => $this->faker->words($this->faker->numberBetween(3, 6), true),
         ];
+    }
+
+    public function returned()
+    {
+        return $this->state([
+            'date_sent' => now()->subWeeks(2),
+            'returned_date' => now()->subWeek(),
+        ]);
     }
 }

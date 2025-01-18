@@ -17,7 +17,6 @@ class FeeMaterialFactory extends Factory
             'updated_at' => Carbon::now(),
             'name' => $this->faker->name(),
             'published_at' => $this->faker->word(),
-            'fee_id' => $this->faker->randomNumber(),
         ];
     }
 }

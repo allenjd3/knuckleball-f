@@ -73,6 +73,11 @@ class Player extends Model
         return $this->hasMany(PostalMail::class);
     }
 
+    public function latestMail(): HasOne
+    {
+        return $this->hasOne(PostalMail::class)->latestOfMany();
+    }
+
     protected function casts(): array
     {
         return [
