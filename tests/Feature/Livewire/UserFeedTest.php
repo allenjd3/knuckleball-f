@@ -12,7 +12,7 @@ it('renders successfully', function () {
 
 test('it shows trending signers', function () {
 
-    Player::factory(10)->has(PostalMail::factory())->create();
+    Player::factory(12)->has(PostalMail::factory())->create();
     $player = Player::factory()
         ->has(PostalMail::factory(3)->returned())
         ->create();
