@@ -7,4 +7,3 @@ test('They can see a user\'s profile', function () {
     $this->get(route('users.profile', $user))
         ->assertOk();
 });
-

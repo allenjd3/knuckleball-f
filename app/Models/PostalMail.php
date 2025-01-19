@@ -29,6 +29,11 @@ class PostalMail extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function player(): BelongsTo
+    {
+        return $this->belongsTo(Player::class);
+    }
+
     protected function casts(): array
     {
         return [

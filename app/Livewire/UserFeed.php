@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Player;
-use App\Models\PostalMail;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
