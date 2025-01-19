@@ -129,7 +129,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             ->createOptionForm([
                                 TextInput::make('name'),
                             ])
-                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)),
+                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
                         Textarea::make('comment'),
                     ])
                     ->using(function (array $data): Model {
