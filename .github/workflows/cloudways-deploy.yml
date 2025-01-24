@@ -22,7 +22,7 @@ jobs:
       - name: Run Deployment Commands
         run: |
           ssh -o StrictHostKeyChecking=no \
-              <user>@${{ secrets.CLOUDWAYS_SSH_HOST }} << 'EOF'
+              ${{ secrets.CLOUDWAYS_SSH_USER }}@${{ secrets.CLOUDWAYS_SSH_HOST }} << 'EOF'
           set -e
 
           echo "Starting deployment on Cloudways server..."
