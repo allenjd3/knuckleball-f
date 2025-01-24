@@ -1,0 +1,54 @@
+name: Deploy to Cloudways
+
+on:
+  push:
+    branches:
+      - main  # Trigger this workflow only on pushes to the main branch
+
+jobs:
+  deploy:
+    name: Deploy to Cloudways
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Set up SSH agent and add private key
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.CLOUDWAYS_SSH_PRIVATE_KEY }}
+
+      # Step 2: Run deployment commands on the Cloudways server
+      - name: Run Deployment Commands
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+              <user>@${{ secrets.CLOUDWAYS_SSH_HOST }} << 'EOF'
+          set -e
+
+          echo "Starting deployment on Cloudways server..."
+
+          # Navigate to the application directory
+          cd ${{ secrets.CLOUDWAYS_APP_PATH }}
+
+          # Step 1: Install PHP dependencies
+          composer install --no-dev --optimize-autoloader
+          echo "Composer dependencies installed."
+
+          # Step 2: Run Laravel migrations
+          php artisan migrate --force
+          echo "Laravel migrations completed."
+
+          # Step 3: Install Node.js dependencies
+          npm install
+          echo "Node.js dependencies installed."
+
+          # Step 4: Build frontend assets
+          npm run build
+          echo "Frontend assets built."
+
+          # Step 5: Clear and cache configurations (optional)
+          php artisan cache:clear
+          php artisan config:cache
+          echo "Cache cleared and configurations cached."
+
+          echo "Deployment completed successfully!"
+          EOF
