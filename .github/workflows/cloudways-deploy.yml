@@ -9,6 +9,7 @@ jobs:
   deploy:
     name: Deploy to Cloudways
     runs-on: ubuntu-latest
+    environment: .env.github
 
     steps:
       # Step 1: Set up SSH agent and add private key
