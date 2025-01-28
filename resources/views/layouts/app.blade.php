@@ -17,7 +17,7 @@
         @filamentStyles
         @vite('resources/css/app.css')
     </head>
-    <body style="--c-500: var(--primary-500)" class="font-sans antialiased">
+    <body class="font-sans antialiased">
         <x-banner />
 
         <div class="min-h-screen">
