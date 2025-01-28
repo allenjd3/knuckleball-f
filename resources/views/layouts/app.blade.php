@@ -8,13 +8,16 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <!-- Fonts -->
+        <link rel="preconnect" href="https://use.typekit.net">
         <link rel="preconnect" href="https://fonts.bunny.net">
+
+        <link href="https://use.typekit.net/hfy1qol.css" rel="stylesheet">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         @filamentStyles
         @vite('resources/css/app.css')
     </head>
-    <body class="font-sans antialiased">
+    <body style="--c-500: var(--primary-500)" class="font-sans antialiased">
         <x-banner />
 
         <div class="min-h-screen">
