@@ -152,8 +152,14 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link href="{{ route('users.feed') }}" :active="request()->routeIs('users.feed')">
+                {{ __('Feed') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('players.index') }}" :active="request()->routeIs('players.index')">
                 {{ __('Players') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
+                {{ __('Teams') }}
             </x-responsive-nav-link>
         </div>
 
