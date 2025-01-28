@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
             'danger' => Color::Red,
             'gray' => Color::Zinc,
             'info' => Color::Blue,
-            'primary' => Color::Red,
+            'primary' => Color::hex('#d83c40'),
             'success' => Color::Green,
             'warning' => Color::Amber,
         ]);
