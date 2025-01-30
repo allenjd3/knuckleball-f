@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\PostalMail;
 use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Component;

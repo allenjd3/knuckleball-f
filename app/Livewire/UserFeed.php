@@ -21,7 +21,21 @@ class UserFeed extends Component
     {
         return Player::query()
             ->withWhereHas('latestMail')
-            ->withCount(['postalMails' => fn ($query) => $query->whereNotNull('returned_date')])
+            ->withCount(
+                [
+                    'postalMails' => fn ($query) => $query
+                        ->when(
+                            auth()->check(),
+                            fn ($query) => $query->whereIn(
+                                'user_id',
+                                fn ($query) => $query->select('follower_id')
+                                    ->from('followables')
+                                    ->where('follower_id', auth()->id())
+                            )
+                        )
+                        ->whereNotNull('returned_date'),
+                ]
+            )
             ->orderByDesc('postal_mails_count')
             ->orderByDesc('created_at')
             ->paginate(10);
