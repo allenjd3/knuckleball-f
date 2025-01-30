@@ -31,6 +31,7 @@ jobs:
           cd ${{ secrets.CLOUDWAYS_APP_PATH }}
 
           # Step 1: Install PHP dependencies
+          git pull
           composer install --no-dev --optimize-autoloader
           echo "Composer dependencies installed."
 
