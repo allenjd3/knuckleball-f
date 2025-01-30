@@ -11,16 +11,25 @@ class UserProfile extends Component
 {
     use WithPagination;
 
-    public User $user;
+    public $userSlug;
 
-    public function mount(User $user)
+    public function mount(string $user)
     {
-        $this->user = $user;
+        $this->userSlug = $user;
     }
 
     public function render()
     {
         return view('livewire.user-profile');
+    }
+
+    #[Computed]
+    public function user()
+    {
+        return User::where('slug', $this->userSlug)
+            ->withCount('following')
+            ->withCount('followers')
+            ->first();
     }
 
     #[Computed]
@@ -31,5 +40,28 @@ class UserProfile extends Component
             ->orderByDesc('date_sent')
             ->with(['player', 'feeMaterials'])
             ->paginate(10);
+    }
+
+    #[Computed]
+    public function isFollowing(): bool
+    {
+        return auth()->user()
+            ?->following()
+            ->where('users.id', $this->user->id)
+            ->exists();
+    }
+
+    public function follow()
+    {
+        auth()->user()->follow($this->user);
+        unset($this->user);
+        unset($this->isFollowing);
+    }
+
+    public function unfollow()
+    {
+        auth()->user()->unfollow($this->user);
+        unset($this->user);
+        unset($this->isFollowing);
     }
 }

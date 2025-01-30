@@ -1,14 +1,21 @@
 <div class="max-w-5xl mx-auto flex gap-8 mt-8">
     <aside class="flex flex-col items-center">
         <div class="rounded-full size-32 overflow-hidden">
-            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="object-cover w-full h-full"/>
+            <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="object-cover w-full h-full"/>
         </div>
 
         <div class="font-bold text-center mt-4">
-        <div>{{ $user->name }}</div>
+        <div>{{ $this->user->name }}</div>
         <div class="text-xs space-y-4">
-            <div>Joined: {{ $user->created_at?->format('M d, Y') }}</div>
-            <div>Following: 5 Followers: 20</div>
+            <div>Joined: {{ $this->user->created_at?->format('M d, Y') }}</div>
+            <div>Following: {{ $this->user->following_count }} Followers: {{ $this->user->followers_count }}</div>
+            @if (auth()->check() && $this->user->id !== auth()->user()?->id)
+                @if (! $this->isFollowing)
+                    <button wire:click="follow">Follow</button>
+                @else
+                    <button wire:click="unfollow">Unfollow</button>
+                @endif
+            @endif
         </div>
     </aside>
     <div class="divide-y">
