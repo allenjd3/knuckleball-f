@@ -2,11 +2,12 @@
 
 namespace App\Traits;
 
-use Laravel\Jetstream\HasProfilePhoto as JetstreamHasProfilePhoto;
 use Filament\Support\Colors\Color;
+use Laravel\Jetstream\HasProfilePhoto as JetstreamHasProfilePhoto;
 use Spatie\Color\Rgb;
 
-trait HasProfilePhoto {
+trait HasProfilePhoto
+{
     use JetstreamHasProfilePhoto;
 
     const BASE_HEX = '#d83c40';
@@ -17,7 +18,7 @@ trait HasProfilePhoto {
             return mb_substr($segment, 0, 1);
         })->join(' '));
 
-        return 'https://ui-avatars.com/api/?name='.urlencode($name).'&color='. $this->createColorValue(shade: 800) .'&background=' . $this->createColorValue(shade: 200);
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=' . $this->createColorValue(shade: 800) . '&background=' . $this->createColorValue(shade: 200);
     }
 
     private function createColorValue(int $shade): string
