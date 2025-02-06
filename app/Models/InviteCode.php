@@ -11,6 +11,8 @@ class InviteCode extends Model
     /** @use HasFactory<\Database\Factories\InviteCodeFactory> */
     use HasFactory;
 
+    protected $guarded = [];
+
     public function scopeHasCode(Builder $query, string $code): void
     {
         $query->where(fn ($query) => $query->where('is_unlimited', true)->orWhere('remaining', '>', 0))
