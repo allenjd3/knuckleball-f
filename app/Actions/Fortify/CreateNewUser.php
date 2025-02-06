@@ -2,11 +2,13 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\InviteCode;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 use Laravel\Jetstream\Jetstream;
+use App\Rules\InviteCode as InviteCodeRule;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -19,12 +21,18 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
+        $validated = Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
+            'code' => ['required', new InviteCodeRule],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
+
+        InviteCode::query()
+            ->hasCode(code: $validated['code'])
+            ->first()
+            ->decrement('remaining');
 
         return User::create([
             'name' => $input['name'],
