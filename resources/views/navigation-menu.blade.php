@@ -22,6 +22,11 @@
                         <x-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                             {{ __('Teams') }}
                         </x-nav-link>
+                        @if (auth()->user()?->isSuperAdmin())
+                            <x-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
+                                {{ __('Admin Panel') }}
+                            </x-nav-link>
+                        @endif
                     </div>
 
                 <div class="hidden sm:flex sm:items-center sm:ms-6">
@@ -161,6 +166,11 @@
             <x-responsive-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                 {{ __('Teams') }}
             </x-responsive-nav-link>
+            @if (auth()->user()?->isSuperAdmin())
+                <x-responsive-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
+                    {{ __('Admin Panel') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
