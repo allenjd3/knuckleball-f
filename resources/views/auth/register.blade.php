@@ -1,13 +1,20 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+            <span class="text-xl font-bold">Knuckleball</span>
         </x-slot>
 
         <x-validation-errors class="mb-4" />
 
         <form method="POST" action="{{ route('register') }}">
             @csrf
+
+            <div>
+                <x-label for="code" value="{{ __('Invite Code') }}" class="mb-1" />
+                <x-filament::input.wrapper>
+                    <x-filament::input id="code" type="text" name="code" :value="old('code')" required autofocus />
+                </x-filament::input.wrapper>
+            </div>
 
             <div>
                 <x-label for="name" value="{{ __('Name') }}" class="mb-1" />
