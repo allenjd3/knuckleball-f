@@ -7,6 +7,7 @@ use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
 use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
 use App\Models\Player;
 use App\Models\Team;
+use App\Support\Collections\PlayerCollection;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -95,6 +97,9 @@ class PlayerResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->icon('heroicon-m-check')
+                        ->action(fn (PlayerCollection $records) => $records->publishAll()),
                     DeleteBulkAction::make(),
                 ]),
             ])
