@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Support\Collections\PlayerCollection;
+use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
+#[CollectedBy(PlayerCollection::class)]
 class Player extends Model
 {
     use HasFactory;
@@ -76,6 +79,11 @@ class Player extends Model
     public function latestMail(): HasOne
     {
         return $this->hasOne(PostalMail::class)->latestOfMany();
+    }
+
+    public function publish()
+    {
+        $this->update(['published_at' => now()]);
     }
 
     protected function casts(): array
