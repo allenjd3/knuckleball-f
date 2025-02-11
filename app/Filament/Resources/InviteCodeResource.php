@@ -2,13 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\InviteCodeResource\Pages;
+use App\Filament\Resources\InviteCodeResource\Pages\CreateInviteCode;
+use App\Filament\Resources\InviteCodeResource\Pages\EditInviteCode;
+use App\Filament\Resources\InviteCodeResource\Pages\ListInviteCodes;
 use App\Models\InviteCode;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -41,11 +45,11 @@ class InviteCodeResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -60,9 +64,9 @@ class InviteCodeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInviteCodes::route('/'),
-            'create' => Pages\CreateInviteCode::route('/create'),
-            'edit' => Pages\EditInviteCode::route('/{record}/edit'),
+            'index' => ListInviteCodes::route('/'),
+            'create' => CreateInviteCode::route('/create'),
+            'edit' => EditInviteCode::route('/{record}/edit'),
         ];
     }
 }
