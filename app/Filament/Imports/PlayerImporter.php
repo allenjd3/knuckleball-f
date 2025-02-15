@@ -20,7 +20,7 @@ class PlayerImporter extends Importer
             ImportColumn::make('team')
                 ->requiredMapping()
                 ->relationship(resolveUsing: ['name'])
-                ->rules(['nullable', 'required']),
+                ->rules(['required']),
             ImportColumn::make('user')
                 ->relationship(resolveUsing: ['email', 'name'])
                 ->rules(['nullable']),
