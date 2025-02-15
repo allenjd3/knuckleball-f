@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\PlayerImporter;
 use App\Filament\Resources\PlayerResource\Pages\CreatePlayer;
 use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
 use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
@@ -20,6 +21,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ImportAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -61,6 +63,8 @@ class PlayerResource extends Resource
                 Action::make('View Players')
                     ->outlined()
                     ->url(route('players.index')),
+                ImportAction::make()
+                    ->importer(PlayerImporter::class),
             ])
             ->columns([
                 ImageColumn::make('media.url')->circular(),
