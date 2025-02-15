@@ -34,11 +34,6 @@ class PlayerImporter extends Importer
         ];
     }
 
-    public function resolveRecord(): ?Player
-    {
-        return new Player();
-    }
-
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your player import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
@@ -48,5 +43,10 @@ class PlayerImporter extends Importer
         }
 
         return $body;
+    }
+
+    public function resolveRecord(): ?Player
+    {
+        return new Player;
     }
 }
