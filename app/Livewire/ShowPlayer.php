@@ -118,10 +118,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->headerActions([
                 CreateTableAction::make()
                     ->form([
-                        DatePicker::make('date_sent'),
+                        DatePicker::make('date_sent')->required(),
                         DatePicker::make('returned_date'),
                         Select::make('fee_material_id')
                             ->label('Material')
+                            ->required()
                             ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
                             ->preload()
                             ->searchable()
