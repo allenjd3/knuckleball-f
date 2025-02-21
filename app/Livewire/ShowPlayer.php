@@ -51,11 +51,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createAddress')
             ->model(Address::class)
             ->form([
-                TextInput::make('address_1'),
+                TextInput::make('address_1')->required(),
                 TextInput::make('address_2'),
-                TextInput::make('city'),
-                TextInput::make('state'),
-                TextInput::make('postal_code'),
+                TextInput::make('city')->required(),
+                TextInput::make('state')->required(),
+                TextInput::make('postal_code')->required(),
             ])
             ->using(fn (array $data) => $this->player->address()->create($data));
     }
@@ -65,16 +65,17 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createFee')
             ->model(Fee::class)
             ->form([
-                TextInput::make('amount'),
+                TextInput::make('amount')->required(),
                 DatePicker::make('published_at'),
                 Select::make('fee_material_id')
                     ->label('Material')
                     ->relationship(name: 'feeMaterial', titleAttribute: 'name')
                     ->preload()
+                    ->required()
                     ->searchable()
                     ->createOptionModalHeading('Create Item')
                     ->createOptionForm([
-                        TextInput::make('name'),
+                        TextInput::make('name')->required(),
                     ]),
             ])
             ->using(fn (array $data) => $this->player->fees()->create($data));
