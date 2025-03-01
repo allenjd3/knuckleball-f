@@ -8,7 +8,8 @@ use App\Livewire\ViewPlayersFromTeam;
 use App\Livewire\ViewTeams;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', UserFeed::class)->name('users.feed');
+Route::view('/', 'landing')->name('landingPage');
+Route::get('/feed', UserFeed::class)->name('users.feed');
 Route::get('teams', ViewTeams::class)->name('teams.index');
 Route::get('teams/{team}', ViewPlayersFromTeam::class)->name('teams.show');
 Route::get('feed/{user:slug}', UserProfile::class)->name('users.profile');
