@@ -4,13 +4,10 @@ namespace App\Filament\Imports;
 
 use App\Jobs\ProcessPlayerData;
 use App\Models\ImportData;
-use App\Models\Player;
-use App\Models\Team;
 use Carbon\CarbonInterface;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Illuminate\Support\Facades\Log;
 
 class ImportDataImporter extends Importer
 {
@@ -74,21 +71,6 @@ class ImportDataImporter extends Importer
         ];
     }
 
-    protected function afterSave(): void
-    {
-        ProcessPlayerData::dispatch()->delay(now()->addMinutes(1));
-    }
-
-    public function resolveRecord(): ?ImportData
-    {
-        return new ImportData();
-    }
-
-    public function getJobRetryUntil(): ?CarbonInterface
-    {
-        return null;
-    }
-
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Your import data import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
@@ -98,5 +80,20 @@ class ImportDataImporter extends Importer
         }
 
         return $body;
+    }
+
+    public function resolveRecord(): ?ImportData
+    {
+        return new ImportData;
+    }
+
+    public function getJobRetryUntil(): ?CarbonInterface
+    {
+        return null;
+    }
+
+    protected function afterSave(): void
+    {
+        ProcessPlayerData::dispatch()->delay(now()->addMinutes(1));
     }
 }

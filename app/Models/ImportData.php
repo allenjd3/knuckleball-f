@@ -10,7 +10,11 @@ class ImportData extends Model
     /** @use HasFactory<\Database\Factories\ImportDataFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'data',
+    ];
+
     protected $casts = [
-        'data' => 'array'
+        'data' => 'array',
     ];
 }

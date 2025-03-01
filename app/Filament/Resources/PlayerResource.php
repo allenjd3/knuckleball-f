@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Imports\ImportDataImporter;
-use App\Filament\Imports\PlayerImporter;
 use App\Filament\Resources\PlayerResource\Pages\CreatePlayer;
 use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
 use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
