@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\ImportDataImporter;
 use App\Filament\Imports\PlayerImporter;
 use App\Filament\Resources\PlayerResource\Pages\CreatePlayer;
 use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
@@ -64,7 +65,7 @@ class PlayerResource extends Resource
                     ->outlined()
                     ->url(route('players.index')),
                 ImportAction::make()
-                    ->importer(PlayerImporter::class),
+                    ->importer(ImportDataImporter::class),
             ])
             ->columns([
                 ImageColumn::make('media.url')->circular(),
