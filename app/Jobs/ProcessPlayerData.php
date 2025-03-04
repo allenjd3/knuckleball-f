@@ -26,9 +26,16 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
         ImportData::query()
             ->lazy(100)
             ->each(function (ImportData $importData) {
+                if (! $team = Team::firstWhere('name', data_get($importData->data, 'team'))) {
+                    $importData->update([
+                        'errors' => 'We didn\'t recognize team ' . data_get($importData->data, 'team') . '. Team must be valid team for mapping.',
+                    ]);
+                    return;
+                }
+
                 $player = Player::firstOrCreate([
                     'name' => data_get($importData->data, 'name'),
-                    'team_id' => Team::firstWhere('name', data_get($importData->data, 'team'))?->id,
+                    'team_id' => $team?->id,
                 ]);
 
                 $address = data_get($importData->data, 'address');
