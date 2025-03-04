@@ -28,7 +28,7 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
             ->each(function (ImportData $importData) {
                 $player = Player::firstOrCreate([
                     'name' => data_get($importData->data, 'name'),
-                    'team_id' => Team::firstWhere('name', data_get($importData->data, 'team'))->id,
+                    'team_id' => Team::firstWhere('name', data_get($importData->data, 'team'))?->id,
                 ]);
 
                 $address = data_get($importData->data, 'address');
