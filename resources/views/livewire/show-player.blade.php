@@ -16,10 +16,16 @@
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
                 @if ($player->address?->exists)
-                    <p>{{ $player->address?->address_1 }}</p>
-                    <p>{{ $player->address?->address_2 }}</p>
-                    <p>{{ $player->address?->city }}, {{ $player->address?->state }}</p>
-                    <p>{{ $player->address?->postal_code }}</p>
+                    @can('viewAny', App\Models\Address::class)
+                        <p>{{ $player->address?->address_1 }}</p>
+                        <p>{{ $player->address?->address_2 }}</p>
+                        <p>{{ $player->address?->city }}, {{ $player->address?->state }}</p>
+                        <p>{{ $player->address?->postal_code }}</p>
+                    @else
+                        <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
+                        <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
+                        <p>Only authorized users can view addresses. <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a></p>
+                    @endcan
                 @else
                     <p class="p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">This player doesn't have an address yet.</p>
                     @can('update', $player)
