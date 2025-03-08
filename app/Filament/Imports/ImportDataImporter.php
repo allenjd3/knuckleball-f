@@ -34,36 +34,39 @@ class ImportDataImporter extends Importer
                 }),
             ImportColumn::make('team')
                 ->requiredMapping()
-                ->rules(['required'])
-                ->fillRecordUsing(function ($record, string $state): void {
+                ->rules(['nullable'])
+                ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
                     $data['team'] = $state;
                     $record->data = $data;
                 }),
             ImportColumn::make('user')
                 ->rules(['nullable'])
-                ->fillRecordUsing(function ($record, string $state): void {
+                ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
                     $data['user'] = $state;
                     $record->data = $data;
                 }),
             ImportColumn::make('published_at')
-                ->rules(['nullable', 'date'])
-                ->fillRecordUsing(function ($record, string $state): void {
+                ->rules(['nullable', 'string'])
+                ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
                     $data['published_at'] = $state;
                     $record->data = $data;
                 }),
             ImportColumn::make('lastTeam')
                 ->rules(['nullable'])
-                ->fillRecordUsing(function ($record, string $state): void {
+                ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
                     $data['lastTeam'] = $state;
                     $record->data = $data;
                 }),
             ImportColumn::make('retired_at')
-                ->rules(['nullable', 'date'])
-                ->fillRecordUsing(function ($record, string $state): void {
+                ->rules([
+                    'nullable',
+                    'string',
+                ])
+                ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
                     $data['retired_at'] = $state;
                     $record->data = $data;
@@ -90,10 +93,5 @@ class ImportDataImporter extends Importer
     public function getJobRetryUntil(): ?CarbonInterface
     {
         return null;
-    }
-
-    protected function afterSave(): void
-    {
-        ProcessPlayerData::dispatch()->delay(now()->addMinutes(1));
     }
 }

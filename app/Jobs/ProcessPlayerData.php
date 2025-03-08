@@ -2,13 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Actions\ParseDates;
 use App\Models\ImportData;
 use App\Models\Player;
 use App\Models\Team;
+use App\Models\User;
+use App\Support\Dtos\AddressDto;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Fluent;
 
 class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
 {
@@ -24,66 +26,40 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         ImportData::query()
-            ->lazy(100)
+            ->lazyById(100)
             ->each(function (ImportData $importData) {
-                if (! $team = Team::firstWhere('name', data_get($importData->data, 'team'))) {
-                    $importData->update([
-                        'errors' => 'We didn\'t recognize team ' . data_get($importData->data, 'team') . '. Team must be valid team for mapping.',
-                    ]);
-                    return;
-                }
+                $team = Team::firstWhere('name', data_get($importData->data, 'team'));
+                $user = User::firstWhere('name', data_get($importData->data, 'user'));
+                $lastTeam = Team::firstWhere('name', data_get($importData->data, 'lastTeam'));
 
-                $player = Player::firstOrCreate([
-                    'name' => data_get($importData->data, 'name'),
-                    'team_id' => $team?->id,
-                ]);
+                $player = Player::firstOrCreate(
+                    [
+                        'name' => data_get($importData->data, 'name'),
+                        'team_id' => $team?->id ?? null,
+                    ],
+                    [
+                        'retired_at' => ParseDates::handle(data_get($importData->data, 'retired_at')),
+                        'user_id' => $user?->id ?? null,
+                        'published_at' => ParseDates::handle(data_get($importData->data, 'published_at')),
+                        'last_team_id' => $lastTeam?->id ?? null,
+                    ],
+                );
 
                 $address = data_get($importData->data, 'address');
-
-                $addressLines = explode("\n", $address);
-                if (count($addressLines) === 4) {
-                    [$name, $address1, $address2, $cityStateZip] = $addressLines;
-                } elseif (count($addressLines) === 3) {
-                    [$address1, $address2, $cityStateZip] = $addressLines;
-                } elseif (count($addressLines) === 2) {
-                    [$address1, $cityStateZip] = $addressLines;
-                } else {
-                    $importData->update([
-                        'errors' => 'We didn\'t count the correct number of lines. We counted ' . count($addressLines),
-                    ]);
-
-                    return;
-                }
-
-                $sanitizedData = $this->sanitizeCityStateZip($cityStateZip);
+                $addressDto = AddressDto::make(explode("\n", $address));
 
                 $player->address()
                     ->create([
-                        'address_1' => $address1,
-                        'address_2' => $address2 ?? '',
-                        'city' => $sanitizedData->city,
-                        'state' => $sanitizedData->state,
-                        'postal_code' => $sanitizedData->zip,
+                        'address_1' => $addressDto->address1,
+                        'address_2' => $addressDto->address2,
+                        'city' => $addressDto->city,
+                        'state' => $addressDto->state,
+                        'postal_code' => $addressDto->zip,
                     ]);
 
                 $this->importDataIds[] = $importData->id;
             });
 
         ImportData::whereIn('id', $this->importDataIds)->delete();
-    }
-
-    private function sanitizeCityStateZip(string $cityStateZip): Fluent
-    {
-        $matches = explode(' ', $cityStateZip);
-
-        $zip = trim(array_pop($matches), ' ,');
-        $state = trim(array_pop($matches), ' ,');
-        $city = trim(implode(' ', $matches), ' ,');
-
-        return fluent([
-            'zip' => $zip,
-            'state' => $state,
-            'city' => $city,
-        ]);
     }
 }
