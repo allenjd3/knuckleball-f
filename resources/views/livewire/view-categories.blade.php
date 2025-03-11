@@ -1,4 +1,4 @@
 <div class="max-w-7xl py-16 mx-auto">
-    <h1 class="text-3xl mb-6">{{ __('Teams') }}</h1>
+    <h1 class="text-3xl mb-6">{{ __('Categories') }}</h1>
     {{ $this->table }}
 </div>

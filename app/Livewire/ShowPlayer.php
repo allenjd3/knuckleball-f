@@ -6,6 +6,7 @@ use App\Models\Address;
 use App\Models\Fee;
 use App\Models\FeeMaterial;
 use App\Models\Player;
+use App\Models\PostalMail;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -118,6 +119,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ])
             ->headerActions([
                 CreateTableAction::make()
+                    ->visible(fn () => auth()?->user()?->can('create', PostalMail::class))
                     ->form([
                         DatePicker::make('date_sent')->required(),
                         DatePicker::make('returned_date'),

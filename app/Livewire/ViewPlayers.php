@@ -20,7 +20,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class ViewPlayers extends Component implements HasActions, HasForms, HasTable
@@ -127,12 +126,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
 
     public function query()
     {
-        return Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
-    }
-
-    #[Computed]
-    public function players()
-    {
-        return Player::all();
+        return Player::query()
+            ->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
     }
 }
