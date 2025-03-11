@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Category;
 use App\Models\Player;
 use App\Models\Team;
 use Filament\Actions\Action;
@@ -127,12 +128,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
 
     public function query()
     {
-        return Player::query()->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
-    }
-
-    #[Computed]
-    public function players()
-    {
-        return Player::all();
+        return Player::query()
+            ->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
     }
 }
