@@ -22,6 +22,9 @@
                         <x-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                             {{ __('Teams') }}
                         </x-nav-link>
+                        <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
+                            {{ __('Categories') }}
+                        </x-nav-link>
                         @if (auth()->user()?->isSuperAdmin())
                             <x-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
                                 {{ __('Admin Panel') }}
@@ -166,6 +169,9 @@
             <x-responsive-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                 {{ __('Teams') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
+                {{ __('Categories') }}
+            </x-responsive-nav-link>
             @if (auth()->user()?->isSuperAdmin())
                 <x-responsive-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
                     {{ __('Admin Panel') }}
@@ -176,6 +182,7 @@
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="flex items-center px-4">
+                @auth
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="shrink-0 me-3">
                         <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()?->profile_photo_url }}" alt="{{ Auth::user()?->name }}" />
@@ -186,63 +193,72 @@
                     <div class="font-medium text-base text-gray-800">{{ Auth::user()?->name }}</div>
                     <div class="font-medium text-sm text-gray-500">{{ Auth::user()?->email }}</div>
                 </div>
+                @endauth
             </div>
 
-            <div class="mt-3 space-y-1">
-                <!-- Account Management -->
-                <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
-                </x-responsive-nav-link>
-
-                @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                    <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
-                        {{ __('API Tokens') }}
-                    </x-responsive-nav-link>
-                @endif
-
-                <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}" x-data>
-                    @csrf
-
-                    <x-responsive-nav-link href="{{ route('logout') }}"
-                                   @click.prevent="$root.submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-
-                <!-- Team Management -->
-                @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
-                    <div class="border-t border-gray-200"></div>
-
-                    <div class="block px-4 py-2 text-xs text-gray-400">
-                        {{ __('Manage Team') }}
-                    </div>
-
-                    <!-- Team Settings -->
-                    <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
-                        {{ __('Team Settings') }}
+            @auth
+                <div class="mt-3 space-y-1">
+                    <!-- Account Management -->
+                    <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                        {{ __('Profile') }}
                     </x-responsive-nav-link>
 
-                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
-                        <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
-                            {{ __('Create New Team') }}
+                    @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
+                        <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
+                            {{ __('API Tokens') }}
                         </x-responsive-nav-link>
-                    @endcan
+                    @endif
 
-                    <!-- Team Switcher -->
-                    @if (Auth::user()->allTeams()->count() > 1)
+                    <!-- Authentication -->
+                    <form method="POST" action="{{ route('logout') }}" x-data>
+                        @csrf
+
+                        <x-responsive-nav-link href="{{ route('logout') }}"
+                                       @click.prevent="$root.submit();">
+                            {{ __('Log Out') }}
+                        </x-responsive-nav-link>
+                    </form>
+
+                    <!-- Team Management -->
+                    @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
                         <div class="border-t border-gray-200"></div>
 
                         <div class="block px-4 py-2 text-xs text-gray-400">
-                            {{ __('Switch Teams') }}
+                            {{ __('Manage Team') }}
                         </div>
 
-                        @foreach (Auth::user()->allTeams() as $team)
-                            <x-switchable-team :team="$team" component="responsive-nav-link" />
-                        @endforeach
+                        <!-- Team Settings -->
+                        <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
+                            {{ __('Team Settings') }}
+                        </x-responsive-nav-link>
+
+                        @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+                            <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
+                                {{ __('Create New Team') }}
+                            </x-responsive-nav-link>
+                        @endcan
+
+                        <!-- Team Switcher -->
+                        @if (Auth::user()->allTeams()->count() > 1)
+                            <div class="border-t border-gray-200"></div>
+
+                            <div class="block px-4 py-2 text-xs text-gray-400">
+                                {{ __('Switch Teams') }}
+                            </div>
+
+                            @foreach (Auth::user()->allTeams() as $team)
+                                <x-switchable-team :team="$team" component="responsive-nav-link" />
+                            @endforeach
+                        @endif
                     @endif
-                @endif
-            </div>
+                </div>
+            @else
+                <div>
+                    <x-responsive-nav-link href="{{ route('login') }}">
+                        {{ __('Login') }}
+                    </x-responsive-nav-link>
+                </div>
+            @endauth
         </div>
     </div>
 </nav>

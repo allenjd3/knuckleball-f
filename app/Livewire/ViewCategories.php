@@ -8,47 +8,40 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class ViewTeams extends Component implements HasActions, HasForms, HasTable
+class ViewCategories extends Component implements HasActions, HasForms, HasTable
 {
     use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithTable;
 
-    public ?Category $category;
-
     public function render()
     {
-        return view('livewire.view-teams');
-    }
-
-    public function mount(?Category $category)
-    {
-        $this->category = $category;
+        return view('livewire.view-categories');
     }
 
     public function table(Table $table)
     {
         return $table
-            ->query(fn () => Team::when($this->category, fn ($query) => $query->where('category_id', $this->category->id)))
+            ->query(fn () => Category::query())
             ->columns([
                 TextColumn::make('name')
-                    ->url(fn (Team $record) => route('teams.show', $record))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('category.name'),
+            ])
+            ->actions([
+                Action::make('show_teams')
+                    ->label('Teams')
+                    ->url(fn (Category $record) => route('categories.teams.index', $record)),
+                Action::make('show_players')
+                    ->label('Players')
+                    ->url(fn (Category $record) => route('categories.players.index', $record)),
             ]);
-    }
-
-    #[Computed]
-    public function teams()
-    {
-        return Team::all();
     }
 }
