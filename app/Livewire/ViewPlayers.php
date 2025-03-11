@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Category;
 use App\Models\Player;
 use App\Models\Team;
 use Filament\Actions\Action;
@@ -21,7 +20,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class ViewPlayers extends Component implements HasActions, HasForms, HasTable

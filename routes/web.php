@@ -3,11 +3,11 @@
 use App\Livewire\ShowPlayer;
 use App\Livewire\UserFeed;
 use App\Livewire\UserProfile;
+use App\Livewire\ViewCategories;
 use App\Livewire\ViewPlayers;
+use App\Livewire\ViewPlayersFromCategory;
 use App\Livewire\ViewPlayersFromTeam;
 use App\Livewire\ViewTeams;
-use App\Livewire\ViewCategories;
-use App\Livewire\ViewPlayersFromCategory;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('landingPage');
