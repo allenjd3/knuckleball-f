@@ -34,4 +34,12 @@ class PostalMailFactory extends Factory
             'returned_date' => now()->subWeek(),
         ]);
     }
+
+    public function unReturned()
+    {
+        return $this->state([
+            'date_sent' => now()->subWeeks(2),
+            'returned_date' => null,
+        ]);
+    }
 }

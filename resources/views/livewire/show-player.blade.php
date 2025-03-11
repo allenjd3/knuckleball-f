@@ -12,7 +12,16 @@
         <div class="flex-1">
             <h1 class="text-3xl">{{ $player->name }}</h1>
             <div class="border-b border-black"></div>
-            <div class="mb-4 text-lg">98 % Response Rate | Fees Required</div>
+            <div class="mb-4 text-lg">
+                @if ($player->response_rate)
+                    {{ $player->response_rate }}
+                @else
+                    Too few responses for calculating response rate
+                @endif
+                @if ($player->fees_required)
+                | Fees Required
+                @endif
+            </div>
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
                 @if ($player->address?->exists)

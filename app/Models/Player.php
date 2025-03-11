@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\Collections\PlayerCollection;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -92,5 +93,15 @@ class Player extends Model
             'published_at' => 'datetime',
             'retired_at' => 'datetime',
         ];
+    }
+
+    protected function responseRate(): Attribute
+    {
+        $total = $this->postalMails()->count();
+        $returned = $this->postalMails()->whereNotNull('returned_date')->count();
+
+        return Attribute::make(
+            get: fn () => $total > 3 ? round(($returned / $total) * 100) . '%' : null,
+        );
     }
 }
