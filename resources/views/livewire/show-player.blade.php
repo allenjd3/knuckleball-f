@@ -19,7 +19,7 @@
                     Too few responses for calculating response rate
                 @endif
                 @if ($player->fees_required)
-                | Fees Required
+                    | Fees Required
                 @endif
             </div>
             <div class="mb-4 p-2">

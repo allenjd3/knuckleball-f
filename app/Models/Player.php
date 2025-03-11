@@ -104,4 +104,11 @@ class Player extends Model
             get: fn () => $total > 3 ? round(($returned / $total) * 100) . '%' : null,
         );
     }
+
+    protected function feesRequired(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->fees()->exists(),
+        );
+    }
 }

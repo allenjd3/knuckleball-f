@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Fee;
+use App\Models\FeeMaterial;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -17,6 +18,7 @@ class FeeFactory extends Factory
             'updated_at' => Carbon::now(),
             'amount' => $this->faker->randomNumber(),
             'player_id' => $this->faker->randomNumber(),
+            'fee_material_id' => FeeMaterial::factory(),
             'published_at' => Carbon::now(),
         ];
     }
