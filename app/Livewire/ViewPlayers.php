@@ -51,7 +51,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                         'Retired' => 'warning',
                         'Active' => 'success',
                     }),
-                TextColumn::make('team.name')->url(fn (Player $record) => $record?->team ? route('teams.show', $record->team) : "#")->label('Team')->sortable(),
+                TextColumn::make('team.name')->url(fn (Player $record) => $record?->team ? route('teams.show', $record->team) : '#')->label('Team')->sortable(),
                 TextColumn::make('retired_at')
                     ->label('Retired Year')
                     ->state(fn ($record) => $record->retired_at?->format('Y') ?? ''),

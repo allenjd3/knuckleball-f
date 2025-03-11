@@ -11,5 +11,5 @@ it('can sanitize an address string', function ($addressString) {
     expect($address->state)->toBe('OH');
     expect($address->zip)->toBe('45011');
 })->with([
-        "2671 Rochester Ave,\n Hamilton OH 45011",
-    ]);
+    "2671 Rochester Ave,\n Hamilton OH 45011",
+]);

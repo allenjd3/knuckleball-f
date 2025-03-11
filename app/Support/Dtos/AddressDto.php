@@ -2,7 +2,8 @@
 
 namespace App\Support\Dtos;
 
-class AddressDto {
+class AddressDto
+{
     public string $address1;
     public string $city;
     public string $state;
@@ -16,7 +17,7 @@ class AddressDto {
         ?string $address2 = null,
     ) {
         $this->name = $name;
-        $this->address1 = trim($address1, " ,");
+        $this->address1 = trim($address1, ' ,');
         $this->address2 = $address2;
     }
 
@@ -40,6 +41,7 @@ class AddressDto {
         );
 
         $addressDto->sanitizeCityStateZip($cityStateZip);
+
         return $addressDto;
     }
 

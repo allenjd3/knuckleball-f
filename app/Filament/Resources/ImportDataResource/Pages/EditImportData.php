@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ImportDataResource\Pages;
 
 use App\Filament\Resources\ImportDataResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditImportData extends EditRecord
@@ -13,7 +13,7 @@ class EditImportData extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

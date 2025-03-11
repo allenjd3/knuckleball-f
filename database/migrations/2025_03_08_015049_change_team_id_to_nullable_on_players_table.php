@@ -6,19 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('players', function (Blueprint $table) {
-             $table->unsignedBigInteger('team_id')->nullable()->change();
+            $table->unsignedBigInteger('team_id')->nullable()->change();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('nullable_on_players', function (Blueprint $table) {
