@@ -98,6 +98,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(User::class, 'followables', 'follower_id', 'followable_id');
     }
 
+    public function cards(): HasMany
+    {
+        return $this->hasMany(Card::class);
+    }
+
     protected function casts(): array
     {
         return [

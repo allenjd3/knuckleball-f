@@ -12,14 +12,17 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\CreateAction as CreateTableAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -91,9 +94,44 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user'))
+            ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user', 'card.media'))
             ->emptyStateHeading('No TTM yet!')
             ->actions([
+                TableAction::make('showCards')
+                    ->label('cards')
+                    ->visible(fn (Model $record) => $record->card->exists)
+                    ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
+                    ->slideOver()
+                    ->modalSubmitActionLabel('Ok'),
+                CreateTableAction::make('createCard')
+                    ->modalHeading('Create Card')
+                    ->label('attach card')
+                    ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
+                    ->form([
+                        TextInput::make('manufacturer')->maxLength(255)->required(),
+                        TextInput::make('series')->maxLength(255)->required(),
+                        TextInput::make('year')->numeric()->required(),
+                        TextInput::make('number')->nullable(),
+                        TextInput::make('variation')->nullable(),
+                        FileUpload::make('url')
+                            ->required()
+                            ->directory('cards')
+                            ->image(),
+                    ])
+                    ->using(function (array $data, Model $record) {
+                        $card = $record->cards()->create([
+                            'manufacturer' => data_get($data, 'manufacturer'),
+                            'user_id' => auth()->user()->id,
+                            'series' => data_get($data, 'series'),
+                            'year' => data_get($data, 'year'),
+                            'number' => data_get($data, 'number'),
+                            'variation' => data_get($data, 'variation'),
+                        ]);
+
+                        $card->media()->create(['url' => data_get($data, 'url')]);
+
+                        return $record;
+                    }),
                 EditAction::make()
                     ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
                     ->form([
@@ -115,6 +153,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('date_sent')->date(),
                 TextColumn::make('returned_date')->date(),
                 TextColumn::make('feeMaterials.name')->label('Item'),
+                ImageColumn::make('card.media.url'),
                 TextColumn::make('comment'),
             ])
             ->headerActions([
