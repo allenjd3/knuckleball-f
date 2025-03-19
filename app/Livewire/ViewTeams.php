@@ -12,7 +12,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class ViewTeams extends Component implements HasActions, HasForms, HasTable
@@ -36,7 +35,12 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
     public function table(Table $table)
     {
         return $table
-            ->query(fn () => Team::when($this->category, fn ($query) => $query->where('category_id', $this->category->id)))
+            ->query(fn () => Team::query()
+                ->when(
+                    $this->category->exists,
+                    fn ($query) => $query->where('category_id', $this->category->id),
+                )
+            )
             ->columns([
                 TextColumn::make('name')
                     ->url(fn (Team $record) => route('teams.show', $record))
@@ -44,11 +48,5 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
                     ->searchable(),
                 TextColumn::make('category.name'),
             ]);
-    }
-
-    #[Computed]
-    public function teams()
-    {
-        return Team::all();
     }
 }
