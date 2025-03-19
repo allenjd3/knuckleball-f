@@ -98,14 +98,16 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->emptyStateHeading('No TTM yet!')
             ->actions([
                 TableAction::make('showCards')
-                    ->label('cards')
+                    ->label('Cards')
+                    ->icon('heroicon-o-rectangle-stack')
                     ->visible(fn (Model $record) => $record->card->exists)
                     ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
                     ->slideOver()
                     ->modalSubmitActionLabel('Ok'),
                 CreateTableAction::make('createCard')
                     ->modalHeading('Create Card')
-                    ->label('attach card')
+                    ->label('Add Card')
+                    ->icon('heroicon-o-plus-circle')
                     ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
                     ->form([
                         TextInput::make('manufacturer')->maxLength(255)->required(),
