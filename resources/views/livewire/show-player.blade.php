@@ -33,7 +33,11 @@
                     @else
                         <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                         <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
-                        <p>Only authorized users can view addresses. <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a></p>
+                        <p>Only authorized users can view addresses.
+                        @guest
+                            <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a>
+                        @endguest
+                        </p>
                     @endcan
                 @else
                     <p class="p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">This player doesn't have an address yet.</p>
