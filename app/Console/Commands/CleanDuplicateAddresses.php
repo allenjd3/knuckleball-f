@@ -13,11 +13,11 @@ class CleanDuplicateAddresses extends Command
 
     public function handle()
     {
-        Player::lazy()
-            ->each(
-                fn ($player) => $player->addresses()
+        $this->withProgressBar(
+            Player::lazyById(),
+            fn (Player $player) => $player->addresses()
                     ->where('addresses.id', '!=', $player->address->id)
                     ->delete(),
-            );
+        );
     }
 }
