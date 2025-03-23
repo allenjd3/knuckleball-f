@@ -16,7 +16,7 @@ class CleanDuplicateAddresses extends Command
         $this->withProgressBar(
             Player::lazyById(),
             fn (Player $player) => $player->addresses()
-                    ->where('addresses.id', '!=', $player->address->id)
+                    ->where('addresses.id', '!=', $player->address?->id)
                     ->delete(),
         );
     }
