@@ -35,5 +35,15 @@
 
         @filamentScripts
         @vite('resources/js/app.js')
+
+        @stack('scripts')
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-899C14WKNP"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-899C14WKNP');
+        </script>
     </body>
 </html>
