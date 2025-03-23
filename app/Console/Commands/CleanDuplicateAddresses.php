@@ -16,7 +16,7 @@ class CleanDuplicateAddresses extends Command
         Player::lazy()
             ->each(
                 fn ($player) => $player->addresses()
-                    ->where('addresses.id', "!=", $player->address->id)
+                    ->where('addresses.id', '!=', $player->address->id)
                     ->delete(),
             );
     }
