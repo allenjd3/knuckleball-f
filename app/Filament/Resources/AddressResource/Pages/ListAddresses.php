@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AddressResource\Pages;
 
 use App\Filament\Resources\AddressResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAddresses extends ListRecords
@@ -13,7 +13,7 @@ class ListAddresses extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            CreateAction::make(),
         ];
     }
 }

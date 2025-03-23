@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\AddressResource\Pages;
 
 use App\Filament\Resources\AddressResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditAddress extends EditRecord
@@ -13,7 +13,7 @@ class EditAddress extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

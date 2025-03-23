@@ -20,15 +20,18 @@ class AddressPolicy
         return $user->isPublished();
     }
 
-    public function create(User $user): bool {
+    public function create(User $user): bool
+    {
         return $user->isSuperAdmin();
     }
 
-    public function update(User $user, Address $address): bool {
+    public function update(User $user, Address $address): bool
+    {
         return $user->isSuperAdmin();
     }
 
-    public function delete(User $user, Address $address): bool {
+    public function delete(User $user, Address $address): bool
+    {
         return $user->isSuperAdmin();
     }
 }

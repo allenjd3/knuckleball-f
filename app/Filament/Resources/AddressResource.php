@@ -2,19 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AddressResource\Pages;
-use App\Filament\Resources\AddressResource\RelationManagers;
+use App\Filament\Resources\AddressResource\Pages\CreateAddress;
+use App\Filament\Resources\AddressResource\Pages\EditAddress;
+use App\Filament\Resources\AddressResource\Pages\ListAddresses;
 use App\Models\Address;
-use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AddressResource extends Resource
 {
@@ -71,11 +71,11 @@ class AddressResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -90,9 +90,9 @@ class AddressResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAddresses::route('/'),
-            'create' => Pages\CreateAddress::route('/create'),
-            'edit' => Pages\EditAddress::route('/{record}/edit'),
+            'index' => ListAddresses::route('/'),
+            'create' => CreateAddress::route('/create'),
+            'edit' => EditAddress::route('/{record}/edit'),
         ];
     }
 }
