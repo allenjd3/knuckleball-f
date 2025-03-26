@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -87,9 +88,23 @@ class Player extends Model
         return $this->hasOne(PostalMail::class)->latestOfMany();
     }
 
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class)->withPivot('approved_at');
+    }
+
     public function publish()
     {
         $this->update(['published_at' => now()]);
+    }
+
+    public function addTag(int $tagId)
+    {
+        if (! $this->can('assign', Tag::class)) {
+            abort(403);
+        }
+
+        $this->tags()->syncWithoutDetaching([$tagId]);
     }
 
     protected function casts(): array

@@ -10,7 +10,20 @@
             @endif
         </div>
         <div class="flex-1">
-            <h1 class="text-3xl">{{ $player->name }}</h1>
+            <div class="flex gap-2 items-center">
+                <h1 class="text-3xl">{{ $player->name }}</h1>
+                @can('update', $player)
+                    <x-filament-actions::group
+                        :actions="[
+                            $this->createFee,
+                            $this->associateTag,
+                        ]"
+                        label="Player Actions"
+                        icon="heroicon-o-plus-circle"
+                        tooltip="Player Actions"
+                    />
+                @endcan
+            </div>
             <div class="border-b border-black"></div>
             <div class="mb-4 text-lg">
                 @if ($player->response_rate)
@@ -52,6 +65,19 @@
                 @endcan
             </div>
             <div>
+                <h3 class="font-bold px-2">Tags:</h3>
+                @auth
+                    <div class="flex flex-wrap gap-2">
+                        @foreach ($player->tags as $tag)
+                            <span class="px-2 py-1 font-bold rounded-full bg-{{ $tag->category_color }}-300 text-{{ $tag->category_color }}-800">{{$tag->label}}</span>
+                        @endforeach
+                    </div>
+                @endauth
+                @can('assign', App\Models\Tag::class)
+                    Assign tag here
+                @endcan
+            </div>
+            <div>
                 <h3 class="font-bold px-2">Fees:</h3>
                 <div class="flex divide-x divide-black">
                     @forelse ($this->fees as $fee)
@@ -60,11 +86,6 @@
                         <p class="px-2">No fees yet!</p>
                     @endforelse
                 </div>
-                @can('update', $player)
-                    <div class="flex gap-4">
-                        {{ $this->createFee }}
-                    </div>
-                @endcan
             </div>
         </div>
     </div>
