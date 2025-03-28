@@ -32,6 +32,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -91,21 +92,23 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     public function associateTag(): Action
     {
         return Action::make('associateTag')
+            ->authorize(auth()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')
                     ->label('Tag')
-                    ->options(Tag::get()
-                      ->groupBy("category")
-                      ->mapWithKeys(
-                        fn($value, $key) => [
-                          Tag::category($key) => $value->pluck("label", "id")
-                        ]
-                      ))
+                    ->options(
+                        Tag::get()
+                          ->groupBy("category")
+                          ->mapWithKeys(
+                            fn($value, $key) => [
+                              Tag::category($key) => $value->pluck("label", "id")
+                            ]
+                        )
+                    )
             ])
             ->action(function (array $data) {
                 $this->player->addTag(data_get($data, 'tag_id'));
             });
-
     }
 
     #[Computed]
@@ -213,12 +216,5 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     }),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    public function addTag(int $tagId)
-    {
-        $this->authorize('view', Tag::find($tagId));
-
-        $this->player->tags()->syncWithoutDetaching([$tagId]);
     }
 }

@@ -15,11 +15,12 @@ test('a published user can associate tag with player', function () {
     $this->actingAs($user);
 
     Livewire::test(ShowPlayer::class, ['player' => $player])
-        ->call('addTag', $tag->id);
+        ->callAction('associateTag', ['tag_id' => $tag->id]);
 
     $this->assertDatabaseHas('player_tag', [
         'player_id' => $player->id,
         'tag_id' => $tag->id,
+        'user_id' => $user->id,
         'approved_at' => null, // Not yet approved
     ]);
 });
@@ -27,17 +28,11 @@ test('a published user can associate tag with player', function () {
 test('an unpublished user cannot associate tag with player', function () {
     $user = User::factory()->create(['published_at' => null]);
     $player = Player::factory()->create();
-    $tag = Tag::factory()->create(['published_at' => now()]);
 
     $this->actingAs($user);
 
     Livewire::test(ShowPlayer::class, ['player' => $player])
-        ->call('addTag', $tag->id);
-
-    $this->assertDatabaseMissing('player_tag', [
-        'player_id' => $player->id,
-        'tag_id' => $tag->id,
-    ]);
+        ->assertActionHidden('associateTag');
 });
 
 test('an admin can approve tag player association', function () {
@@ -45,7 +40,7 @@ test('an admin can approve tag player association', function () {
     $admin = User::factory()->create(['super_admin' => true]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id]);
+    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
 
     $this->freezeTime(function () use ($player, $tag, $admin, $playerTag) {
         $admin->approveTag($playerTag);
@@ -53,6 +48,7 @@ test('an admin can approve tag player association', function () {
         $this->assertDatabaseHas('player_tag', [
             'player_id' => $player->id,
             'tag_id' => $tag->id,
+            'user_id' => $admin->id,
             'approved_at' => now()->toDateTimeString(),
         ]);
     });
@@ -63,7 +59,7 @@ test('a non admin cannot approve tag player association', function () {
     $regularUser = User::factory()->create(['super_admin' => false]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id]);
+    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
 
     $this->freezeTime(function () use ($player, $tag, $regularUser, $playerTag) {
         $regularUser->approveTag($playerTag);
@@ -72,6 +68,7 @@ test('a non admin cannot approve tag player association', function () {
             'player_id' => $player->id,
             'tag_id' => $tag->id,
             'approved_at' => now()->toDateTimeString(),
+            'user_id' => $regularUser->id,
         ]);
     });
 });

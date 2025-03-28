@@ -90,7 +90,7 @@ class Player extends Model
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class)->withPivot('approved_at');
+        return $this->belongsToMany(Tag::class)->withPivot('approved_at', 'user_id');
     }
 
     public function publish()
@@ -101,14 +101,14 @@ class Player extends Model
     public function addTag(int $tagId)
     {
         if (! auth()->user()?->can('assign', Tag::class)) {
-            abort(403);
+            return abort(403);
         }
 
-        if (auth()->user()->isSuperAdmin()) {
-            $this->tags()->syncWithoutDetaching([$tagId => ['approved_at' => now()]]);
-        }
+        $approvedAt = auth()->user()->isSuperAdmin()
+            ? now()
+            : null;
 
-        $this->tags()->syncWithoutDetaching([$tagId]);
+        $this->tags()->syncWithoutDetaching([$tagId => ['approved_at' => $approvedAt, 'user_id' => auth()->user()->id]]);
     }
 
     protected function casts(): array

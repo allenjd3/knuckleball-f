@@ -12,7 +12,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('player_id');
             $table->unsignedBigInteger('tag_id');
+            $table->unsignedBigInteger('user_id');
             $table->datetime('approved_at')->nullable();
+
+            $table->unique(['player_id', 'tag_id']);
+            $table->index(['player_id', 'user_id']);
         });
     }
 

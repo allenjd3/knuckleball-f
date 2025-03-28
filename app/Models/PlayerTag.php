@@ -12,12 +12,18 @@ class PlayerTag extends Pivot
     protected $fillable = [
         'player_id',
         'tag_id',
+        'user_id',
         'approved_at',
     ];
 
     public function player(): BelongsTo
     {
         return $this->belongsTo(Player::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     protected function casts(): array
