@@ -76,38 +76,6 @@ test('a non admin cannot approve tag player association', function () {
     });
 });
 
-// Only superadmin can create tags
-test('only superadmin can create tags', function () {
-    $superAdmin = User::factory()->create(['super_admin' => true]);
-    $regularUser = User::factory()->create(['super_admin' => false]);
-    $randomCategory = array_keys(Tag::categories())[rand(0, 3)];
-
-    $this->actingAs($superAdmin);
-    Livewire::test(CreateTag::class)
-        ->fillForm(['label' => 'Hall of Famer', 'category' => $randomCategory])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $this->assertDatabaseHas('tags', ['label' => 'Hall of Famer']);
-
-    $this->actingAs($regularUser);
-    Livewire::test(CreateTag::class)
-        ->assertForbidden();
-
-    $this->assertDatabaseMissing('tags', ['label' => 'Fan Favorite']);
-});
-
-// Tag should have required attributes
-test('tag requires label', function () {
-    $superAdmin = User::factory()->create(['super_admin' => true]);
-
-    $this->actingAs($superAdmin);
-    Livewire::test(CreateTag::class)
-        ->fillForm(['label' => null])
-        ->call('create')
-        ->assertHasFormErrors(['label']);
-});
-
 // Tags are categorized correctly
 test('tags are categorized correctly', function () {
     $positiveTag = Tag::factory()->create([

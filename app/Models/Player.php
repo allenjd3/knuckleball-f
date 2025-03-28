@@ -100,8 +100,12 @@ class Player extends Model
 
     public function addTag(int $tagId)
     {
-        if (! $this->can('assign', Tag::class)) {
+        if (! auth()->user()?->can('assign', Tag::class)) {
             abort(403);
+        }
+
+        if (auth()->user()->isSuperAdmin()) {
+            $this->tags()->syncWithoutDetaching([$tagId => ['approved_at' => now()]]);
         }
 
         $this->tags()->syncWithoutDetaching([$tagId]);

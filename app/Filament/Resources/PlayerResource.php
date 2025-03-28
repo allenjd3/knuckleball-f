@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Imports\ImportDataImporter;
+use App\Filament\Resources\PlayerResource\Pages\ApproveTags;
 use App\Filament\Resources\PlayerResource\Pages\CreatePlayer;
 use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
 use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
@@ -121,6 +122,7 @@ class PlayerResource extends Resource
             'index' => ListPlayers::route('/'),
             'create' => CreatePlayer::route('/create'),
             'edit' => EditPlayer::route('/{record}/edit'),
+            'approve-tags' => ApproveTags::route('/approve-tags'),
         ];
     }
 }

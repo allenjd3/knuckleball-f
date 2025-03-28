@@ -12,17 +12,25 @@
         <div class="flex-1">
             <div class="flex gap-2 items-center">
                 <h1 class="text-3xl">{{ $player->name }}</h1>
-                @can('update', $player)
+                @php
+                $actions = [];
+                if (auth()->user()?->can('update', $player)) {
+                    array_push($actions, $this->createFee);
+                }
+
+                if (auth()->user()?->can('assign', App\Models\Tag::class)) {
+                    array_push($actions, $this->associateTag);
+                }
+                @endphp
+
+                @if (count($actions))
                     <x-filament-actions::group
-                        :actions="[
-                            $this->createFee,
-                            $this->associateTag,
-                        ]"
+                        :actions="$actions"
                         label="Player Actions"
                         icon="heroicon-o-plus-circle"
                         tooltip="Player Actions"
                     />
-                @endcan
+                @endif
             </div>
             <div class="border-b border-black"></div>
             <div class="mb-4 text-lg">
@@ -60,16 +68,21 @@
                 @endif
 
                 @can('update', $player)
-
                     <x-filament-actions::modals />
                 @endcan
             </div>
             <div>
                 <h3 class="font-bold px-2">Tags:</h3>
                 @auth
-                    <div class="flex flex-wrap gap-2">
+                    <div class="flex flex-wrap">
                         @foreach ($player->tags as $tag)
-                            <span class="px-2 py-1 font-bold rounded-full bg-{{ $tag->category_color }}-300 text-{{ $tag->category_color }}-800">{{$tag->label}}</span>
+                            <x-filament::button
+                                class="tag {{ $tag->slug }}"
+                                :x-tooltip.raw="$tag->description"
+                            >
+                                {{$tag->label}}
+                            </x-filament::button>
+                            {{-- <div class="tag {{ $tag->slug }}">{{$tag->label}}</div> --}}
                         @endforeach
                     </div>
                 @endauth

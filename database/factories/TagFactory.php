@@ -14,6 +14,8 @@ class TagFactory extends Factory
     {
         return [
             'label' => $this->faker->words(2, true),
+            'slug' => $this->faker->slug(),
+            'description' => $this->faker->words(5, true),
             'category' => array_keys(Tag::categories())[rand(0, 3)],
             'published_at' => rand(0, 1) ? now()->subWeek() : null,
         ];

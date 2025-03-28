@@ -12,6 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('label');
             $table->string('category');
+            $table->string('slug');
+            $table->string('description');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });

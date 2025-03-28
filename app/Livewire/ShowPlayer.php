@@ -103,7 +103,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                       ))
             ])
             ->action(function (array $data) {
-                dd($data);
                 $this->player->addTag(data_get($data, 'tag_id'));
             });
 
