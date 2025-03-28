@@ -77,7 +77,7 @@
                     <div class="flex flex-wrap">
                         @foreach ($this->tags as $tag)
                             <x-filament::button
-                                class="tag {{ $tag->slug }} {{ is_null($tag->pivot->approved_at ? 'opacity-50' : '' )}}"
+                                class="tag {{ $tag->slug }} {{ is_null($tag->pivot->approved_at) ? 'opacity-50' : '' }}"
                                 :x-tooltip.raw="is_null($tag->pivot->approved_at) ? 'Pending Approval' : $tag->description"
                             >
                                 {{$tag->label}}

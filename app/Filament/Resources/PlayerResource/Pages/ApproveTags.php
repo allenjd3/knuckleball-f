@@ -37,7 +37,15 @@ class ApproveTags extends Page implements HasActions, HasTable
             ->actions([
                 Action::make('approve')
                     ->label('Approve')
-                    ->action(fn (Model $record) => Player::find($record->player_id)->tags()->syncWithoutDetaching([$record->tag_id => ['approved_at' => now()]])),
+                    ->action(fn (Model $record) => Player::find($record->player_id)
+                        ->tags()
+                        ->syncWithoutDetaching([$record->tag_id => ['approved_at' => now()]])),
+                Action::make('deny')
+                    ->label('Deny')
+                    ->action(fn (Model $record) => Player::find($record->player_id)
+                        ->tags()
+                        ->detach([$record->tag_id]),
+                    ),
             ])->emptyStateHeading('No Unapproved Tags!');
     }
 }
