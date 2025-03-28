@@ -21,6 +21,11 @@ class PlayerTag extends Pivot
         return $this->belongsTo(Player::class);
     }
 
+    public function tag(): BelongsTo
+    {
+        return $this->belongsTo(Tag::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

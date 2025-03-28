@@ -75,14 +75,13 @@
                 <h3 class="font-bold px-2">Tags:</h3>
                 @auth
                     <div class="flex flex-wrap">
-                        @foreach ($player->tags as $tag)
+                        @foreach ($this->tags as $tag)
                             <x-filament::button
-                                class="tag {{ $tag->slug }}"
-                                :x-tooltip.raw="$tag->description"
+                                class="tag {{ $tag->slug }} {{ is_null($tag->pivot->approved_at ? 'opacity-50' : '' )}}"
+                                :x-tooltip.raw="is_null($tag->pivot->approved_at) ? 'Pending Approval' : $tag->description"
                             >
                                 {{$tag->label}}
                             </x-filament::button>
-                            {{-- <div class="tag {{ $tag->slug }}">{{$tag->label}}</div> --}}
                         @endforeach
                     </div>
                 @endauth

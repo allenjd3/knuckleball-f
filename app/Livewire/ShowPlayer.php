@@ -117,6 +117,22 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return $this->player->fees()->with('feeMaterial')->get();
     }
 
+    #[Computed]
+    public function tags()
+    {
+        return $this->player
+            ->tags()
+            ->where(fn ($query) => $query
+                ->when(
+                    auth()->check(),
+                    fn ($query) => $query->where('player_tag.user_id', auth()->user()->id)->orWhere('player_tag.approved_at', '<', now()),
+                    fn ($query) => $query->where(fn ($query) => $query->where('player_tag.approved_at', '<', now())),
+                )
+            )
+            ->limit(20)
+            ->get();
+    }
+
     public function table(Table $table): Table
     {
         return $table
