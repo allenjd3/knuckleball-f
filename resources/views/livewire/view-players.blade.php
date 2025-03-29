@@ -1,7 +1,7 @@
 <div>
     <div class="max-w-7xl py-16 mx-auto">
         <div class="flex justify-center">
-        @if ($mediaUrl)
+        @if (isset($mediaUrl))
             <img src="{{ Storage::url($mediaUrl) }}" alt="{{ $teamName }}" class="size-44 rounded-full" />
         @endif
         </div>
