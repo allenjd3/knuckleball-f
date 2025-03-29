@@ -7,6 +7,7 @@ use App\Filament\Resources\TeamResource\Pages\EditTeam;
 use App\Filament\Resources\TeamResource\Pages\ListTeams;
 use App\Models\Team;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -33,6 +34,9 @@ class TeamResource extends Resource
                     ->relationship(name: 'category', titleAttribute: 'name')
                     ->nullable(),
                 DatePicker::make('published_at'),
+                FileUpload::make('url')
+                    ->directory('teams')
+                    ->avatar(),
             ]);
     }
 

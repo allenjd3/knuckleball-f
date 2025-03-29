@@ -8,6 +8,7 @@ use App\Models\Team;
 class ViewPlayersFromTeam extends ViewPlayers
 {
     public string $teamName;
+    public ?string $mediaUrl;
 
     protected int $teamId;
 
@@ -15,7 +16,9 @@ class ViewPlayersFromTeam extends ViewPlayers
         int $team
     ) {
         $this->teamId = $team;
-        $this->teamName = Team::select('name')->firstWhere('id', $this->teamId)->name;
+        $teamModel = Team::firstWhere('id', $this->teamId);
+        $this->teamName = $teamModel->name;
+        $this->mediaUrl = $teamModel->media?->url;
     }
 
     public function query()
