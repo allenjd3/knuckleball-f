@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <span class="text-xl font-bold">Knuckleball</span>
+            <h3 style="--c-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
         </x-slot>
 
         <x-validation-errors class="mb-4" />

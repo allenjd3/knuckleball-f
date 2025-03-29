@@ -1,5 +1,10 @@
 <div>
     <div class="max-w-7xl py-16 mx-auto">
+        <div class="flex justify-center">
+        @if ($mediaUrl)
+            <img src="{{ Storage::url($mediaUrl) }}" alt="{{ $teamName }}" class="size-44 rounded-full" />
+        @endif
+        </div>
         <h1 class="text-3xl mb-6">{{ __('Players') . (isset($teamName) ? ': ' . $teamName : '') }}</h1>
         {{ $this->table }}
 
