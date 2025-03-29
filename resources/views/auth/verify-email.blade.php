@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
-            <x-authentication-card-logo />
+            <h3 style="--c-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
         </x-slot>
 
         <div class="mb-4 text-sm text-gray-600">
