@@ -28,7 +28,7 @@ class InviteCodeResource extends Resource
         return $form
             ->schema([
                 TextInput::make('code')->required(),
-                TextInput::make('remaining')->numeric(),
+                TextInput::make('remaining')->numeric()->default(0),
                 Checkbox::make('is_unlimited')->label('Unlimited Uses?'),
             ]);
     }
