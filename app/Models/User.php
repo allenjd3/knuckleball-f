@@ -114,6 +114,17 @@ class User extends Authenticatable implements FilamentUser
             ->updateExistingPivot($playerTag->tag_id, ['approved_at' => now()]);
     }
 
+    public function rejectTag(PlayerTag $playerTag)
+    {
+        if ($this->cannot('update', $playerTag)) {
+            return;
+        }
+
+        $playerTag->player
+            ->tags()
+            ->detach([$playerTag->tag_id]);
+    }
+
     protected function casts(): array
     {
         return [

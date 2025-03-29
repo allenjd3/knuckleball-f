@@ -80,7 +80,7 @@
                                 class="tag {{ $tag->slug }} {{ is_null($tag->pivot->approved_at) ? 'opacity-50' : '' }}"
                                 :x-tooltip.raw="is_null($tag->pivot->approved_at) ? 'Pending Approval' : $tag->description"
                             >
-                                {{$tag->label}}
+                                {{ $tag->label }}
                             </x-filament::button>
                         @endforeach
                     </div>

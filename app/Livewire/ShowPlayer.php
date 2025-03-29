@@ -9,7 +9,6 @@ use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\Tag;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
@@ -21,7 +20,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\CreateAction as CreateTableAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
@@ -32,7 +30,6 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -98,13 +95,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->label('Tag')
                     ->options(
                         Tag::get()
-                          ->groupBy("category")
-                          ->mapWithKeys(
-                            fn($value, $key) => [
-                              Tag::category($key) => $value->pluck("label", "id")
-                            ]
-                        )
-                    )
+                            ->groupBy('category')
+                            ->mapWithKeys(
+                                fn ($value, $key) => [
+                                    Tag::category($key) => $value->pluck('label', 'id'),
+                                ]
+                            )
+                    ),
             ])
             ->action(function (array $data) {
                 $this->player->addTag(data_get($data, 'tag_id'));

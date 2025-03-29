@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\PlayerResource\Pages;
 
 use App\Filament\Resources\PlayerResource;
-use App\Models\Player;
 use App\Models\PlayerTag;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -17,8 +16,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApproveTags extends Page implements HasActions, HasTable
 {
-    use InteractsWithTable;
     use InteractsWithActions;
+    use InteractsWithTable;
 
     protected static string $resource = PlayerResource::class;
 
@@ -37,15 +36,10 @@ class ApproveTags extends Page implements HasActions, HasTable
             ->actions([
                 Action::make('approve')
                     ->label('Approve')
-                    ->action(fn (Model $record) => Player::find($record->player_id)
-                        ->tags()
-                        ->syncWithoutDetaching([$record->tag_id => ['approved_at' => now()]])),
+                    ->action(fn (Model $record) => auth()->user()->approveTag($record)),
                 Action::make('deny')
                     ->label('Deny')
-                    ->action(fn (Model $record) => Player::find($record->player_id)
-                        ->tags()
-                        ->detach([$record->tag_id]),
-                    ),
+                    ->action(fn (Model $record) => auth()->user()->rejectTag($record)),
             ])->emptyStateHeading('No Unapproved Tags!');
     }
 }

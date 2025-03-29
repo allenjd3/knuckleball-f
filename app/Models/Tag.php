@@ -48,23 +48,11 @@ class Tag extends Model
     protected function categoryLabel(): Attribute
     {
         return Attribute::get(
-            fn ($value, $attributes) => match($attributes['category']) {
+            fn ($value, $attributes) => match ($attributes['category']) {
                 'positive' => 'Positive Tags',
                 'neutral' => 'Neutral Tags',
                 'unpredictable' => 'Unpredictable Tags',
                 'negative' => 'Negative Tags',
-            },
-        );
-    }
-
-    protected function categoryColor(): Attribute
-    {
-        return Attribute::get(
-            fn ($value, $attributes) => match($attributes['category']) {
-                'positive' => 'green',
-                'neutral' => 'blue',
-                'unpredictable' => 'yellow',
-                'negative' => 'red',
             },
         );
     }

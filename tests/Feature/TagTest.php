@@ -1,6 +1,5 @@
 <?php
 
-use App\Filament\Resources\TagResource\Pages\CreateTag;
 use App\Livewire\ShowPlayer;
 use App\Models\Player;
 use App\Models\PlayerTag;
@@ -54,6 +53,23 @@ test('an admin can approve tag player association', function () {
     });
 });
 
+test('an admin can reject tag player association', function () {
+    $admin = User::factory()->create(['super_admin' => true]);
+    $player = Player::factory()->create();
+    $tag = Tag::factory()->create(['published_at' => now()]);
+    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
+
+    $this->freezeTime(function () use ($player, $tag, $admin, $playerTag) {
+        $admin->rejectTag($playerTag);
+
+        $this->assertDatabaseMissing('player_tag', [
+            'player_id' => $player->id,
+            'tag_id' => $tag->id,
+            'user_id' => $admin->id,
+        ]);
+    });
+});
+
 // A non-admin cannot approve tag player association
 test('a non admin cannot approve tag player association', function () {
     $regularUser = User::factory()->create(['super_admin' => false]);
@@ -73,26 +89,43 @@ test('a non admin cannot approve tag player association', function () {
     });
 });
 
+test('a non admin cannot reject a player tag', function () {
+    $regularUser = User::factory()->create(['super_admin' => false]);
+    $player = Player::factory()->create();
+    $tag = Tag::factory()->create(['published_at' => now()]);
+    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
+
+    $this->freezeTime(function () use ($player, $tag, $regularUser, $playerTag) {
+        $regularUser->rejectTag($playerTag);
+
+        $this->assertDatabaseHas('player_tag', [
+            'player_id' => $player->id,
+            'tag_id' => $tag->id,
+            'user_id' => $regularUser->id,
+        ]);
+    });
+});
+
 // Tags are categorized correctly
 test('tags are categorized correctly', function () {
     $positiveTag = Tag::factory()->create([
         'label' => 'Verified',
-        'category' => 'positive'
+        'category' => 'positive',
     ]);
 
     $neutralTag = Tag::factory()->create([
         'label' => 'Sticker Shock',
-        'category' => 'neutral'
+        'category' => 'neutral',
     ]);
 
     $unpredictableTag = Tag::factory()->create([
         'label' => 'The Wild Card',
-        'category' => 'unpredictable'
+        'category' => 'unpredictable',
     ]);
 
     $negativeTag = Tag::factory()->create([
         'label' => 'Elusive Signer',
-        'category' => 'negative'
+        'category' => 'negative',
     ]);
 
     expect($positiveTag->category)->toBe('positive');
