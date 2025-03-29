@@ -7,6 +7,7 @@ use App\Models\Fee;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
+use App\Models\Tag;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -85,10 +86,48 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->using(fn (array $data) => $this->player->fees()->create($data));
     }
 
+    public function associateTag(): Action
+    {
+        return Action::make('associateTag')
+            ->authorize(auth()->user()?->can('assign', Tag::class))
+            ->form([
+                Select::make('tag_id')
+                    ->label('Tag')
+                    ->options(
+                        Tag::get()
+                            ->groupBy('category')
+                            ->mapWithKeys(
+                                fn ($value, $key) => [
+                                    Tag::category($key) => $value->pluck('label', 'id'),
+                                ]
+                            )
+                    ),
+            ])
+            ->action(function (array $data) {
+                $this->player->addTag(data_get($data, 'tag_id'));
+            });
+    }
+
     #[Computed]
     public function fees()
     {
         return $this->player->fees()->with('feeMaterial')->get();
+    }
+
+    #[Computed]
+    public function tags()
+    {
+        return $this->player
+            ->tags()
+            ->where(fn ($query) => $query
+                ->when(
+                    auth()->check(),
+                    fn ($query) => $query->where('player_tag.user_id', auth()->user()->id)->orWhere('player_tag.approved_at', '<', now()),
+                    fn ($query) => $query->where(fn ($query) => $query->where('player_tag.approved_at', '<', now())),
+                )
+            )
+            ->limit(20)
+            ->get();
     }
 
     public function table(Table $table): Table

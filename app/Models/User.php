@@ -65,7 +65,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function isSuperAdmin(): bool
     {
-        return $this->super_admin;
+        return (bool) $this->super_admin;
     }
 
     public function isPublished(): bool
@@ -103,12 +103,35 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Card::class);
     }
 
+    public function approveTag(PlayerTag $playerTag)
+    {
+        if ($this->cannot('update', $playerTag)) {
+            return;
+        }
+
+        $playerTag->player
+            ->tags()
+            ->updateExistingPivot($playerTag->tag_id, ['approved_at' => now()]);
+    }
+
+    public function rejectTag(PlayerTag $playerTag)
+    {
+        if ($this->cannot('update', $playerTag)) {
+            return;
+        }
+
+        $playerTag->player
+            ->tags()
+            ->detach([$playerTag->tag_id]);
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'published_at' => 'datetime',
+            'super_admin' => 'bool',
         ];
     }
 }

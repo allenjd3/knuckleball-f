@@ -28,5 +28,9 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         $teams->each(fn ($team) => Player::factory(12)->for($team)->create());
+
+        $this->call([
+            TagSeeder::class,
+        ]);
     }
 }
