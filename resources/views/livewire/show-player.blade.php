@@ -72,8 +72,8 @@
                 @endcan
             </div>
             <div>
-                <h3 class="font-bold px-2">Tags:</h3>
-                @auth
+                @if (auth()->check() && $this->tags->count())
+                    <h3 class="font-bold px-2">Tags:</h3>
                     <div class="flex flex-wrap">
                         @foreach ($this->tags as $tag)
                             <x-filament::button
@@ -84,10 +84,7 @@
                             </x-filament::button>
                         @endforeach
                     </div>
-                @endauth
-                @can('assign', App\Models\Tag::class)
-                    Assign tag here
-                @endcan
+                @endif
             </div>
             <div>
                 <h3 class="font-bold px-2">Fees:</h3>
