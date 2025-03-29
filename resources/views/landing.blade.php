@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="keywords" content="">
 	<meta name="description" content="">
-	<link rel="icon" type="image/png"  href="images/favicon.png">
+	<link rel="icon" type="image/png"  href="{{ asset('images/favicon.png') }}">
 
 
 
@@ -41,6 +41,10 @@
 </head>
 <body data-spy="scroll" data-target=".navbar-collapse" data-offset="50">
 
+
+
+
+
 <!-- navigation section -->
 <div class="navbar navbar-default navbar-fixed-top sticky-navigation" role="navigation">
 	<div class="container">
@@ -51,12 +55,12 @@
 				<span class="icon icon-bar"></span>
 				<span class="icon icon-bar"></span>
 			</button>
-			<a href="http://www.knuckleball.app" class="navbar-brand">KNUCKLEBALL</a>
+			<a href="{{ route('home') }}" class="navbar-brand">KNUCKLEBALL</a>
 		</div>
 
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav navbar-right main-navigation">
-				<li><a href="{{ route('landingPage') }}" class="smoothScroll">HOME</a></li>
+				<li><a href="#home" class="smoothScroll">HOME</a></li>
 				<li><a href="#feature" class="smoothScroll">FEATURES</a></li>
 				<li><a href="{{ route('players.index') }}">TTM DATABASE</a></li>
 				<li><a href="#contact" class="smoothScroll">CONTACT</a></li>
@@ -66,6 +70,7 @@
 	</div>
 </div>
 
+
 <!-- home section -->
 <section id="home">
 	<div class="container">
@@ -73,14 +78,7 @@
 
 			<div class="col-md-12 col-sm-12">
 				<h3 class="wow bounceIn">KNUCKLEBALL&nbsp;</h3>
-				<h2>
-                    <span class="bold">Fresh, Free, and Built for Today’s TTM Collector. </span>
-                    <br>
-                    <br>
-                    <p>
-                        <a class="buttonhero" href="https://knuckleball.fly.dev/players">Activate Your Invite</a>
-                    </p>
-                </h2>
+				<h2><span class="bold">Fresh, Free, and Built for Today’s TTM Collector. <br><br><p><a class="buttonhero" href="{{ route('register') }}">Activate Your Invite</a></p>	</span></h2>
 
 				<img src="{{ asset('images/Card_Hero.png') }}" alt="Cards">
 			</div>
@@ -88,6 +86,7 @@
 		</div>
 	</div>
 </section>
+
 
 <!-- feature section -->
 <section id="feature">
@@ -101,6 +100,8 @@
 					<h2 style="color:#d83c40">Knuckleball is the modern, hassle-free way to find addresses, share wins, and grow your collection.</h2>
 				</div>
 			</div>
+
+
 
 			<div class="col-lg-4 col-md-4 col-sm-6 wow fadeInUp" data-wow-delay="0.6s">
 				<div class="col-md-12 col-sm-12">
@@ -127,7 +128,7 @@
 					<p>Knuckleball’s free tool tracks response rates for each player, helping you optimize your collection strategy by identifying the most responsive players.</p>
 				</div>
 				<div class="col-md-12 col-sm-6">
-					<h3>Social Feed</h3>
+					<h3>Social Network and Feed</h3>
 					<hr>
 					<p>Stay connected with other collectors through Knuckleball’s real-time social feed. </p>
 				</div>
@@ -136,6 +137,7 @@
 		</div>
 	</div>
 </section>
+
 
 <!-- video section -->
 <section id="video" >
@@ -149,8 +151,8 @@
 					<p>TTM (Through The Mail) is a popular method for sports fans to collect autographs by mailing requests to athletes. It’s a great way to connect with your favorite players and build your autograph collection from home. <br><b>Start sending your requests today with <em>Knuckleball</em> and build your dream collection!</b>
 
 					</p>
-                    <a class="button" href="#">Get in the Game</a>
-                </div>
+                        <a href="{{ route('players.index') }}" class="button">Get in the Game</a>
+                    </div>
 			</div>
 
 			<div class="col-md-6 col-sm-10 wow fadeInRight" data-wow-delay="0.9s">
@@ -163,6 +165,10 @@
 	</div>
 </section>
 
+
+
+
+
 <!-- contact section -->
 <section id="contact">
 	<div class="container">
@@ -172,26 +178,16 @@
 				<div class="section-title">
 					<h1 class="heading bold">Contact Us</h1>
 					<p>Are you a player or agent? Reach out to us directly for profile verification and ownership requests. <br>We’re here to help ensure accurate representation.</p>
+                    <a class="button" href="mailto:hello@knuckleball.app?subject=Player%20Verification&body=Hi%20Knuckleball">Drop us a Line</a>
 					<hr>
 				</div>
 			</div>
 
 			<div class="col-md-offset-2 col-md-8 col-sm-12">
-				<form action="contact.php" method="post" class="wow fadeInUp" data-wow-delay="0.6s">
-					<div class="col-md-6 col-sm-6">
-						<input type="text" class="form-control" placeholder="Name" name="name" required>
-					</div>
-					<div class="col-md-6 col-sm-6">
-						<input type="email" class="form-control" placeholder="Email" name="email" required>
-					</div>
-					<div class="col-md-12 col-sm-12">
-						<textarea class="form-control" placeholder="Message" rows="7" name"message" required></textarea>
-					</div>
-					<div class="col-md-offset-4 col-md-8 col-sm-offset-4 col-sm-8">
-						<input type="submit" class="form-control" value="SEND MESSAGE">
-					</div>
-				</form>
+
+
 			</div>
+
 
 			</div>
 <br>
@@ -199,6 +195,7 @@
 		</div>
 	</div>
 </section>
+
 
 <!-- footer section -->
 <footer>
@@ -218,6 +215,7 @@
 	</div>
 </footer>
 
+
 <!-- JAVASCRIPT JS FILES -->
 <script src="{{ asset('js/jquery.js') }}"></script>
 <script src="{{ asset('js/bootstrap.min.js') }}"></script>
@@ -227,7 +225,6 @@
 <script src="{{ asset('js/wow.min.js') }}"></script>
 <script src="{{ asset('js/custom.js') }}"></script>
 
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-899C14WKNP"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
