@@ -10,7 +10,7 @@ use App\Livewire\ViewPlayersFromTeam;
 use App\Livewire\ViewTeams;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing')->name('landingPage');
+Route::view('/', 'landing')->name('home');
 Route::get('feed', UserFeed::class)->name('users.feed');
 Route::get('teams', ViewTeams::class)->name('teams.index');
 Route::get('categories/{category}/teams', ViewTeams::class)->name('categories.teams.index');
