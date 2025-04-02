@@ -110,15 +110,18 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->preload(),
                 FileUpload::make('url')
                     ->directory('avatars')
+                    ->nullable()
                     ->avatar(),
             ])
             ->using(function (array $data): Model {
                 $data = collect($data);
                 $player = Player::create($data->only(['name', 'team_id'])->toArray());
 
-                $player->media()->create([
-                    'url' => $data->get('url'),
-                ]);
+                if ($url = $data->get('url')) {
+                    $player->media()->create([
+                        'url' => $url,
+                    ]);
+                }
 
                 return $player;
             });
