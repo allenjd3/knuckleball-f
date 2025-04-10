@@ -58,9 +58,9 @@ class Player extends Model
         return $this->morphOne(Media::class, 'imageable')->latestOfMany();
     }
 
-    public function address(): HasOne
+    public function address()
     {
-        return $this->hasOne(Address::class)->latestOfMany();
+        return $this->addresses()->latest()->published()->first();
     }
 
     public function addresses(): HasMany

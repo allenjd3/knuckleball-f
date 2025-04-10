@@ -21,6 +21,11 @@
                 if (auth()->user()?->can('assign', App\Models\Tag::class)) {
                     array_push($actions, $this->associateTag);
                 }
+
+                if (auth()->user()?->can('create', App\Models\Address::class)) {
+                    array_push($actions, $this->createAddress);
+                }
+
                 @endphp
 
                 @if (count($actions))
@@ -45,12 +50,12 @@
             </div>
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
-                @if ($player->address?->exists)
+                @if ($this->address?->exists || $this->address?->exists && $this->hasUnpublishedAddress)
                     @can('viewAny', App\Models\Address::class)
-                        <p>{{ $player->address?->address_1 }}</p>
-                        <p>{{ $player->address?->address_2 }}</p>
-                        <p>{{ $player->address?->city }}, {{ $player->address?->state }}</p>
-                        <p>{{ $player->address?->postal_code }}</p>
+                        <p>{{ $this->address->address_1 }}</p>
+                        <p>{{ $this->address->address_2 }}</p>
+                        <p>{{ $this->address->city }}, {{ $this->address->state }}</p>
+                        <p>{{ $this->address->postal_code }}</p>
                     @else
                         <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                         <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
@@ -60,11 +65,13 @@
                         @endguest
                         </p>
                     @endcan
+                    @if ($this->hasUnpublishedAddress)
+                        <p class="font-bold text-green-500">Thanks for your submission. It is in review!</p>
+                    @endif
+                @elseif ($this->hasUnpublishedAddress)
+                    <p class="p-8 border-4 rounded-lg border-green-200 border-dashed text-green-500 font-bold">Thanks for your submission. It is in review!</p>
                 @else
                     <p class="p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">This player doesn't have an address yet.</p>
-                    @can('update', $player)
-                        <div class="my-4">{{ $this->createAddress }}</div>
-                    @endcan
                 @endif
 
                 @can('update', $player)

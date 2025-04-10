@@ -6,15 +6,18 @@ use App\Filament\Resources\AddressResource\Pages\CreateAddress;
 use App\Filament\Resources\AddressResource\Pages\EditAddress;
 use App\Filament\Resources\AddressResource\Pages\ListAddresses;
 use App\Models\Address;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class AddressResource extends Resource
 {
@@ -50,6 +53,10 @@ class AddressResource extends Resource
                     ->label('Player')
                     ->relationship(name: 'player', titleAttribute: 'name')
                     ->required(),
+                DatePicker::make('published_at')
+                    ->label('Published At')
+                    ->default(now()->subDay())
+                    ->nullable(),
             ]);
     }
 
@@ -69,6 +76,9 @@ class AddressResource extends Resource
                     ->label('Zip'),
                 TextColumn::make('player.name')
                     ->searchable(),
+                TextColumn::make('published_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->actions([
                 EditAction::make(),
@@ -76,6 +86,8 @@ class AddressResource extends Resource
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    BulkAction::make('publish')
+                        ->action(fn (Collection $records) => $records->each->update(['published_at' => now()->startOfDay() ]))
                 ]),
             ]);
     }

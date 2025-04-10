@@ -22,7 +22,7 @@ class AddressPolicy
 
     public function create(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isPublished();
     }
 
     public function update(User $user, Address $address): bool

@@ -103,6 +103,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Card::class);
     }
 
+    public function addresses(): HasMany
+    {
+        return $this->hasMany(Address::class);
+    }
+
     public function approveTag(PlayerTag $playerTag)
     {
         if ($this->cannot('update', $playerTag)) {

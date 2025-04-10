@@ -41,14 +41,25 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
     public Player $player;
 
-    public function mount(Player $player)
-    {
-        $this->player = $player->load('address');
-    }
-
     public function render()
     {
         return view('livewire.show-player');
+    }
+
+    #[Computed]
+    public function address()
+    {
+        return $this->player->address();
+    }
+
+    #[Computed]
+    public function hasUnpublishedAddress()
+    {
+        return auth()->user()
+            ?->addresses()
+            ->unpublished()
+            ->where('player_id', $this->player->id)
+            ->exists();
     }
 
     public function createAddressAction(): Action
@@ -62,7 +73,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
             ])
-            ->using(fn (array $data) => $this->player->address()->create($data));
+            ->using(fn (array $data) => $this->player->addresses()->create([...$data, 'user_id' => auth()->user()->id]));
     }
 
     public function createFeeAction(): Action
