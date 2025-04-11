@@ -48,13 +48,14 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
                 $address = data_get($importData->data, 'address');
                 $addressDto = AddressDto::make(explode("\n", $address));
 
-                $player->address()
+                $player->addresses()
                     ->create([
                         'address_1' => $addressDto->address1,
                         'address_2' => $addressDto->address2,
                         'city' => $addressDto->city,
                         'state' => $addressDto->state,
                         'postal_code' => $addressDto->zip,
+                        'published_at' => now()->subDay(),
                     ]);
 
                 $this->importDataIds[] = $importData->id;

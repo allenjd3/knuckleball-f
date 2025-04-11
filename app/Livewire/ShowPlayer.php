@@ -41,14 +41,38 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
     public Player $player;
 
-    public function mount(Player $player)
-    {
-        $this->player = $player->load('address');
-    }
-
     public function render()
     {
-        return view('livewire.show-player');
+        return view(
+            'livewire.show-player',
+            collect([])->when(auth()->user()?->isSuperAdmin(),
+                fn ($collection) => $collection->merge([
+                    'unpublishedAddress' => $this->player
+                        ->addresses()
+                        ->unpublished()
+                        ->notRejected()
+                        ->latest()
+                        ->first(),
+                ]),
+            )->toArray(),
+        );
+    }
+
+    #[Computed]
+    public function address()
+    {
+        return $this->player->address();
+    }
+
+    #[Computed]
+    public function hasUnpublishedAddress()
+    {
+        return auth()->user()
+            ?->addresses()
+            ->unpublished()
+            ->notRejected()
+            ->where('player_id', $this->player->id)
+            ->exists();
     }
 
     public function createAddressAction(): Action
@@ -62,7 +86,21 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
             ])
-            ->using(fn (array $data) => $this->player->address()->create($data));
+            ->using(
+                function (array $data) {
+                    $address = $this->player
+                        ->addresses()
+                        ->create([
+                            ...$data,
+                            'user_id' => auth()->user()->id,
+                            'published_at' => auth()->user()->isSuperAdmin() ? now() : null,
+                        ]);
+
+                    unset($this->address);
+
+                    return $address;
+                }
+            );
     }
 
     public function createFeeAction(): Action
@@ -86,9 +124,17 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->using(fn (array $data) => $this->player->fees()->create($data));
     }
 
+    public function editPlayer(): Action
+    {
+        return Action::make('editPlayer')
+            ->icon('heroicon-o-pencil-square')
+            ->url(route('filament.cp.resources.players.edit', $this->player));
+    }
+
     public function associateTag(): Action
     {
         return Action::make('associateTag')
+            ->icon('heroicon-o-tag')
             ->authorize(auth()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')
