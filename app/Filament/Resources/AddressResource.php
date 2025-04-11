@@ -6,6 +6,7 @@ use App\Filament\Resources\AddressResource\Pages\CreateAddress;
 use App\Filament\Resources\AddressResource\Pages\EditAddress;
 use App\Filament\Resources\AddressResource\Pages\ListAddresses;
 use App\Models\Address;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -57,6 +58,9 @@ class AddressResource extends Resource
                     ->label('Published At')
                     ->default(now()->subDay())
                     ->nullable(),
+                Checkbox::make('rejected')
+                    ->label('Reject Address (hide it from review)')
+                    ->default(false),
             ]);
     }
 

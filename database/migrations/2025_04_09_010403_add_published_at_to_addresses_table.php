@@ -11,6 +11,7 @@ return new class extends Migration
     {
         Schema::table('addresses', function (Blueprint $table) {
             $table->dateTime('published_at')->nullable();
+            $table->boolean('rejected')->default(false);
             $table->unsignedBigInteger('user_id')->nullable();
         });
 

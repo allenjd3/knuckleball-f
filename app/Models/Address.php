@@ -18,6 +18,7 @@ class Address extends Model
         'user_id',
         'city',
         'state',
+        'rejected',
         'published_at',
         'postal_code',
     ];
@@ -32,6 +33,11 @@ class Address extends Model
         $builder->whereNull('published_at');
     }
 
+    public function scopeNotRejected(Builder $builder)
+    {
+        $builder->where('rejected', false);
+    }
+
     public function player(): BelongsTo
     {
         return $this->belongsTo(Player::class);
@@ -41,6 +47,7 @@ class Address extends Model
     {
         return [
             'published_at' => 'datetime',
+            'reject' => 'boolean',
         ];
     }
 }

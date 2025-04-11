@@ -60,7 +60,7 @@ class Player extends Model
 
     public function address()
     {
-        return $this->addresses()->latest()->published()->first();
+        return $this->addresses()->latest()->published()->notRejected()->first();
     }
 
     public function addresses(): HasMany

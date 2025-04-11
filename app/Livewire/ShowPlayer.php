@@ -43,7 +43,19 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
     public function render()
     {
-        return view('livewire.show-player');
+        return view(
+            'livewire.show-player',
+            collect([])->when(auth()->user()?->isSuperAdmin(),
+                fn ($collection) => $collection->merge([
+                    'unpublishedAddress' => $this->player
+                        ->addresses()
+                        ->unpublished()
+                        ->notRejected()
+                        ->latest()
+                        ->first(),
+                ]),
+            )->toArray(),
+        );
     }
 
     #[Computed]
@@ -58,6 +70,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return auth()->user()
             ?->addresses()
             ->unpublished()
+            ->notRejected()
             ->where('player_id', $this->player->id)
             ->exists();
     }
@@ -97,9 +110,17 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->using(fn (array $data) => $this->player->fees()->create($data));
     }
 
+    public function editPlayer(): Action
+    {
+        return Action::make('editPlayer')
+            ->icon("heroicon-o-pencil-square")
+            ->url(route('filament.cp.resources.players.edit', $this->player));
+    }
+
     public function associateTag(): Action
     {
         return Action::make('associateTag')
+            ->icon("heroicon-o-tag")
             ->authorize(auth()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')

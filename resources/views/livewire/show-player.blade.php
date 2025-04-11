@@ -14,6 +14,10 @@
                 <h1 class="text-3xl">{{ $player->name }}</h1>
                 @php
                 $actions = [];
+                if (auth()->user()?->isSuperAdmin()) {
+                    array_push($actions, $this->editPlayer);
+                }
+
                 if (auth()->user()?->can('update', $player)) {
                     array_push($actions, $this->createFee);
                 }
@@ -72,6 +76,10 @@
                     <p class="p-8 border-4 rounded-lg border-green-200 border-dashed text-green-500 font-bold">Thanks for your submission. It is in review!</p>
                 @else
                     <p class="p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">This player doesn't have an address yet.</p>
+                @endif
+
+                @if (isset($unpublishedAddress))
+                    <p class="font-bold text-green-500">There is an unpublished address for your review. <a href="{{ route('filament.cp.resources.addresses.edit', ['record' => data_get($unpublishedAddress, 'id')]) }}" class="text-black hover:underline">Review It</a></p>
                 @endif
 
                 @can('update', $player)
