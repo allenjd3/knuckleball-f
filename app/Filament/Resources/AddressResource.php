@@ -16,9 +16,12 @@ use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class AddressResource extends Resource
 {
@@ -83,15 +86,19 @@ class AddressResource extends Resource
                 TextColumn::make('published_at')
                     ->dateTime()
                     ->sortable(),
+                CheckboxColumn::make('rejected'),
             ])
             ->actions([
                 EditAction::make(),
+            ])
+            ->filters([
+                TernaryFilter::make('rejected')
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     BulkAction::make('publish')
-                        ->action(fn (Collection $records) => $records->each->update(['published_at' => now()->startOfDay() ]))
+                        ->action(fn (Collection $records) => $records->each->update(['published_at' => now()->startOfDay() ])),
                 ]),
             ]);
     }

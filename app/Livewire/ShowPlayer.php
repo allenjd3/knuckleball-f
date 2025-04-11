@@ -86,7 +86,21 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
             ])
-            ->using(fn (array $data) => $this->player->addresses()->create([...$data, 'user_id' => auth()->user()->id]));
+            ->using(
+                function (array $data) {
+                    $address = $this->player
+                        ->addresses()
+                        ->create([
+                            ...$data,
+                            'user_id' => auth()->user()->id,
+                            'published_at' => auth()->user()->isSuperAdmin() ? now() : null,
+                        ]);
+
+                    unset($this->address);
+
+                    return $address;
+                }
+            );
     }
 
     public function createFeeAction(): Action
