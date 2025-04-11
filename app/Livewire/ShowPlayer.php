@@ -127,14 +127,14 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     public function editPlayer(): Action
     {
         return Action::make('editPlayer')
-            ->icon("heroicon-o-pencil-square")
+            ->icon('heroicon-o-pencil-square')
             ->url(route('filament.cp.resources.players.edit', $this->player));
     }
 
     public function associateTag(): Action
     {
         return Action::make('associateTag')
-            ->icon("heroicon-o-tag")
+            ->icon('heroicon-o-tag')
             ->authorize(auth()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')
