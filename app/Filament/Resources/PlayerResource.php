@@ -10,6 +10,7 @@ use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
 use App\Models\Player;
 use App\Models\Team;
 use App\Support\Collections\PlayerCollection;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -23,8 +24,10 @@ use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ImportAction;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class PlayerResource extends Resource
@@ -43,7 +46,13 @@ class PlayerResource extends Resource
                     ->required(),
                 Select::make('last_team_id')
                     ->label('Last Played For')
-                    ->options(fn (?Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === ($record?->team_id ?? 0))->toArray())
+                    ->options(fn (?Player $record) => Team::published()
+                        ->where('rejected', false)
+                        ->get()
+                        ->pluck('name', 'id')
+                        ->reject(fn ($team, $id) => $id === ($record?->team_id ?? 0))
+                        ->toArray()
+                    )
                     ->default(fn (?Player $record) => $record?->last_team_id),
                 Select::make('user_id')
                     ->relationship(name: 'user', titleAttribute: 'name')
@@ -92,6 +101,7 @@ class PlayerResource extends Resource
                 TextColumn::make('lastTeam.name')->label('Last Team')->sortable(),
                 TextColumn::make('retired_at')
                     ->state(fn ($record) => $record->retired_at?->format('Y') ?? 'NULL'),
+                CheckboxColumn::make('rejected'),
                 TextColumn::make('published_at')->sortable()->date(),
                 TextColumn::make('user.name')->searchable(),
             ])
@@ -99,6 +109,9 @@ class PlayerResource extends Resource
                 EditAction::make(),
                 DeleteAction::make()
                     ->requiresConfirmation(),
+            ])
+            ->filters([
+                TernaryFilter::make('rejected'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

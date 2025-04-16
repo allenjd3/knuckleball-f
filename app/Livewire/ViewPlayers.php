@@ -98,13 +98,20 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 Select::make('team_id')
                     ->label('Team')
                     ->relationship('team')
-                    ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
+                    ->options(fn () => Team::published()
+                        ->where('rejected', false)
+                        ->get()
+                        ->pluck('name', 'id')
+                        ->toArray()
+                    )
                     ->createOptionModalHeading('Create Team')
                     ->createOptionForm(function () {
                         return [
                             TextInput::make('name'),
-                            DatePicker::make('published_at'),
                         ];
+                    })
+                    ->createOptionUsing(function (array $data) {
+                        Team::create([...$data, 'published_at' => now()->subDay()]);
                     })
                     ->searchable()
                     ->preload(),
@@ -115,7 +122,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ])
             ->using(function (array $data): Model {
                 $data = collect($data);
-                $player = Player::create($data->only(['name', 'team_id'])->toArray());
+                $player = Player::create([...$data->only(['name', 'team_id']), 'published_at' => now()->subDay()])->toArray();
 
                 if ($url = $data->get('url')) {
                     $player->media()->create([
@@ -130,6 +137,10 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     public function query()
     {
         return Player::query()
-            ->with(['team', 'lastTeam', 'media'])->where('published_at', '<', now()->endOfDay());
+            ->with(['team', 'lastTeam', 'media'])
+            ->where(
+                fn ($query) => $query->where('published_at', '<', now()->endOfDay())
+                    ->where('rejected', false)
+            );
     }
 }
