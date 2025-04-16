@@ -16,7 +16,9 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class TeamResource extends Resource
@@ -33,7 +35,7 @@ class TeamResource extends Resource
                 Select::make('category_id')
                     ->relationship(name: 'category', titleAttribute: 'name')
                     ->nullable(),
-                DatePicker::make('published_at'),
+                DatePicker::make('published_at')->default(now()->subDay()),
                 FileUpload::make('url')
                     ->directory('teams')
                     ->avatar(),
@@ -45,10 +47,13 @@ class TeamResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->searchable(),
-                TextColumn::make('published_at')->date(),
+                TextColumn::make('published_at')->sortable()->date(),
+                CheckboxColumn::make('rejected'),
                 TextColumn::make('category.name'),
             ])
-            ->filters([])
+            ->filters([
+                TernaryFilter::make('rejected'),
+            ])
             ->actions([
                 EditAction::make(),
             ])

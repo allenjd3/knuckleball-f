@@ -79,6 +79,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     {
         return CreateAction::make('createAddress')
             ->model(Address::class)
+            ->authorize(fn () => auth()->user()?->can('create', Address::class))
             ->form([
                 TextInput::make('address_1')->required(),
                 TextInput::make('address_2'),
@@ -107,6 +108,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     {
         return CreateAction::make('createFee')
             ->model(Fee::class)
+            ->authorize(fn () => auth()->user()?->can('create', Fee::class))
             ->form([
                 TextInput::make('amount')->required(),
                 DatePicker::make('published_at'),
@@ -127,6 +129,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     public function editPlayer(): Action
     {
         return Action::make('editPlayer')
+            ->authorize(fn () => auth()->user()?->can('update', $this->player))
             ->icon('heroicon-o-pencil-square')
             ->url(route('filament.cp.resources.players.edit', $this->player));
     }
@@ -135,7 +138,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     {
         return Action::make('associateTag')
             ->icon('heroicon-o-tag')
-            ->authorize(auth()->user()?->can('assign', Tag::class))
+            ->authorize(fn () => auth()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')
                     ->label('Tag')

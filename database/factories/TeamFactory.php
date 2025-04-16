@@ -22,6 +22,13 @@ class TeamFactory extends Factory
         ];
     }
 
+    public function published()
+    {
+        return $this->state([
+            'published_at' => now()->subDay(),
+        ]);
+    }
+
     private function teamNames(): array
     {
         return [

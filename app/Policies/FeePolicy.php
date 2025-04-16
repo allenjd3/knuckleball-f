@@ -10,17 +10,38 @@ class FeePolicy
 {
     use HandlesAuthorization;
 
-    public function viewAny(User $user): bool {}
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
 
-    public function view(User $user, Fee $fee): bool {}
+    public function view(User $user, Fee $fee): bool
+    {
+        return $user->isPublished();
+    }
 
-    public function create(User $user): bool {}
+    public function create(User $user): bool
+    {
+        return $user->isPublished();
+    }
 
-    public function update(User $user, Fee $fee): bool {}
+    public function update(User $user, Fee $fee): bool
+    {
+        return $user->isPublished();
+    }
 
-    public function delete(User $user, Fee $fee): bool {}
+    public function delete(User $user, Fee $fee): bool
+    {
+        return $user->isSuperAdmin();
+    }
 
-    public function restore(User $user, Fee $fee): bool {}
+    public function restore(User $user, Fee $fee): bool
+    {
+        return $user->isSuperAdmin();
+    }
 
-    public function forceDelete(User $user, Fee $fee): bool {}
+    public function forceDelete(User $user, Fee $fee): bool
+    {
+        return $user->isSuperAdmin();
+    }
 }

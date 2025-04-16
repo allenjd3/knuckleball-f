@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,8 +15,14 @@ class Team extends Model
 
     protected $fillable = [
         'name',
+        'rejected',
         'published_at',
     ];
+
+    public function scopePublished(Builder $builder)
+    {
+        $builder->where('published_at', '<', now());
+    }
 
     public function user(): BelongsTo
     {

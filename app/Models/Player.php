@@ -22,6 +22,7 @@ class Player extends Model
         'name',
         'team_id',
         'last_team_id',
+        'rejected',
         'retired_at',
         'published_at',
     ];
