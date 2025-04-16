@@ -10,7 +10,7 @@ test('Unauthenticated users can view teams', function () {
 });
 
 test('Teams are visible in the livewire component', function () {
-    $team = Team::factory()->create();
+    $team = Team::factory()->published()->create();
 
     Livewire::test('ViewTeams')
         ->assertSee($team->name);
@@ -60,8 +60,9 @@ test('approved teams are still visible', function () {
 
 test('an admin is emailed if new teams are added', function () {
     Notification::fake([PendingApprovals::class]);
+    User::factory()->state(['super_admin' => true])->create();
+
     $this->artisan('notify:pending-approvals');
 
     Notification::assertSentTimes(PendingApprovals::class, 1);
 });
-

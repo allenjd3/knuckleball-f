@@ -1,5 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('notify:pending-approvals')->weeklyOn(2, '1:00');
+Schedule::command('notify:pending-approvals')->weeklyOn(2, '1:00');
