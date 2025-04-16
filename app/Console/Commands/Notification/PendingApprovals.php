@@ -24,17 +24,17 @@ class PendingApprovals extends Command
     {
         $unapprovedPlayersCount = Player::query()
             ->whereNull('published_at')
-            ->where('rejected_at', false)
+            ->where('rejected', false)
             ->count();
 
         $unapprovedAddressesCount = Address::query()
             ->whereNull('published_at')
-            ->where('rejected_at', false)
+            ->where('rejected', false)
             ->count();
 
         $unapprovedTeamsCount = Team::query()
             ->whereNull('published_at')
-            ->where('rejected_at', false)
+            ->where('rejected', false)
             ->count();
 
         User::where('super_admin', true)->get()
