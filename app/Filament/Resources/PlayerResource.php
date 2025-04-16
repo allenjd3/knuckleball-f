@@ -10,7 +10,6 @@ use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
 use App\Models\Player;
 use App\Models\Team;
 use App\Support\Collections\PlayerCollection;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;

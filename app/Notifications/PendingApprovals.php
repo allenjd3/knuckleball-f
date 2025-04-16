@@ -3,7 +3,6 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -15,8 +14,7 @@ class PendingApprovals extends Notification
         public int $unapprovedTeamsCount,
         public int $unapprovedPlayersCount,
         public int $unapprovedAddressesCount,
-    ) {
-    }
+    ) {}
 
     public function via(object $notifiable): array
     {
