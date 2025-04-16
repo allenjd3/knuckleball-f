@@ -26,10 +26,6 @@
                     array_push($actions, $this->associateTag);
                 }
 
-                if (auth()->user()?->can('create', App\Models\Address::class)) {
-                    array_push($actions, $this->createAddress);
-                }
-
                 @endphp
 
                 @if (count($actions))
@@ -82,6 +78,9 @@
                     <p class="font-bold text-green-500">There is an unpublished address for your review. <a href="{{ route('filament.cp.resources.addresses.edit', ['record' => data_get($unpublishedAddress, 'id')]) }}" class="text-black hover:underline">Review It</a></p>
                 @endif
 
+                @can('create', App\Models\Address::class)
+                    <div class="mt-2">{{ $this->createAddress }}</div>
+                @endcan
                 @can('update', $player)
                     <x-filament-actions::modals />
                 @endcan
