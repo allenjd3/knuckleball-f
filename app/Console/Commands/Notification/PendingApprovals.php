@@ -40,7 +40,11 @@ class PendingApprovals extends Command
         User::where('super_admin', true)->get()
             ->each(
                 fn ($user) => $user->notify(
-                    new NotificationsPendingApprovals($unapprovedTeamsCount, $unapprovedAddressesCount, $unapprovedPlayersCount)
+                    new NotificationsPendingApprovals(
+                        unapprovedTeamsCount: $unapprovedTeamsCount,
+                        unapprovedAddressesCount: $unapprovedAddressesCount,
+                        unapprovedPlayersCount: $unapprovedPlayersCount
+                    )
                 )
             );
     }
