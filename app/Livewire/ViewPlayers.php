@@ -122,7 +122,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ])
             ->using(function (array $data): Model {
                 $data = collect($data);
-                $player = Player::create([...$data->only(['name', 'team_id']), 'published_at' => now()->subDay()])->toArray();
+                $player = Player::create([...$data->only(['name', 'team_id']), 'published_at' => now()->subDay()]);
 
                 if ($url = $data->get('url')) {
                     $player->media()->create([
