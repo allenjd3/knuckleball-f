@@ -168,6 +168,6 @@ return [
     ],
 
     'middleware' => [
-        AssignRequestId::class
-    ]
+        AssignRequestId::class,
+    ],
 ];
