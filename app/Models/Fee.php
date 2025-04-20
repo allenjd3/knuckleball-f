@@ -12,6 +12,7 @@ class Fee extends Model
 
     protected $fillable = [
         'amount',
+        'user_id',
         'published_at',
         'fee_material_id',
     ];
