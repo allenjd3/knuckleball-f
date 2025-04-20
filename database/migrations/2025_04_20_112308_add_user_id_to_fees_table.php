@@ -12,11 +12,4 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
         });
     }
-
-    public function down(): void
-    {
-        Schema::table('fees', function (Blueprint $table) {
-            //
-        });
-    }
 };
