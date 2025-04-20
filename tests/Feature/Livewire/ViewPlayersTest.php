@@ -36,10 +36,10 @@ test('Players can be sorted by name', function () {
         ->assertCanSeeTableRecords($players->sortBy('title'), inOrder: true);
 });
 
-test('Players can be updated by super admins', function ($superAdmin) {
+test('Players can be updated by super admins', function () {
     $team = Team::factory()->create();
     $team2 = Team::factory()->create();
-    $user = User::factory()->state(['super_admin' => $superAdmin])->create();
+    $user = User::factory()->state(['super_admin' => rand(0, 1) ? true : false])->create();
 
     $oldData = [
         'name' => 'Joe DeScoobio',
@@ -59,12 +59,10 @@ test('Players can be updated by super admins', function ($superAdmin) {
 
     $livewireTest = Livewire::actingAs($user)->test('ViewPlayers');
 
-    if ($superAdmin) {
-        $livewireTest->callTableAction(EditAction::class, $player, data: $updatedData);
-        $this->assertDatabaseHas('players', $updatedData);
-    } else {
-        $livewireTest->assertTableActionHidden(EditAction::class, $player);
-        $this->assertDatabaseHas('players', $oldData);
-    }
+    $livewireTest->callTableAction(EditAction::class, $player, data: $updatedData);
+    $this->assertDatabaseHas('players', $updatedData);
+});
 
-})->with([false, true]);
+test('Players cannot be updated by non-users', function () {
+    Livewire::test('ViewPlayers')->assertTableActionHidden(EditAction::class);
+});

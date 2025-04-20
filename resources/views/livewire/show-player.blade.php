@@ -104,7 +104,10 @@
                 <h3 class="font-bold px-2">Fees:</h3>
                 <div class="flex divide-x divide-black">
                     @forelse ($this->fees as $fee)
-                        <p class="px-2">${{ $fee->amount }} per {{ str($fee->feeMaterial->name) }}</p>
+                        <div class="px-2">
+                            ${{ $fee->amount }} per {{ str($fee->feeMaterial->name) }}
+                            <livewire:edit-fee wire:key="edit-fee-{{ $fee->id }}" :$fee />
+                        </div>
                     @empty
                         <p class="px-2">No fees yet!</p>
                     @endforelse
