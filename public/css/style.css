@@ -373,6 +373,9 @@ font-style: normal;
   border-color: transparent;
 }
 
+.hero-img {
+    max-width: 100%;
+}
 
 /*
   feature section

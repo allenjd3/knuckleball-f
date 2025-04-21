@@ -13,7 +13,7 @@
         "filament/notifications": "^3.2",
         "filament/tables": "^3.2",
         "honeybadger-io/honeybadger-laravel": "^4.4",
-        "laravel/framework": "^11.9",
+        "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.2",
         "laravel/pail": "^1.2",
         "laravel/sanctum": "^4.0",

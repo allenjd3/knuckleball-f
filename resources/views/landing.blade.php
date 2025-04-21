@@ -80,7 +80,7 @@
 				<h3 class="wow bounceIn">KNUCKLEBALL&nbsp;</h3>
 				<h2><span class="bold">Fresh, Free, and Built for Today’s TTM Collector. <br><br><p><a class="buttonhero" href="{{ route('register') }}">Activate Your Invite</a></p>	</span></h2>
 
-				<img src="{{ asset('images/Card_Hero.png') }}" alt="Cards">
+				<img class="hero-img" src="{{ asset('images/Card_Hero.png') }}" alt="Cards">
 			</div>
 
 		</div>
