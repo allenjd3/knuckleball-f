@@ -88,6 +88,7 @@ return [
                 'smtp',
                 'log',
             ],
+            'retry-after' => 60,
         ],
 
         'roundrobin' => [
@@ -96,6 +97,7 @@ return [
                 'ses',
                 'postmark',
             ],
+            'retry-after' => 60,
         ],
 
     ],
