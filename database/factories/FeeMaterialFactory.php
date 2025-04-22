@@ -15,8 +15,8 @@ class FeeMaterialFactory extends Factory
         return [
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
-            'name' => $this->faker->name(),
-            'published_at' => $this->faker->word(),
+            'name' => $this->faker->word(),
+            'published_at' => now()->subWeek(),
         ];
     }
 }

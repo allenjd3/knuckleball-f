@@ -61,7 +61,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('city')->required(),
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
-            ])
+           ])
             ->using(fn (array $data) => $this->player->address()->create($data));
     }
 
@@ -198,7 +198,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('comment'),
             ])
             ->headerActions([
-                CreateTableAction::make()
+                CreateTableAction::make('createPostalMail')
                     ->visible(fn () => auth()?->user()?->can('create', PostalMail::class))
                     ->form([
                         DatePicker::make('date_sent')->required(),
@@ -223,6 +223,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                                 ->create(array_merge($data, ['player_id' => $this->player->id]));
 
                             $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
+
+                            $postalMail->feeds()->create(['comment' => 'some comment here']);
 
                             return $postalMail;
                         });

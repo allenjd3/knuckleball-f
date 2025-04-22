@@ -2,7 +2,10 @@
 
 namespace App\Livewire;
 
+use App\Models\Feed;
 use App\Models\Player;
+use App\Models\PostalMail;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,6 +17,13 @@ class UserFeed extends Component
     public function render()
     {
         return view('livewire.user-feed');
+    }
+
+    #[Computed]
+    public function feeds()
+    {
+        return Feed::query()
+            ->paginate(20);
     }
 
     #[Computed]
