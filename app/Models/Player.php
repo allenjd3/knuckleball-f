@@ -22,6 +22,7 @@ class Player extends Model
         'name',
         'team_id',
         'last_team_id',
+        'rejected',
         'retired_at',
         'published_at',
     ];
@@ -58,9 +59,9 @@ class Player extends Model
         return $this->morphOne(Media::class, 'imageable')->latestOfMany();
     }
 
-    public function address(): HasOne
+    public function address()
     {
-        return $this->hasOne(Address::class)->latestOfMany();
+        return $this->addresses()->latest()->published()->notRejected()->first();
     }
 
     public function addresses(): HasMany

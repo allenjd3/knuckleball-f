@@ -58,3 +58,19 @@ test('invite codes decrement after use', function () {
     $this->post(route('register'), $userData)->assertValid();
     $this->assertEquals(1, $inviteCode->fresh()->remaining);
 });
+
+test('a new user is published as soon as they register', function () {
+    $inviteCode = InviteCode::factory()->state(['remaining' => 2])->create();
+    $userData = User::factory()->make()->only(['name', 'email', 'password']);
+    $userData = [
+        'name' => 'Joe Schmo',
+        'email' => 'joe@jamesdallen.me',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'code' => $inviteCode->code,
+    ];
+
+    $this->post(route('register'), $userData)->assertValid();
+
+    $this->assertTrue(User::firstWhere('name', 'Joe Schmo')->isPublished());
+});

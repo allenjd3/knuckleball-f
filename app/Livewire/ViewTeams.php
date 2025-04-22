@@ -4,8 +4,11 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Team;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\CreateAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
@@ -32,10 +35,22 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
         $this->category = $category;
     }
 
+    public function createTeam(): Action
+    {
+        return CreateAction::make('createTeam')
+            ->model(Team::class)
+            ->authorize(fn () => auth()->user()?->can('create', Team::class))
+            ->form([
+                TextInput::make('name')->required()->maxLength(255)->minLength(1),
+            ]);
+    }
+
     public function table(Table $table)
     {
         return $table
             ->query(fn () => Team::query()
+                ->where('rejected', false)
+                ->published()
                 ->when(
                     $this->category->exists,
                     fn ($query) => $query->where('category_id', $this->category->id),

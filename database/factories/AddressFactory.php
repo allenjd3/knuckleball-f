@@ -23,4 +23,11 @@ class AddressFactory extends Factory
             'player_id' => $this->faker->randomNumber(),
         ];
     }
+
+    public function published()
+    {
+        return $this->state([
+            'published_at' => now()->subDay(),
+        ]);
+    }
 }

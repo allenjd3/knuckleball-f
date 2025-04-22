@@ -24,7 +24,7 @@ class PlayerPolicy
 
     public function update(User $user, Player $player): bool
     {
-        return $user->isPublished() && $user->isSuperAdmin();
+        return $user->isPublished();
     }
 
     public function delete(User $user, Player $player): bool

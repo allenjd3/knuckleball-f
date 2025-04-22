@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Forms\Schema\FeeForm;
 use App\Models\Address;
 use App\Models\Fee;
 use App\Models\FeeMaterial;
@@ -31,6 +32,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ShowPlayer extends Component implements HasActions, HasForms, HasTable
@@ -41,55 +43,102 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
     public Player $player;
 
-    public function mount(Player $player)
-    {
-        $this->player = $player->load('address');
-    }
-
     public function render()
     {
-        return view('livewire.show-player');
+        return view(
+            'livewire.show-player',
+            collect([])->when(request()->user()?->isSuperAdmin(),
+                fn ($collection) => $collection->merge([
+                    'unpublishedAddress' => $this->player
+                        ->addresses()
+                        ->unpublished()
+                        ->notRejected()
+                        ->latest()
+                        ->first(),
+                ]),
+            )->toArray(),
+        );
+    }
+
+    #[Computed]
+    public function address()
+    {
+        return $this->player->address();
+    }
+
+    #[Computed]
+    public function hasUnpublishedAddress()
+    {
+        return request()->user()
+            ?->addresses()
+            ->unpublished()
+            ->notRejected()
+            ->where('player_id', $this->player->id)
+            ->exists();
     }
 
     public function createAddressAction(): Action
     {
         return CreateAction::make('createAddress')
             ->model(Address::class)
+            ->authorize(fn () => request()->user()?->can('create', Address::class))
             ->form([
                 TextInput::make('address_1')->required(),
                 TextInput::make('address_2'),
                 TextInput::make('city')->required(),
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
+<<<<<<< HEAD
            ])
             ->using(fn (array $data) => $this->player->address()->create($data));
+=======
+            ])
+            ->using(
+                function (array $data) {
+                    $address = $this->player
+                        ->addresses()
+                        ->create([
+                            ...$data,
+                            'user_id' => request()->user()->id,
+                            'published_at' => request()->user()->isSuperAdmin() ? now() : null,
+                        ]);
+
+                    unset($this->address);
+
+                    return $address;
+                }
+            );
+>>>>>>> main
     }
 
     public function createFeeAction(): Action
     {
         return CreateAction::make('createFee')
             ->model(Fee::class)
-            ->form([
-                TextInput::make('amount')->required(),
-                DatePicker::make('published_at'),
-                Select::make('fee_material_id')
-                    ->label('Material')
-                    ->relationship(name: 'feeMaterial', titleAttribute: 'name')
-                    ->preload()
-                    ->required()
-                    ->searchable()
-                    ->createOptionModalHeading('Create Item')
-                    ->createOptionForm([
-                        TextInput::make('name')->required(),
-                    ]),
-            ])
+            ->authorize(fn () => request()->user()?->can('create', Fee::class))
+            ->form(FeeForm::schema())
+            ->mutateFormDataUsing(function (array $data) {
+                data_set($data, 'user_id', request()->user()?->id);
+                data_set($data, 'published_at', now()->subDay());
+
+                return $data;
+            })
             ->using(fn (array $data) => $this->player->fees()->create($data));
+    }
+
+    public function editPlayer(): Action
+    {
+        return Action::make('editPlayer')
+            ->authorize(fn () => request()->user()?->can('update', $this->player))
+            ->icon('heroicon-o-pencil-square')
+            ->url(route('filament.cp.resources.players.edit', $this->player));
     }
 
     public function associateTag(): Action
     {
         return Action::make('associateTag')
-            ->authorize(auth()->user()?->can('assign', Tag::class))
+            ->icon('heroicon-o-tag')
+            ->authorize(fn () => request()->user()?->can('assign', Tag::class))
             ->form([
                 Select::make('tag_id')
                     ->label('Tag')
@@ -121,13 +170,19 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->tags()
             ->where(fn ($query) => $query
                 ->when(
-                    auth()->check(),
-                    fn ($query) => $query->where('player_tag.user_id', auth()->user()->id)->orWhere('player_tag.approved_at', '<', now()),
+                    request()->user(),
+                    fn ($query) => $query->where('player_tag.user_id', request()->user()->id)->orWhere('player_tag.approved_at', '<', now()),
                     fn ($query) => $query->where(fn ($query) => $query->where('player_tag.approved_at', '<', now())),
                 )
             )
             ->limit(20)
             ->get();
+    }
+
+    #[On('feeUpdated')]
+    public function resetFees()
+    {
+        unset($this->fees);
     }
 
     public function table(Table $table): Table
@@ -147,7 +202,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->modalHeading('Create Card')
                     ->label('Add Card')
                     ->icon('heroicon-o-plus-circle')
-                    ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
+                    ->visible(fn (Model $record) => request()->user()?->can('update', $record))
                     ->form([
                         TextInput::make('manufacturer')->maxLength(255)->required(),
                         TextInput::make('series')->maxLength(255)->required(),
@@ -162,7 +217,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->using(function (array $data, Model $record) {
                         $card = $record->cards()->create([
                             'manufacturer' => data_get($data, 'manufacturer'),
-                            'user_id' => auth()->user()->id,
+                            'user_id' => request()->user()->id,
                             'series' => data_get($data, 'series'),
                             'year' => data_get($data, 'year'),
                             'number' => data_get($data, 'number'),
@@ -174,7 +229,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         return $record;
                     }),
                 EditAction::make()
-                    ->visible(fn (Model $record) => auth()->user()?->can('update', $record))
+                    ->visible(fn (Model $record) => request()->user()?->can('update', $record))
                     ->form([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
@@ -186,7 +241,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         return $record;
                     }),
                 DeleteAction::make('delete')
-                    ->visible(fn (Model $record) => auth()->user()?->can('delete', $record))
+                    ->visible(fn (Model $record) => request()->user()?->can('delete', $record))
                     ->requiresConfirmation(),
             ])
             ->columns([
@@ -198,8 +253,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('comment'),
             ])
             ->headerActions([
+<<<<<<< HEAD
                 CreateTableAction::make('createPostalMail')
                     ->visible(fn () => auth()?->user()?->can('create', PostalMail::class))
+=======
+                CreateTableAction::make()
+                    ->visible(fn () => request()?->user()?->can('create', PostalMail::class))
+>>>>>>> main
                     ->form([
                         DatePicker::make('date_sent')->required(),
                         DatePicker::make('returned_date'),
@@ -218,7 +278,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ])
                     ->using(function (array $data): Model {
                         return DB::transaction(function () use ($data) {
-                            $postalMail = auth()->user()
+                            $postalMail = request()->user()
                                 ->postalMails()
                                 ->create(array_merge($data, ['player_id' => $this->player->id]));
 
