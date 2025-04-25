@@ -197,7 +197,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->modalHeading('Create Card')
                     ->label('Add Card')
                     ->icon('heroicon-o-plus-circle')
-                    ->visible(fn (Model $record) => request()->user()?->can('update', $record))
+                    ->visible(function (?Model $record) {
+                        if (is_null($record)) {
+                            return false;
+                        }
+
+                        return request()->user()?->can('update', $record);
+                    })
                     ->form([
                         TextInput::make('manufacturer')->maxLength(255)->required(),
                         TextInput::make('series')->maxLength(255)->required(),
