@@ -60,6 +60,11 @@ class PostalMail extends Model
         return $this->morphMany(Feed::class, 'feedable');
     }
 
+    public function getFollowableId()
+    {
+        return $this->user_id;
+    }
+
     public function generateMeta()
     {
         $user = $this->user;

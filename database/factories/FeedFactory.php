@@ -45,6 +45,7 @@ class FeedFactory extends Factory
         return $this->state([
             'feedable_id' => $model::factory()->for($user)->create()->id,
             'feedable_type' => $model,
+            'followable_id' => $user->id,
         ]);
     }
 }

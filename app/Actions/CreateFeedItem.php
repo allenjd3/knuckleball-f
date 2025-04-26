@@ -8,6 +8,10 @@ class CreateFeedItem
 {
     public static function execute(PostalMail $feedItem, ?string $comment)
     {
-        $feedItem->feeds()->create(['comment' => $comment ?? "", 'meta' => $feedItem->generateMeta()]);
+        $feedItem->feeds()->create([
+            'comment' => $comment ?? "",
+            'followable_id' => $feedItem->getFollowableId(),
+            'meta' => $feedItem->generateMeta(),
+        ]);
     }
 }

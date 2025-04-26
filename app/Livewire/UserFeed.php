@@ -4,39 +4,20 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use App\Models\Player;
-use DB;
+use App\Models\User;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class UserFeed extends Component
 {
     use WithPagination;
-    public $feeds = [];
-    public $cursor = null;
+
     public $hasMore = true;
 
-    public function mount()
+    public function paginationView()
     {
-        $this->loadMore(); // Load first set
-    }
-
-    public function loadMore()
-    {
-        $query = Feed::orderByDesc('id');
-
-        $results = $this->cursor
-            ? $query->cursorPaginate(10, ['*'], 'cursor', $this->cursor)
-            : $query->cursorPaginate(10);
-
-        $this->feeds = [...$this->feeds, ...$results->items()];
-        if (count($this->feeds) > 50) {
-            array_slice($this->feeds, -50);
-        }
-
-        $this->cursor = $results->nextCursor()?->encode();
-        $this->hasMore = $results->hasMorePages();
+        return 'vendor.pagination.simple-tailwind';
     }
 
     public function render()
@@ -48,9 +29,16 @@ class UserFeed extends Component
     public function feeds()
     {
         return Feed::query()
-            ->addSelect('1 as poo')
-            ->get();
-
+            ->select('feeds.*')
+            ->selectSub(fn ($query) =>
+                $query->selectRaw('1')
+                    ->from('users')
+                    ->whereColumn('users.id', 'feeds.followable_id')
+                    ->wherein('users.id', auth()->user()?->followers()->select('id') ?? []),
+                'is_following'
+            )
+            ->orderByDesc('created_at')
+            ->simplePaginate();
     }
 
     #[Computed]
