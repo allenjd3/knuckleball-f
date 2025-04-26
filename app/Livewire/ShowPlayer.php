@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Actions\CreateFeedItem;
 use App\Forms\Schema\FeeForm;
 use App\Models\Address;
 use App\Models\Fee;
@@ -248,7 +249,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('comment'),
             ])
             ->headerActions([
-                CreateTableAction::make()
+                CreateTableAction::make('createPostalMail')
                     ->visible(fn () => request()?->user()?->can('create', PostalMail::class))
                     ->form([
                         DatePicker::make('date_sent')->required(),
@@ -274,7 +275,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
                             $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
 
-                            $postalMail->feeds()->create(['comment' => 'some comment here']);
+                            CreateFeedItem::execute(feedItem: $postalMail, comment: $postalMail->comment);
 
                             return $postalMail;
                         });

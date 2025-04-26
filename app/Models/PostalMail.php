@@ -59,4 +59,20 @@ class PostalMail extends Model
     {
         return $this->morphMany(Feed::class, 'feedable');
     }
+
+    public function generateMeta()
+    {
+        $user = $this->user;
+        $player = $this->player;
+
+        return [
+            'photo' => $user->profile_photo_url,
+            'user' => $user->name,
+            'user_path' => $user->path(),
+            'player' => $player->name,
+            'player_path' => $player->path(),
+            'date_sent' => $this->date_sent,
+            'date_returned' => $this->date_returned,
+        ];
+    }
 }

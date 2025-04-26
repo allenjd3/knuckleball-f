@@ -130,6 +130,11 @@ class User extends Authenticatable implements FilamentUser
             ->detach([$playerTag->tag_id]);
     }
 
+    public function path(): string
+    {
+        return route('users.profile', ['user' => $this]);
+    }
+
     protected function casts(): array
     {
         return [

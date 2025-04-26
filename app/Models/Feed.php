@@ -13,10 +13,15 @@ class Feed extends Model
 
     protected $fillable = [
         'comment',
+        'meta',
     ];
 
     protected $casts = [
         'meta' => 'array',
+    ];
+
+    protected $attributes = [
+        'meta' => '[]',
     ];
 
     public function feedable(): MorphTo

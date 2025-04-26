@@ -35,9 +35,17 @@ class DatabaseSeeder extends Seeder
             ->create();
 
         $teams->each(fn ($team) => Player::factory(12)->for($team)->create());
-        Feed::factory(5)->forUser($user)->create();
+        Feed::factory(5)->forUser($user)->postalMail()->create();
 
-        PostalMail::factory(50)->has(Card::factory(3)->for($user))->create()->each(fn ($mail) => $mail->feeds()->create(['comment' => $faker->paragraph()]));
+    PostalMail::factory(50)
+            ->has(
+                Card::factory(3)->for($user)
+            )->create()
+            ->each(
+                fn ($mail) => $mail->feeds()->create(
+                    Feed::factory()->postalMail()->make()->only('comment', 'meta')
+                )
+            );
 
         $materials = FeeMaterial::limit(5)
             ->pluck('id');

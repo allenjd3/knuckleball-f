@@ -3,8 +3,16 @@
         <a href="{{ auth()->check() ? route('users.profile', auth()->user()) : route('login') }}">My Feed</a>
     </aside>
     <main class="divide-y w-full">
-    @foreach ($this->feeds as $feed)
+    @foreach ($feeds as $feed)
         <x-dynamic-component :component="$feed->componentName()" :$feed />
     @endforeach
+    @if ($hasMore)
+    <x-filament::button
+        wire:click="loadMore"
+    >
+        Next Page
+    </x-filament::button>
+    @endif
+
     </main>
 </div>

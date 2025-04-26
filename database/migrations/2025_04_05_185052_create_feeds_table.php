@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('feedable');
             $table->string('comment', 500);
-            $table->json('meta')->default(json_encode([]));
+            $table->json('meta');
             $table->timestamps();
         });
     }

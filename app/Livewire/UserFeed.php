@@ -4,15 +4,40 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use App\Models\Player;
-use App\Models\PostalMail;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use DB;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class UserFeed extends Component
 {
     use WithPagination;
+    public $feeds = [];
+    public $cursor = null;
+    public $hasMore = true;
+
+    public function mount()
+    {
+        $this->loadMore(); // Load first set
+    }
+
+    public function loadMore()
+    {
+        $query = Feed::orderByDesc('id');
+
+        $results = $this->cursor
+            ? $query->cursorPaginate(10, ['*'], 'cursor', $this->cursor)
+            : $query->cursorPaginate(10);
+
+        $this->feeds = [...$this->feeds, ...$results->items()];
+        if (count($this->feeds) > 50) {
+            array_slice($this->feeds, -50);
+        }
+
+        $this->cursor = $results->nextCursor()?->encode();
+        $this->hasMore = $results->hasMorePages();
+    }
 
     public function render()
     {
@@ -23,7 +48,9 @@ class UserFeed extends Component
     public function feeds()
     {
         return Feed::query()
-            ->paginate(20);
+            ->addSelect('1 as poo')
+            ->get();
+
     }
 
     #[Computed]
