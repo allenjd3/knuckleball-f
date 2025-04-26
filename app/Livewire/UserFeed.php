@@ -31,10 +31,16 @@ class UserFeed extends Component
         return Feed::query()
             ->select('feeds.*')
             ->selectSub(
-                fn ($query) => $query->selectRaw('1')->whereIn('users.id', auth()->user()?->following->pluck('id')),
-                'is_following'
+                fn ($query) => $query
+                    ->when(
+                        auth()->check(),
+                        fn($query) => $query->selectRaw('1')
+                            ->from('users as u')
+                            ->whereColumn('u.id', 'feeds.followable_id')
+                            ->whereIn('u.id', auth()->user()?->following()->select('users.id')),
+                        fn ($query) => $query->selectRaw('0'),
+                    ), 'is_following'
             )
-            ->join('users', 'feeds.followable_id', '=', 'users.id')
             ->orderByDesc('is_following')
             ->orderByDesc('created_at')
             ->simplepaginate();
