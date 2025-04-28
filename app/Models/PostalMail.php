@@ -47,14 +47,6 @@ class PostalMail extends Model
         return $this->hasMany(Card::class);
     }
 
-    protected function casts(): array
-    {
-        return [
-            'date_sent' => 'datetime',
-            'returned_date' => 'datetime',
-        ];
-    }
-
     public function feeds(): MorphMany
     {
         return $this->morphMany(Feed::class, 'feedable');
@@ -78,6 +70,14 @@ class PostalMail extends Model
             'player_path' => $player->path(),
             'date_sent' => $this->date_sent,
             'date_returned' => $this->date_returned,
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'date_sent' => 'datetime',
+            'returned_date' => 'datetime',
         ];
     }
 }

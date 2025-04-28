@@ -13,6 +13,7 @@ class Feed extends Model
 
     protected $fillable = [
         'comment',
+        'followable_id',
         'meta',
     ];
 
@@ -31,7 +32,7 @@ class Feed extends Model
 
     public function componentName(): string
     {
-        return match(true) {
+        return match (true) {
             $this->feedable_type === PostalMail::class => 'feeds.postal-mail'
         };
     }

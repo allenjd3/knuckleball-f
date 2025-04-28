@@ -3,14 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Card;
-use App\Models\Feed;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\Team;
 use App\Models\User;
 use Database\Seeders\Production\FeedSeeder;
-use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder

@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use App\Models\Player;
-use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -34,7 +33,7 @@ class UserFeed extends Component
                 fn ($query) => $query
                     ->when(
                         auth()->check(),
-                        fn($query) => $query->selectRaw('1')
+                        fn ($query) => $query->selectRaw('1')
                             ->from('users as u')
                             ->whereColumn('u.id', 'feeds.followable_id')
                             ->whereIn('u.id', auth()->user()?->following()->select('users.id')),

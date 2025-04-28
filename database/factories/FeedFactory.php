@@ -15,6 +15,7 @@ class FeedFactory extends Factory
     public function definition(): array
     {
         $model = PostalMail::class;
+
         return [
             'feedable_id' => $model::factory()->create(),
             'feedable_type' => $model,
@@ -36,7 +37,7 @@ class FeedFactory extends Factory
                 'photo' => $user->profile_photo_url,
                 'date_sent' => now()->subWeek(),
                 'date_returned' => rand(0, 1) ? now()->subDay() : null,
-            ]
+            ],
         ]);
     }
 
