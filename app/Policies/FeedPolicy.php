@@ -12,7 +12,7 @@ class FeedPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,7 +20,7 @@ class FeedPolicy
      */
     public function view(User $user, Feed $feed): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,7 +28,7 @@ class FeedPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isPublished();
     }
 
     /**
@@ -36,7 +36,7 @@ class FeedPolicy
      */
     public function update(User $user, Feed $feed): bool
     {
-        return false;
+        return $user->isPublished();
     }
 
     /**
@@ -44,7 +44,7 @@ class FeedPolicy
      */
     public function delete(User $user, Feed $feed): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -52,7 +52,7 @@ class FeedPolicy
      */
     public function restore(User $user, Feed $feed): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -60,6 +60,6 @@ class FeedPolicy
      */
     public function forceDelete(User $user, Feed $feed): bool
     {
-        return false;
+        return $user->isSuperAdmin();
     }
 }

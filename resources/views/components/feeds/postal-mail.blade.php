@@ -1,6 +1,6 @@
-<article class="py-2 grid grid-cols-[100px,1fr]">
+<article class="py-2 grid grid-cols-[100px_1fr]">
     <div class="flex items-start justify-center items-center w-[100px]">
-        <img class="size-12 border rounded-full" src="{{ $photo }}" alt="{{ $user }}" />
+        <img class="size-12 rounded-full" src="{{ $photo }}" alt="{{ $user }}" />
     </div>
     <div>
         <p class="font-bold"><a href="{{ $player_path }}">{{ $player }}</a></p>
