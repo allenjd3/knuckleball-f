@@ -19,21 +19,9 @@
         </div>
     </aside>
     <div class="divide-y">
-        @foreach ($this->postalMails as $postalMail)
-            <div class="p-4 cursor-pointer" @click="window.location.href='{{ route("players.show", $postalMail->player ) }}'">
-                <div class="items-center">
-                    <div class="font-bold">
-                        {{ $postalMail->player->name }}
-                    </div>
-                    <div class="flex gap-4">
-                        <span>Sent: {{ $postalMail->date_sent->format('M d, Y') }}</span>
-                        <span>Returned: {{ $postalMail->returned_date?->format('M d, Y') }}</span>
-                    </div>
-                    <div>
-                        {{ $postalMail->comment }}
-                    </div>
-                </div>
-            </div>
+        @foreach ($this->feeds as $feed)
+            <x-dynamic-component :component="$feed->componentName()" :$feed />
         @endforeach
+        {{ $this->feeds->links() }}
     </div>
 </div>
