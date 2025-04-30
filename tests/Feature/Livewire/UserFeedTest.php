@@ -20,6 +20,7 @@ test('it creates a feed when adding postal mail', function () {
         $feeMaterial = FeeMaterial::factory()->create();
         Livewire::actingAs($user)->test('ShowPlayer', ['player' => $player])
             ->callTableAction('createPostalMail', data: [
+                'comment' => 'some comment here',
                 'user_id' => $user->id,
                 'fee_material_id' => $feeMaterial->id,
                 'date_sent' => now()->subWeek(),
@@ -36,7 +37,7 @@ test('it creates a feed when adding postal mail', function () {
 test('it pulls the feeds', function () {
     Feed::factory(21)->postalMail()->create();
 
-    $this->assertCount(10, Livewire::test(UserFeed::class)
+    $this->assertCount(15, Livewire::test(UserFeed::class)
         ->instance()
         ->feeds);
 });

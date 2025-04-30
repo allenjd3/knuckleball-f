@@ -29,6 +29,7 @@ class FeedFactory extends Factory
         $player ??= Player::factory()->create();
 
         return $this->state([
+            'followable_id' => $user->id,
             'meta' => [
                 'player' => $player->name,
                 'player_path' => $player->path(),
