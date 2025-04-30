@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class PostalMail extends Model
 {
@@ -44,6 +45,32 @@ class PostalMail extends Model
     public function cards(): HasMany
     {
         return $this->hasMany(Card::class);
+    }
+
+    public function feeds(): MorphMany
+    {
+        return $this->morphMany(Feed::class, 'feedable');
+    }
+
+    public function getFollowableId()
+    {
+        return $this->user_id;
+    }
+
+    public function generateMeta()
+    {
+        $user = $this->user;
+        $player = $this->player;
+
+        return [
+            'photo' => $user->profile_photo_url,
+            'user' => $user->name,
+            'user_path' => $user->path(),
+            'player' => $player->name,
+            'player_path' => $player->path(),
+            'date_sent' => $this->date_sent,
+            'date_returned' => $this->date_returned,
+        ];
     }
 
     protected function casts(): array
