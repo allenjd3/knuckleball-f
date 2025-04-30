@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Feed;
 use App\Models\User;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -33,13 +34,12 @@ class UserProfile extends Component
     }
 
     #[Computed]
-    public function postalMails()
+    public function feeds()
     {
-        return $this->user
-            ->postalMails()
-            ->orderByDesc('date_sent')
-            ->with(['player', 'feeMaterials'])
-            ->paginate(10);
+        return Feed::query()
+            ->where('followable_id', $this->user->id)
+            ->orderByDesc('created_at')
+            ->simplepaginate();
     }
 
     #[Computed]
