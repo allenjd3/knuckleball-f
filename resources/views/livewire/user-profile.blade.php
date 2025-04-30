@@ -18,7 +18,7 @@
             @endif
         </div>
     </aside>
-    <div class="divide-y">
+    <div class="divide-y w-full">
         @foreach ($this->feeds as $feed)
             <x-dynamic-component :component="$feed->componentName()" :$feed />
         @endforeach
