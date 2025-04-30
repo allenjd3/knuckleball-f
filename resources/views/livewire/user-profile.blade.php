@@ -1,5 +1,5 @@
-<div class="max-w-5xl mx-auto flex gap-8 mt-8">
-    <aside class="flex flex-col items-center">
+<div class="max-w-5xl mx-auto flex flex-col md:flex-row gap-8 mt-8">
+    <aside class="flex flex-col justify-center items-center w-max">
         <div class="rounded-full size-32 overflow-hidden">
             <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="object-cover w-full h-full"/>
         </div>
