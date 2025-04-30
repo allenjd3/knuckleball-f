@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Feed;
-use App\Models\Player;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
