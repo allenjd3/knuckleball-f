@@ -69,7 +69,7 @@ class PostalMail extends Model
             'player' => $player->name,
             'player_path' => $player->path(),
             'date_sent' => $this->date_sent,
-            'date_returned' => $this->date_returned,
+            'date_returned' => $this->returned_date,
         ];
     }
 
