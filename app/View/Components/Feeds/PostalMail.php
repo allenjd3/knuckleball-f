@@ -28,7 +28,9 @@ class PostalMail extends Component
         $this->player_path = data_get($feed->meta, 'player_path');
         $this->user_path = data_get($feed->meta, 'user_path');
         $this->dateSent = Carbon::parse(data_get($feed->meta, 'date_sent'))->format('M d, Y');
-        $this->dateReturned = Carbon::parse(data_get($feed->meta, 'date_returned'))->format('M d, Y');
+        $this->dateReturned = data_get($feed->meta, 'date_returned')
+            ? Carbon::parse(data_get($feed->meta, 'date_returned'))->format('M d, Y')
+            : 'Not returned yet';
         $this->type = data_get($feed->meta, 'type', '');
     }
 
