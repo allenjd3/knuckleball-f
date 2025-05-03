@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Actions\UpdateFeedItem;
+use App\Events\PostalMailDeleted;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,6 +23,17 @@ class PostalMail extends Model
         'player_id',
         'comment',
     ];
+
+    protected static function booted()
+    {
+        static::updated(function (PostalMail $postalMail) {
+            UpdateFeedItem::execute($postalMail, $postalMail->comment);
+        });
+
+        static::deleting(function (PostalMail $postalMail) {
+            PostalMailDeleted::dispatch($postalMail->id);
+        });
+    }
 
     public function feeMaterials(): BelongsToMany
     {
