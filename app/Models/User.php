@@ -144,4 +144,9 @@ class User extends Authenticatable implements FilamentUser
             'super_admin' => 'bool',
         ];
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 }
