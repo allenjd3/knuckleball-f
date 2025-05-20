@@ -8,7 +8,7 @@ use Livewire\Livewire;
 test('the user can make a comment', function () {
     $user = User::factory()->create();
     Livewire::actingAs($user)->test(AddComment::class)
-        ->set('body', 'This is a comment')
+        ->fillForm(['body' => 'This is a comment'])
         ->call('save');
 
     $this->assertDatabaseHas('comments', [

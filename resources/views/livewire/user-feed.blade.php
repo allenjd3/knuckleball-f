@@ -3,6 +3,7 @@
         <a href="{{ auth()->check() ? route('users.profile', auth()->user()) : route('login') }}">My Feed</a>
     </aside>
     <main class="divide-y w-full">
+    <livewire:add-comment />
     @foreach ($this->feeds as $feed)
         <x-dynamic-component :component="$feed->componentName()" :$feed />
     @endforeach

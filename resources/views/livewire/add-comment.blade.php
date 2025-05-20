@@ -1,3 +1,12 @@
 <div>
-    {{-- A good traveler has no fixed plans and is not intent upon arriving. --}}
+    <form wire:submit="save">
+        {{ $this->form }}
+
+        <x-filament::button
+            type="submit"
+            size="sm"
+        >
+            Add Comment
+        </x-filament::button>
+    </form>
 </div>
