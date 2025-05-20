@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use App\Models\Comment;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
