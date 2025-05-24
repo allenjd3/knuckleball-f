@@ -1,5 +1,5 @@
 <div>
-    <form wire:submit="save">
+    <form wire:submit="save" class="space-y-4 my-8">
         {{ $this->form }}
 
         <x-filament::button

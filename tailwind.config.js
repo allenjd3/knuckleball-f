@@ -7,4 +7,9 @@ export default {
         './resources/views/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
     ],
+    theme: {
+        fontFamily: {
+            'display': ['industry-inc-base', 'sans-serif'],
+        }
+    }
 }

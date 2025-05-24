@@ -2,11 +2,12 @@
 
 namespace App\Actions;
 
+use App\Models\Comment;
 use App\Models\PostalMail;
 
 class CreateFeedItem
 {
-    public static function execute(PostalMail $feedItem, ?string $comment)
+    public static function execute(PostalMail|Comment $feedItem, ?string $comment)
     {
         $feedItem->feeds()->create([
             'comment' => $comment ?? '',

@@ -35,7 +35,11 @@ class UserFeed extends Component
                         fn ($query) => $query->selectRaw('1')
                             ->from('users as u')
                             ->whereColumn('u.id', 'feeds.followable_id')
-                            ->whereIn('u.id', auth()->user()?->following()->select('users.id')),
+                            ->where(
+                                fn ($query) => $query
+                                    ->whereIn('u.id', auth()->user()?->following()->select('users.id'))
+                                    ->orWhere('u.id', auth()->user()?->id)
+                            ),
                         fn ($query) => $query->selectRaw('0'),
                     ), 'is_following'
             )

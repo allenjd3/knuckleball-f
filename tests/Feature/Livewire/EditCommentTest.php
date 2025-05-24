@@ -4,7 +4,7 @@ use App\Livewire\EditComment;
 use App\Models\Comment;
 use App\Models\User;
 
-test("the user can delete their own comment", function () {
+test('the user can delete their own comment', function () {
     $user = User::factory()->create();
 
     $comment = Comment::factory()
@@ -42,7 +42,7 @@ test("the user cannot delete another user's comment", function () {
     ]);
 });
 
-test("the user can edit their own comment", function () {
+test('the user can edit their own comment', function () {
     $user = User::factory()->create();
 
     $comment = Comment::factory()

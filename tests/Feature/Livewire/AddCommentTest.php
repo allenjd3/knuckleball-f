@@ -18,7 +18,7 @@ test('the user can make a comment', function () {
     $this->assertTrue(Comment::firstWhere('body', 'This is a comment')->user->is($user));
 });
 
-test("the user can reply to a comment", function () {
+test('the user can reply to a comment', function () {
     $user = User::factory()->create();
     $comment = Comment::factory()->create();
     Livewire::actingAs($user)->test(AddComment::class, ['commentId' => $comment->id])
@@ -30,4 +30,3 @@ test("the user can reply to a comment", function () {
         'body' => 'This is a comment',
     ]);
 });
-
