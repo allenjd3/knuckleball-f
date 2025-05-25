@@ -45,9 +45,15 @@ test('the comment is not saved without content', function () {
     $user = User::factory()->create();
     Livewire::actingAs($user)->test(AddComment::class)
         ->fillForm(['body' => ''])
-        ->call('save');
+        ->call('save')
+        ->assertHasErrors('body');
+});
 
-    $this->assertDatabaseMissing('comments', [
-        'body' => '',
-    ]);
+
+test('the comment content has a maximum length', function () {
+    $user = User::factory()->create();
+    Livewire::actingAs($user)->test(AddComment::class)
+        ->fillForm(['body' => str('l')->repeat(501)->__toString()])
+        ->call('save')
+        ->assertHasErrors('body');
 });
