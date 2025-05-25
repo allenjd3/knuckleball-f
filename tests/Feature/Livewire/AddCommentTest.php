@@ -30,3 +30,24 @@ test('the user can reply to a comment', function () {
         'body' => 'This is a comment',
     ]);
 });
+
+test('guests cannot make a comment', function () {
+    Livewire::test(AddComment::class)
+        ->set('body', 'This is a comment')
+        ->call('save');
+
+    $this->assertDatabaseMissing('comments', [
+        'body' => 'This is a comment',
+    ]);
+});
+
+test('the comment is not saved without content', function () {
+    $user = User::factory()->create();
+    Livewire::actingAs($user)->test(AddComment::class)
+        ->fillForm(['body' => ''])
+        ->call('save');
+
+    $this->assertDatabaseMissing('comments', [
+        'body' => '',
+    ]);
+});

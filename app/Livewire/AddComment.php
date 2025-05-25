@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Models\Comment;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Grid;
@@ -11,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class AddComment extends Component implements HasActions, HasForms
@@ -41,16 +43,21 @@ class AddComment extends Component implements HasActions, HasForms
             ->schema([
                 Textarea::make('body')
                     ->label('Comment')
-                    ->minLength(0)
+                    ->minLength(1)
                     ->maxLength(500)
             ]);
     }
 
     public function save()
     {
+        $this->authorize('create', Comment::class);
+        $validated = $this->validate([
+            'body' => 'required|min:1|max:500',
+        ]);
+
         $comment = auth()->user()
             ?->comments()
-            ->create(['body' => $this->body, 'comment_id' => $this->commentId]);
+            ->create(['body' => $validated['body'], 'comment_id' => $this->commentId]);
 
         CreateFeedItem::execute($comment, $comment->body);
         $this->dispatch('feed-updated');
