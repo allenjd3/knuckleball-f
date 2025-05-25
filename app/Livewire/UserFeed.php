@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -46,5 +47,11 @@ class UserFeed extends Component
             ->orderByDesc('is_following')
             ->orderByDesc('created_at')
             ->simplepaginate();
+    }
+
+    #[On('feed-updated')]
+    public function updateFeed()
+    {
+        unset($this->feeds);
     }
 }

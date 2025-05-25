@@ -35,7 +35,13 @@ class Comment extends Model
 
     public function generateMeta()
     {
+        $user = $this->user;
+
         return [
+            'photo' => $user->profile_photo_url,
+            'user' => $user->name,
+            'user_path' => $user->path(),
+            'date_sent' => $this->date_sent,
         ];
     }
 

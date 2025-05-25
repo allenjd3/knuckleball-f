@@ -39,32 +39,20 @@ class AddComment extends Component implements HasActions, HasForms
         return $form
             ->statePath('')
             ->schema([
-                Grid::make(1)->schema([
-                    Textarea::make('body')
-                        ->label('Comment')
-                        ->minLength(0)
-                        ->maxLength(500)
-                        ->extraFieldWrapperAttributes([
-                            'style' => 'grid-column: 1 / -1 !important;',
-                        ])
-                        ->columnSpan('full'),
-                ]),
+                Textarea::make('body')
+                    ->label('Comment')
+                    ->minLength(0)
+                    ->maxLength(500)
             ]);
     }
 
     public function save()
     {
-        if ($this->commentId) {
-            $comment = auth()->user()
-                ?->comments()
-                ->create(['body' => $this->body, 'comment_id' => $this->commentId]);
-        } else {
-            $comment = auth()->user()
-                ?->comments()
-                ->create(['body' => $this->body]);
-        }
+        $comment = auth()->user()
+            ?->comments()
+            ->create(['body' => $this->body, 'comment_id' => $this->commentId]);
 
         CreateFeedItem::execute($comment, $comment->body);
-        $this->dispatch('comment-created');
+        $this->dispatch('feed-updated');
     }
 }
