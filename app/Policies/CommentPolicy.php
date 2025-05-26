@@ -29,16 +29,16 @@ class CommentPolicy
 
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id;
+        return $user->id === $comment->user_id || $user->isSuperAdmin();
     }
 
     public function restore(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id;
+        return  $user->isSuperAdmin();
     }
 
     public function forceDelete(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id;
+        return $user->isSuperAdmin();
     }
 }

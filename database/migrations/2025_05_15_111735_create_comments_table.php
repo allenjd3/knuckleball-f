@@ -15,6 +15,7 @@ return new class extends Migration
             $table->string('body', 300);
             $table->foreignIdFor(User::class)->nullable();
             $table->foreignIdFor(Comment::class)->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -6,7 +6,7 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PostalMailDeleted
+class CommentDeleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

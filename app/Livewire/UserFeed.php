@@ -28,6 +28,7 @@ class UserFeed extends Component
     public function feeds()
     {
         return Feed::query()
+            ->with('feedable')
             ->select('feeds.*')
             ->selectSub(
                 fn ($query) => $query
