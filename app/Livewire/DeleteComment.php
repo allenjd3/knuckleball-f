@@ -8,10 +8,12 @@ use Livewire\Component;
 class DeleteComment extends Component
 {
     public int $commentId;
+    public bool $canDelete;
 
-    public function mount($commentId = 0)
+    public function mount($commentId = 0, $canDelete = false)
     {
         $this->commentId = $commentId;
+        $this->canDelete = $canDelete;
     }
 
     public function render()

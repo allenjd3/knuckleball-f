@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Blade;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -36,5 +37,9 @@ class AppServiceProvider extends ServiceProvider
             'success' => Color::Green,
             'warning' => Color::Amber,
         ]);
+
+        Blade::directive('comment', function (string $expression) {
+            return "<?php echo nl2br(e($expression)); ?>";
+        });
     }
 }

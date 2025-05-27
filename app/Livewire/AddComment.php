@@ -6,13 +6,11 @@ use App\Actions\CreateFeedItem;
 use App\Models\Comment;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Livewire\Attributes\Locked;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class AddComment extends Component implements HasActions, HasForms
@@ -60,6 +58,8 @@ class AddComment extends Component implements HasActions, HasForms
             ->create(['body' => $validated['body'], 'comment_id' => $this->commentId]);
 
         CreateFeedItem::execute($comment, $comment->body);
+
+        $this->body = '';
         $this->dispatch('feed-updated');
     }
 }
