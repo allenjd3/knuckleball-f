@@ -42,7 +42,7 @@ class AddComment extends Component implements HasActions, HasForms
                 Textarea::make('body')
                     ->label('Comment')
                     ->minLength(1)
-                    ->maxLength(500)
+                    ->maxLength(500),
             ]);
     }
 

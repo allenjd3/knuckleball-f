@@ -2,11 +2,11 @@
 
 namespace App\Providers;
 
-use Blade;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,7 +39,7 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Blade::directive('comment', function (string $expression) {
-            return "<?php echo nl2br(e($expression)); ?>";
+            return "<?php echo nl2br(e({$expression})); ?>";
         });
     }
 }

@@ -49,7 +49,6 @@ test('the comment is not saved without content', function () {
         ->assertHasErrors('body');
 });
 
-
 test('the comment content has a maximum length', function () {
     $user = User::factory()->create();
     Livewire::actingAs($user)->test(AddComment::class)
