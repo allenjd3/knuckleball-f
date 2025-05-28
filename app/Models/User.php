@@ -135,6 +135,11 @@ class User extends Authenticatable implements FilamentUser
         return route('users.profile', ['user' => $this]);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     protected function casts(): array
     {
         return [

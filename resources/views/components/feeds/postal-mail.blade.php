@@ -1,4 +1,4 @@
-<article class="py-2 grid grid-cols-[100px_1fr]">
+<article class="py-2 grid grid-cols-[100px_1fr]" {{ $attributes }}>
     <div class="flex items-start justify-center items-center w-[100px]">
         <img class="size-12 rounded-full" src="{{ $photo }}" alt="{{ $user }}" />
     </div>

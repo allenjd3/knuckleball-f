@@ -33,7 +33,8 @@ class Feed extends Model
     public function componentName(): string
     {
         return match (true) {
-            $this->feedable_type === PostalMail::class => 'feeds.postal-mail'
+            $this->feedable_type === PostalMail::class => 'feeds.postal-mail',
+            $this->feedable_type === Comment::class => 'feeds.comment',
         };
     }
 }

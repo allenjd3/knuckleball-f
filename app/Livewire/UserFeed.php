@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -27,6 +28,7 @@ class UserFeed extends Component
     public function feeds()
     {
         return Feed::query()
+            ->with('feedable')
             ->select('feeds.*')
             ->selectSub(
                 fn ($query) => $query
@@ -35,12 +37,22 @@ class UserFeed extends Component
                         fn ($query) => $query->selectRaw('1')
                             ->from('users as u')
                             ->whereColumn('u.id', 'feeds.followable_id')
-                            ->whereIn('u.id', auth()->user()?->following()->select('users.id')),
+                            ->where(
+                                fn ($query) => $query
+                                    ->whereIn('u.id', auth()->user()?->following()->select('users.id'))
+                                    ->orWhere('u.id', auth()->user()?->id)
+                            ),
                         fn ($query) => $query->selectRaw('0'),
                     ), 'is_following'
             )
             ->orderByDesc('is_following')
             ->orderByDesc('created_at')
             ->simplepaginate();
+    }
+
+    #[On('feed-updated')]
+    public function updateFeed()
+    {
+        unset($this->feeds);
     }
 }
