@@ -35,29 +35,3 @@ test('soft deleted comments are hidden from the UI', function () {
 
     $this->assertCount(0, Feed::all());
 });
-
-// test('soft deleted comments can be restored by an admin', function () {
-//     $comment = Comment::factory()->create();
-//     $admin = User::factory()->isSuperAdmin()->create();
-//
-//     Livewire::actingAs($admin)
-//         ->test(DeleteComment::class, ['commentId' => $comment->id])
-//         ->call('restore');
-//
-//     $this->assertFalse($comment->fresh()->trashed());
-// });
-//
-// test('soft deleted comments can be destroyed by an admin', function () {
-//     $comment = Comment::factory()->for(User::factory())->create();
-//
-//     $admin = User::factory()->isSuperAdmin()->create();
-//
-//     $comment->delete();
-//
-//     Livewire::actingAs($admin)
-//         ->test(DeleteComment::class, ['commentId' => $comment->id])
-//         ->call('destroy');
-//
-//     $this->assertCount(0, Comment::all());
-//     $this->assertNull($comment->fresh()?->trashed());
-// });
