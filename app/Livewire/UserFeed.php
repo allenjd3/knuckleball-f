@@ -45,7 +45,7 @@ class UserFeed extends Component
                         fn ($query) => $query->selectRaw('0'),
                     ), 'is_following'
             )
-            ->orderByDesc('is_following')
+            ->orderByRaw('(is_following * 0.6 + RAND() * 0.4) DESC')
             ->orderByDesc('created_at')
             ->simplepaginate();
     }
