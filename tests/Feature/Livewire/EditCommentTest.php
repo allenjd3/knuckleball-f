@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\CreateFeedItem;
 use App\Livewire\EditComment;
 use App\Models\Comment;
 use App\Models\User;
@@ -10,7 +11,7 @@ test('the user can delete their own comment', function () {
     $comment = Comment::factory()
         ->state([
             'user_id' => $user->id,
-            'body' => 'This is a comment',
+            'body' => 'This comment',
         ])
         ->create();
 
@@ -18,9 +19,7 @@ test('the user can delete their own comment', function () {
         ->test(EditComment::class, ['commentId' => $comment->id])
         ->call('delete');
 
-    $this->assertDatabaseMissing('comments', [
-        'body' => 'This is a comment',
-    ]);
+    $this->assertTrue($comment->fresh()->trashed());
 });
 
 test("the user cannot delete another user's comment", function () {
@@ -51,6 +50,7 @@ test('the user can edit their own comment', function () {
             'body' => 'This is a comment',
         ])
         ->create();
+    CreateFeedItem::execute($comment, $comment->body);
 
     Livewire::actingAs($user)
         ->test(EditComment::class, ['commentId' => $comment->id])
