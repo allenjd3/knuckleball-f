@@ -13,7 +13,7 @@ class DeleteComment extends Component
     public function mount($commentId = 0, $canDelete = false)
     {
         $this->commentId = $commentId;
-        $this->canDelete = $canDelete;
+        $this->canDelete = (bool) $canDelete;
     }
 
     public function render()
