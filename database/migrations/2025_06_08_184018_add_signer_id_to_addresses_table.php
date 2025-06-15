@@ -9,12 +9,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Schema::table('addresses', function (Blueprint $table) {
-        //     $table->unsignedBigInteger('signer_id')->nullable();
-        // });
+        Schema::table('addresses', function (Blueprint $table) {
+            $table->unsignedBigInteger('signer_id')->nullable();
+        });
 
         Address::lazy()->each(function ($address) {
-            $address->update(['signer_id' => $address->player->id]);
+            $address->update(['signer_id' => $address->player_id]);
         });
     }
 };
