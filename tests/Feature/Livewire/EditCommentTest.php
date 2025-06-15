@@ -36,9 +36,7 @@ test("the user cannot delete another user's comment", function () {
         ->call('delete')
         ->assertForbidden();
 
-    $this->assertDatabaseHas('comments', [
-        'body' => 'This is a comment',
-    ]);
+    $this->assertFalse($comment->fresh()->trashed());
 });
 
 test('the user can edit their own comment', function () {

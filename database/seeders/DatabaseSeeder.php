@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
 
             $this->call([
                 TagSeeder::class,
+                AddressSeeder::class,
                 FeedSeeder::class,
             ]);
         }

@@ -8,9 +8,11 @@ use App\Filament\Resources\AddressResource\Pages\ListAddresses;
 use App\Models\Address;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -52,10 +54,13 @@ class AddressResource extends Resource
                     ->required()
                     ->string()
                     ->maxLength(255),
+                Hidden::make('signer_id')
+                    ->dehydrated(),
                 Select::make('player_id')
                     ->label('Player')
                     ->relationship(name: 'player', titleAttribute: 'name')
-                    ->required(),
+                    ->required()
+                    ->afterStateUpdated(fn (Set $set, ?string $state) => $set('signer_id', $state)),
                 DatePicker::make('published_at')
                     ->label('Published At')
                     ->default(now()->subDay())
@@ -80,7 +85,8 @@ class AddressResource extends Resource
                 TextColumn::make('postal_code')
                     ->searchable()
                     ->label('Zip'),
-                TextColumn::make('player.name')
+                TextColumn::make('signer.signable.name')
+                    ->label('Name')
                     ->searchable(),
                 TextColumn::make('published_at')
                     ->dateTime()

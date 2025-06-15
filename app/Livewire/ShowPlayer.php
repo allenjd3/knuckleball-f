@@ -96,6 +96,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         ->addresses()
                         ->create([
                             ...$data,
+                            'player_id' => $this->player->id,
                             'user_id' => request()->user()->id,
                             'published_at' => request()->user()->isSuperAdmin() ? now() : null,
                         ]);
