@@ -16,7 +16,7 @@ class AddressFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'address_1' => $this->faker->address(),
-            'address_2' => $this->faker->address(),
+            'address_2' => rand(0, 1) ? $this->faker->address() : '',
             'city' => $this->faker->city(),
             'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),

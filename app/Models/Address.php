@@ -15,6 +15,7 @@ class Address extends Model
         'address_1',
         'address_2',
         'player_id',
+        'signer_id',
         'user_id',
         'city',
         'state',
@@ -38,9 +39,14 @@ class Address extends Model
         $builder->where('rejected', false);
     }
 
-    public function player(): BelongsTo
+    public function player()
     {
-        return $this->belongsTo(Player::class);
+        return $this->signer->signable();
+    }
+
+    public function signer(): BelongsTo
+    {
+        return $this->belongsTo(Signer::class);
     }
 
     protected function casts(): array

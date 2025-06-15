@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Collections\PlayerCollection;
+use App\Traits\Signable;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 class Player extends Model
 {
     use HasFactory;
+    use Signable;
 
     protected $fillable = [
         'name',
@@ -29,6 +31,10 @@ class Player extends Model
 
     protected static function booted()
     {
+        static::created(function (Player $player) {
+            $player->signer()->create();
+        });
+
         static::saving(function (Player $player) {
             $player->slug = str($player->name)->slug()->toString();
         });
@@ -62,11 +68,6 @@ class Player extends Model
     public function address()
     {
         return $this->addresses()->latest()->published()->notRejected()->first();
-    }
-
-    public function addresses(): HasMany
-    {
-        return $this->hasMany(Address::class);
     }
 
     public function path(): string
