@@ -41,7 +41,7 @@ class Address extends Model
 
     public function player()
     {
-        return $this->belongsTo(Player::class);
+        return $this->signer?->signable();
     }
 
     public function signer(): BelongsTo
