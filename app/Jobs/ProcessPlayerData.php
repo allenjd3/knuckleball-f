@@ -52,7 +52,7 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
                     ->create([
                         'address_1' => $addressDto->address1,
                         'address_2' => $addressDto->address2,
-                        'player_id' => $player->id,
+                        'signer_id' => $player->id,
                         'city' => $addressDto->city,
                         'state' => $addressDto->state,
                         'postal_code' => $addressDto->zip,
