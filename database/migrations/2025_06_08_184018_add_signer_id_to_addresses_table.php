@@ -14,7 +14,7 @@ return new class extends Migration
         // });
 
         Address::lazy()->each(function ($address) {
-            $address->update(['signer_id' => $address->player->signer->id]);
+            $address->update(['signer_id' => $address->player->id]);
         });
     }
 };
