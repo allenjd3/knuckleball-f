@@ -12,7 +12,7 @@ class AddressSeeder extends Seeder
     {
         Player::get()
             ->each(
-                fn ($player) => Address::factory()->state(['player_id' => $player->id])->create()
+                fn ($player) => Address::factory()->state(['signer_id' => $player->signer->id])->create()
             );
     }
 }
