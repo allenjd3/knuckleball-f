@@ -20,7 +20,6 @@ class AddressFactory extends Factory
             'city' => $this->faker->city(),
             'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),
-            'player_id' => $this->faker->randomNumber(),
         ];
     }
 
