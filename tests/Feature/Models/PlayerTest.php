@@ -17,8 +17,8 @@ test('it gives response rate after 3 responses', function () {
 test('it calculates the correct response rate', function ($total, $returned, $percent) {
     $player = Player::factory()->create();
 
-    PostalMail::factory($returned)->state(['player_id' => $player->id])->returned()->create();
-    PostalMail::factory($total - $returned)->state(['player_id' => $player->id])->unReturned()->create();
+    PostalMail::factory($returned)->state(['signer_id' => $player->signer->id])->returned()->create();
+    PostalMail::factory($total - $returned)->state(['signer_id' => $player->signer->id])->unReturned()->create();
     expect($player->response_rate)->toBe($percent);
 })->with([[5, 3, '60%'], [6, 5, '83%'], [2, 2, null]]);
 
