@@ -2,7 +2,6 @@
 
 use App\Actions\CreateFeedItem;
 use App\Models\PostalMail;
-use App\Models\Signer;
 
 test('it updates a feed item', function () {
     $postalMail = PostalMail::factory()->unReturned()->create();

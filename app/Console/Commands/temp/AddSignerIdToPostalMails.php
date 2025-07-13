@@ -7,7 +7,6 @@ use App\Models\Signer;
 use Illuminate\Console\Command;
 
 use function Laravel\Prompts\progress;
-use function PHPUnit\Framework\callback;
 
 class AddSignerIdToPostalMails extends Command
 {
