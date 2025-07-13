@@ -80,11 +80,6 @@ class Player extends Model
         return $this->hasMany(Fee::class);
     }
 
-    public function postalMails(): HasMany
-    {
-        return $this->signer->postalMails();
-    }
-
     public function latestMail(): HasOne
     {
         return $this->hasOne(PostalMail::class)->latestOfMany();
