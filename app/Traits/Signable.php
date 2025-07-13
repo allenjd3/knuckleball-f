@@ -13,6 +13,11 @@ trait Signable
         return $this->morphOne(Signer::class, 'signable');
     }
 
+    public function postalMails(): HasMany
+    {
+        return $this->signer->postalMails();
+    }
+
     public function addresses(): HasMany
     {
         return $this->signer->addresses();
