@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\FeeMaterial;
-use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\Signer;
 use App\Models\User;
