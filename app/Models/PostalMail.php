@@ -21,6 +21,7 @@ class PostalMail extends Model
         'returned_date',
         'fee_material_id',
         'player_id',
+        'signer_id',
         'comment',
     ];
 
@@ -45,9 +46,14 @@ class PostalMail extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function signer(): BelongsTo
+    {
+        return $this->belongsTo(Signer::class);
+    }
+
     public function player(): BelongsTo
     {
-        return $this->belongsTo(Player::class);
+        return $this->signer->signable();
     }
 
     public function card(): HasOne

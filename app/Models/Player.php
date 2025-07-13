@@ -82,7 +82,7 @@ class Player extends Model
 
     public function postalMails(): HasMany
     {
-        return $this->hasMany(PostalMail::class);
+        return $this->signer->postalMails();
     }
 
     public function latestMail(): HasOne
@@ -123,11 +123,8 @@ class Player extends Model
 
     protected function responseRate(): Attribute
     {
-        $total = $this->postalMails()->count();
-        $returned = $this->postalMails()->whereNotNull('returned_date')->count();
-
         return Attribute::make(
-            get: fn () => $total > 3 ? round(($returned / $total) * 100) . '%' : null,
+            get: fn () => $this->signer->response_rate,
         );
     }
 
