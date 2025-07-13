@@ -36,5 +36,4 @@ class Signer extends Model
             get: fn () => $total > 3 ? round(($returned / $total) * 100) . '%' : null,
         );
     }
-
 }

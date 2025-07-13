@@ -13,6 +13,7 @@ class AddSignerIdToPostalMails extends Command
     protected $signature = 'operation:add-signer-id-to-postal-mails';
 
     protected $description = 'One off command for adding the signer id to postal mails table';
+
     public function handle()
     {
         progress(
