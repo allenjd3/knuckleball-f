@@ -23,7 +23,7 @@ class AddSignerIdToPostalMails extends Command
                 'signer_id' => Signer::where('signable_type', 'player')
                     ->where('signable_id', $postalMail->player_id)
                     ->first()
-                    ->id,
+                    ?->id,
             ])
         );
     }
