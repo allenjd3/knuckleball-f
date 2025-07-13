@@ -20,7 +20,6 @@ class PostalMail extends Model
         'date_sent',
         'returned_date',
         'fee_material_id',
-        'player_id',
         'signer_id',
         'comment',
     ];

@@ -21,7 +21,6 @@ class PostalMailFactory extends Factory
             'updated_at' => Carbon::now(),
             'user_id' => User::factory(),
             'fee_material_id' => FeeMaterial::factory(),
-            'player_id' => Player::factory(),
             'signer_id' => Signer::factory(),
             'date_sent' => Carbon::now(),
             'returned_date' => rand(0, 1) ? Carbon::now() : null,

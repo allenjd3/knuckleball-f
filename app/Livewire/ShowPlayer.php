@@ -278,7 +278,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         return DB::transaction(function () use ($data) {
                             $postalMail = request()->user()
                                 ->postalMails()
-                                ->create(array_merge($data, ['player_id' => $this->player->id, 'signer_id' => $this->player->signer->id]));
+                                ->create(array_merge($data, ['signer_id' => $this->player->signer->id]));
 
                             $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
 
