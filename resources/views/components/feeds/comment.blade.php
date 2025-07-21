@@ -8,7 +8,7 @@
                 <div>
                     <livewire:delete-comment
                         wire:key="{{ str()->random() }}"
-                        :canDelete="auth()->user()?->can('delete', $feed->feedable)"
+                        :canDelete="(bool) auth()->user()?->can('delete', $feed->feedable)"
                         :commentId="$feed->feedable_id"
                     />
                 </div>
