@@ -31,21 +31,6 @@ class UserFeed extends Component
         return Feed::query()
             ->with('feedable')
             ->select('feeds.*')
-            ->selectSub(
-                fn ($query) => $query
-                    ->when(
-                        auth()->check(),
-                        fn ($query) => $query->selectRaw('1')
-                            ->from('users as u')
-                            ->whereColumn('u.id', 'feeds.followable_id')
-                            ->where(
-                                fn ($query) => $query
-                                    ->whereIn('u.id', auth()->user()?->following()->select('users.id'))
-                                    ->orWhere('u.id', auth()->user()?->id)
-                            ),
-                        fn ($query) => $query->selectRaw('0'),
-                    ), 'is_following'
-            )
             ->orderByRaw(
                 "
                     CASE
@@ -53,7 +38,7 @@ class UserFeed extends Component
                         ELSE 0
                     END DESC
                 ", [now()->subMinutes(30), auth()->user()->id])
-            ->orderByRaw('FIELD(id, ' . $this->getOrderedIds()->implode(',') . ')')
+            ->when(count($this->getOrderedIds()), fn ($query) => $query->orderByRaw('FIELD(id, ' . $this->getOrderedIds()->implode(',') . ')'))
             ->orderByDesc('created_at')
             ->simplepaginate();
     }
@@ -66,7 +51,13 @@ class UserFeed extends Component
 
     private function getOrderedIds()
     {
-        return Cache::flexible('user-feed-order',
+        if (! auth()->check()) {
+            return collect();
+        }
+
+        $followCount = auth()->user()->following()->count();
+
+        return Cache::flexible('user-feed-order-' . auth()->user()->id,
             [900, 3600],
             fn () =>
                 Feed::query()
@@ -89,6 +80,7 @@ class UserFeed extends Component
                     )
                     ->orderByRaw('(is_following * 0.95 + RAND() * 0.05) DESC')
                     ->orderByDesc('created_at')
+                    ->limit($followCount * 3)
                     ->pluck('id')
         );
     }
