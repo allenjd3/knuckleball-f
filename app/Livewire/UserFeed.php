@@ -31,13 +31,16 @@ class UserFeed extends Component
         return Feed::query()
             ->with('feedable')
             ->select('feeds.*')
-            ->orderByRaw(
-                '
+            ->when(
+                auth()->check(),
+                fn ($query) => $query->orderByRaw(
+                    '
                     CASE
                         WHEN created_at > ? AND followable_id = ? THEN 1
                         ELSE 0
                     END DESC
-                ', [now()->subMinutes(30), auth()->user()->id])
+                    ', [now()->subMinutes(30), auth()->user()?->id]),
+            )
             ->when(count($this->getOrderedIds()), fn ($query) => $query->orderByRaw('FIELD(id, ' . $this->getOrderedIds()->implode(',') . ')'))
             ->orderByDesc('created_at')
             ->simplepaginate();
