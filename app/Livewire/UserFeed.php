@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Feed;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -30,22 +31,17 @@ class UserFeed extends Component
         return Feed::query()
             ->with('feedable')
             ->select('feeds.*')
-            ->selectSub(
-                fn ($query) => $query
-                    ->when(
-                        auth()->check(),
-                        fn ($query) => $query->selectRaw('1')
-                            ->from('users as u')
-                            ->whereColumn('u.id', 'feeds.followable_id')
-                            ->where(
-                                fn ($query) => $query
-                                    ->whereIn('u.id', auth()->user()?->following()->select('users.id'))
-                                    ->orWhere('u.id', auth()->user()?->id)
-                            ),
-                        fn ($query) => $query->selectRaw('0'),
-                    ), 'is_following'
+            ->when(
+                auth()->check(),
+                fn ($query) => $query->orderByRaw(
+                    '
+                    CASE
+                        WHEN created_at > ? AND followable_id = ? THEN 1
+                        ELSE 0
+                    END DESC
+                    ', [now()->subMinutes(30), auth()->user()?->id]),
             )
-            ->orderByRaw('(is_following * 0.6 + RAND() * 0.4) DESC')
+            ->when(count($this->getOrderedIds()), fn ($query) => $query->orderByRaw('FIELD(id, ' . $this->getOrderedIds()->implode(',') . ')'))
             ->orderByDesc('created_at')
             ->simplepaginate();
     }
@@ -54,5 +50,40 @@ class UserFeed extends Component
     public function updateFeed()
     {
         unset($this->feeds);
+    }
+
+    private function getOrderedIds()
+    {
+        if (! auth()->check()) {
+            return collect();
+        }
+
+        $followCount = auth()->user()->following()->count();
+
+        return Cache::flexible('user-feed-order-' . auth()->user()->id,
+            [900, 3600],
+            fn () => Feed::query()
+                ->with('feedable')
+                ->select('feeds.*')
+                ->selectSub(
+                    fn ($query) => $query
+                        ->when(
+                            auth()->check(),
+                            fn ($query) => $query->selectRaw('1')
+                                ->from('users as u')
+                                ->whereColumn('u.id', 'feeds.followable_id')
+                                ->where(
+                                    fn ($query) => $query
+                                        ->whereIn('u.id', auth()->user()?->following()->select('users.id'))
+                                        ->orWhere('u.id', auth()->user()?->id)
+                                ),
+                            fn ($query) => $query->selectRaw('0'),
+                        ), 'is_following'
+                )
+                ->orderByRaw('(is_following * 0.95 + RAND() * 0.05) DESC')
+                ->orderByDesc('created_at')
+                ->limit($followCount * 3)
+                ->pluck('id')
+        );
     }
 }
