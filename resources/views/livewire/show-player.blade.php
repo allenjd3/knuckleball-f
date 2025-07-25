@@ -40,7 +40,7 @@
             <div class="border-b border-black"></div>
             <div class="mb-4 text-lg">
                 @if ($player->response_rate)
-                    {{ $player->response_rate }}
+                    {{ $player->response_rate }} response rate
                 @else
                     Too few responses for calculating response rate
                 @endif
