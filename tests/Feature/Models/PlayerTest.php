@@ -23,7 +23,11 @@ test('it calculates the correct response rate', function ($total, $returned, $pe
 })->with([[5, 3, '60%'], [6, 5, '83%'], [2, 2, null]]);
 
 test('it can show that fees are required', function () {
-    $player = Player::factory()->has(Fee::factory())->create();
+    $player = Player::factory()->create();
+    Fee::factory()->state([
+        'signer_id' => $player->signer->id,
+    ])->create();
+
     $playerWithoutFees = Player::factory()->create();
 
     expect($player->fees_required)->toBeTrue();
