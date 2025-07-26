@@ -3,7 +3,6 @@
 use App\Models\Fee;
 use App\Models\Player;
 use App\Models\PostalMail;
-use App\Models\Signer;
 
 test('it can gives a null when less than 3 responses', function () {
     $player = Player::factory()->has(PostalMail::factory())->create();
@@ -26,7 +25,7 @@ test('it calculates the correct response rate', function ($total, $returned, $pe
 test('it can show that fees are required', function () {
     $player = Player::factory()->create();
     Fee::factory()->state([
-        'signer_id' => $player->signer->id
+        'signer_id' => $player->signer->id,
     ])->create();
 
     $playerWithoutFees = Player::factory()->create();

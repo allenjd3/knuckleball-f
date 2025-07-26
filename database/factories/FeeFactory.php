@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Fee;
 use App\Models\FeeMaterial;
-use App\Models\Player;
 use App\Models\Signer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
