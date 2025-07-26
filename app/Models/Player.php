@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -20,14 +19,7 @@ class Player extends Model
     use HasFactory;
     use Signable;
 
-    protected $fillable = [
-        'name',
-        'team_id',
-        'last_team_id',
-        'rejected',
-        'retired_at',
-        'published_at',
-    ];
+    protected $guarded = [];
 
     protected static function booted()
     {
@@ -73,11 +65,6 @@ class Player extends Model
     public function path(): string
     {
         return route('players.show', $this->id);
-    }
-
-    public function fees(): HasMany
-    {
-        return $this->hasMany(Fee::class);
     }
 
     public function latestMail(): HasOne

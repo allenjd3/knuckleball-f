@@ -9,12 +9,7 @@ class PlayerTag extends Pivot
 {
     public $timestamps = false;
 
-    protected $fillable = [
-        'player_id',
-        'tag_id',
-        'user_id',
-        'approved_at',
-    ];
+    protected $guarded = [];
 
     public function player(): BelongsTo
     {

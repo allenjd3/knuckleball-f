@@ -10,12 +10,7 @@ class Fee extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'amount',
-        'user_id',
-        'published_at',
-        'fee_material_id',
-    ];
+    protected $guarded = [];
 
     public function feeMaterial(): BelongsTo
     {

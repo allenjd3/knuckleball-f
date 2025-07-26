@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Fee;
 use App\Models\FeeMaterial;
+use App\Models\Player;
+use App\Models\Signer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
@@ -17,7 +19,8 @@ class FeeFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'amount' => $this->faker->randomNumber(),
-            'player_id' => $this->faker->randomNumber(),
+            'player_id' => Player::factory(),
+            'signer_id' => Signer::factory(),
             'fee_material_id' => FeeMaterial::factory(),
             'published_at' => Carbon::now(),
         ];

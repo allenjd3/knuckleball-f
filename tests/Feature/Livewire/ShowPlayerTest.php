@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\ShowPlayer;
+use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\User;
 
@@ -16,4 +17,19 @@ test('it can create addresses', function () {
             'postal_code' => '45011',
         ])
         ->assertHasNoActionErrors();
+});
+
+test('it can create a fee', function () {
+    $user = User::factory()->isSuperAdmin()->create();
+    $player = Player::factory()->create();
+    $feeMaterial = FeeMaterial::factory()->create();
+
+    Livewire::actingAs($user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction('createFee', data: [
+            'amount' => 23,
+            'fee_material_id' => $feeMaterial->id,
+        ])
+        ->assertHasNoActionErrors();
+
+    $this->assertTrue($player->fresh()->fees->pluck('amount')->contains(23));
 });

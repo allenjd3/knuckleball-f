@@ -117,10 +117,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->mutateFormDataUsing(function (array $data) {
                 data_set($data, 'user_id', request()->user()?->id);
                 data_set($data, 'published_at', now()->subDay());
+                data_set($data, 'player_id', $this->player->id);
 
                 return $data;
             })
-            ->using(fn (array $data) => $this->player->fees()->create($data));
+            ->using(fn (array $data) => $this->player->signer->fees()->create($data));
     }
 
     public function editPlayer(): Action
