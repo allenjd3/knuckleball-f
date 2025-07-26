@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Card;
+use App\Models\Fee;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
@@ -37,7 +38,7 @@ class DatabaseSeeder extends Seeder
                 ->for($user)
                 ->create();
 
-            $teams->each(fn ($team) => Player::factory(12)->for($team)->create());
+            $teams->each(fn ($team) => Player::factory(12)->for($team)->has(Fee::factory())->create());
 
             PostalMail::factory(50)
                 ->has(

@@ -22,4 +22,9 @@ trait Signable
     {
         return $this->signer->addresses();
     }
+
+    public function fees(): HasMany
+    {
+        return $this->signer->fees();
+    }
 }

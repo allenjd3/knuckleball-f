@@ -12,14 +12,7 @@ class Card extends Model
     /** @use HasFactory<\Database\Factories\CardFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'manufacturer',
-        'series',
-        'year',
-        'user_id',
-        'number',
-        'variation',
-    ];
+    protected $guarded = [];
 
     public function postalMail(): BelongsTo
     {

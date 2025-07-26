@@ -16,13 +16,7 @@ class PostalMail extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'date_sent',
-        'returned_date',
-        'fee_material_id',
-        'signer_id',
-        'comment',
-    ];
+    protected $guarded = [];
 
     protected static function booted()
     {

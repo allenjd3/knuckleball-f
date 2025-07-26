@@ -77,7 +77,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ])
                     ->visible(fn (Player $player) => auth()->user()?->can('update', $player))
                     ->using(function (array $data, Player $record) {
-                        $data = collect($data);
+                        $data = collect($data)->except('url');
                         $record->update($data->toArray());
 
                         if ($url = $data->get('url')) {

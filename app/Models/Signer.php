@@ -12,6 +12,8 @@ class Signer extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function signable(): MorphTo
     {
         return $this->morphTo();
@@ -25,6 +27,11 @@ class Signer extends Model
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);
+    }
+
+    public function fees(): HasMany
+    {
+        return $this->hasMany(Fee::class);
     }
 
     protected function responseRate(): Attribute

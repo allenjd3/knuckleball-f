@@ -11,11 +11,7 @@ class Feed extends Model
     /** @use HasFactory<\Database\Factories\FeedFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'comment',
-        'followable_id',
-        'meta',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'meta' => 'array',

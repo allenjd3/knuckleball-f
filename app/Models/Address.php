@@ -11,17 +11,7 @@ class Address extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'address_1',
-        'address_2',
-        'signer_id',
-        'user_id',
-        'city',
-        'state',
-        'rejected',
-        'published_at',
-        'postal_code',
-    ];
+    protected $guarded = [];
 
     public function scopePublished(Builder $builder)
     {

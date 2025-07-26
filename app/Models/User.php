@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Traits\HasProfilePhoto;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -23,12 +21,7 @@ class User extends Authenticatable implements FilamentUser
     use Notifiable;
     use TwoFactorAuthenticatable;
 
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'published_at',
-    ];
+    protected $guarded = [];
 
     protected $hidden = [
         'password',

@@ -13,11 +13,7 @@ class Team extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'rejected',
-        'published_at',
-    ];
+    protected $guarded = [];
 
     public function scopePublished(Builder $builder)
     {

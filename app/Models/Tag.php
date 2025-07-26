@@ -12,11 +12,7 @@ class Tag extends Model
     /** @use HasFactory<\Database\Factories\TagFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'label',
-        'category',
-        'published_at',
-    ];
+    protected $guarded = [];
 
     public static function categories()
     {

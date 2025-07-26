@@ -11,10 +11,7 @@ class FeeMaterial extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'published_at',
-    ];
+    protected $guarded = [];
 
     public function fees(): HasMany
     {
