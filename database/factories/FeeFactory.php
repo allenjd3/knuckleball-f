@@ -19,7 +19,6 @@ class FeeFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
             'amount' => $this->faker->randomNumber(),
-            'player_id' => Player::factory(),
             'signer_id' => Signer::factory(),
             'fee_material_id' => FeeMaterial::factory(),
             'published_at' => Carbon::now(),
