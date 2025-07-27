@@ -168,8 +168,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->where(fn ($query) => $query
                 ->when(
                     request()->user(),
-                    fn ($query) => $query->where('player_tag.user_id', request()->user()->id)->orWhere('player_tag.approved_at', '<', now()),
-                    fn ($query) => $query->where(fn ($query) => $query->where('player_tag.approved_at', '<', now())),
+                    fn ($query) => $query->where('signer_tag.user_id', request()->user()->id)->orWhere('signer_tag.approved_at', '<', now()),
+                    fn ($query) => $query->where(fn ($query) => $query->where('signer_tag.approved_at', '<', now())),
                 )
             )
             ->limit(20)

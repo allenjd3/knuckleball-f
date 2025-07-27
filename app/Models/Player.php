@@ -72,11 +72,6 @@ class Player extends Model
         return $this->hasOne(PostalMail::class)->latestOfMany();
     }
 
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class)->withPivot('approved_at', 'user_id');
-    }
-
     public function publish()
     {
         $this->update(['published_at' => now()]);

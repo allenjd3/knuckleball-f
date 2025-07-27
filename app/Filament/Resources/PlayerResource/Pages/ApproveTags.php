@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PlayerResource\Pages;
 
 use App\Filament\Resources\PlayerResource;
-use App\Models\PlayerTag;
+use App\Models\SignerTag;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Resources\Pages\Page;
@@ -27,10 +27,11 @@ class ApproveTags extends Page implements HasActions, HasTable
     {
         return $table
             ->query(
-                PlayerTag::query()->whereNull('approved_at')
+                SignerTag::query()->whereNull('approved_at')
             )
             ->columns([
-                TextColumn::make('player.name'),
+                TextColumn::make('signer.signable.name')
+                    ->url(fn (Model $record) => $record->signer->signable->path()),
                 TextColumn::make('tag.label'),
             ])
             ->actions([
