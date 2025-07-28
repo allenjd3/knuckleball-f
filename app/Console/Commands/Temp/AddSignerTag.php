@@ -21,7 +21,11 @@ class AddSignerTag extends Command
             label: 'Add signer_tag',
             steps: PlayerTag::all(),
             callback: function ($playerTag) {
-                $signerId = Player::find($playerTag->player_id)->signer->id;
+                $signerId = Player::find($playerTag->player_id)?->signer->id;
+
+                if (! $signerId) {
+                    return;
+                }
 
                 SignerTag::create([
                     'signer_id' => $signerId,
