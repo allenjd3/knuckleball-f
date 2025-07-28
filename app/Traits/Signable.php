@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Signer;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
@@ -26,5 +27,10 @@ trait Signable
     public function fees(): HasMany
     {
         return $this->signer->fees();
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->signer->tags();
     }
 }

@@ -101,26 +101,28 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Address::class);
     }
 
-    public function approveTag(PlayerTag $playerTag)
+    public function approveTag(SignerTag $signerTag)
     {
-        if ($this->cannot('update', $playerTag)) {
+        if ($this->cannot('update', $signerTag)) {
             return;
         }
 
-        $playerTag->player
+        $signerTag->signer
+            ->signable
             ->tags()
-            ->updateExistingPivot($playerTag->tag_id, ['approved_at' => now()]);
+            ->updateExistingPivot($signerTag->tag_id, ['approved_at' => now()]);
     }
 
-    public function rejectTag(PlayerTag $playerTag)
+    public function rejectTag(SignerTag $signerTag)
     {
-        if ($this->cannot('update', $playerTag)) {
+        if ($this->cannot('update', $signerTag)) {
             return;
         }
 
-        $playerTag->player
+        $signerTag->signer
+            ->signable
             ->tags()
-            ->detach([$playerTag->tag_id]);
+            ->detach([$signerTag->tag_id]);
     }
 
     public function path(): string

@@ -2,7 +2,7 @@
 
 use App\Livewire\ShowPlayer;
 use App\Models\Player;
-use App\Models\PlayerTag;
+use App\Models\SignerTag;
 use App\Models\Tag;
 use App\Models\User;
 
@@ -16,8 +16,8 @@ test('a published user can associate tag with player', function () {
     Livewire::test(ShowPlayer::class, ['player' => $player])
         ->callAction('associateTag', ['tag_id' => $tag->id]);
 
-    $this->assertDatabaseHas('player_tag', [
-        'player_id' => $player->id,
+    $this->assertDatabaseHas('signer_tag', [
+        'signer_id' => $player->signer->id,
         'tag_id' => $tag->id,
         'user_id' => $user->id,
         'approved_at' => null, // Not yet approved
@@ -39,13 +39,13 @@ test('an admin can approve tag player association', function () {
     $admin = User::factory()->create(['super_admin' => true]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
+    $playerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
 
     $this->freezeTime(function () use ($player, $tag, $admin, $playerTag) {
         $admin->approveTag($playerTag);
 
-        $this->assertDatabaseHas('player_tag', [
-            'player_id' => $player->id,
+        $this->assertDatabaseHas('signer_tag', [
+            'signer_id' => $player->signer->id,
             'tag_id' => $tag->id,
             'user_id' => $admin->id,
             'approved_at' => now()->toDateTimeString(),
@@ -57,13 +57,13 @@ test('an admin can reject tag player association', function () {
     $admin = User::factory()->create(['super_admin' => true]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
+    $signerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
 
-    $this->freezeTime(function () use ($player, $tag, $admin, $playerTag) {
-        $admin->rejectTag($playerTag);
+    $this->freezeTime(function () use ($player, $tag, $admin, $signerTag) {
+        $admin->rejectTag($signerTag);
 
-        $this->assertDatabaseMissing('player_tag', [
-            'player_id' => $player->id,
+        $this->assertDatabaseMissing('signer_tag', [
+            'signer_id' => $player->signer->id,
             'tag_id' => $tag->id,
             'user_id' => $admin->id,
         ]);
@@ -75,13 +75,13 @@ test('a non admin cannot approve tag player association', function () {
     $regularUser = User::factory()->create(['super_admin' => false]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
+    $signerTag = SignerTag::create(['signer_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
 
-    $this->freezeTime(function () use ($player, $tag, $regularUser, $playerTag) {
-        $regularUser->approveTag($playerTag);
+    $this->freezeTime(function () use ($player, $tag, $regularUser, $signerTag) {
+        $regularUser->approveTag($signerTag);
 
-        $this->assertDatabaseMissing('player_tag', [
-            'player_id' => $player->id,
+        $this->assertDatabaseMissing('signer_tag', [
+            'signer_id' => $player->signer->id,
             'tag_id' => $tag->id,
             'approved_at' => now()->toDateTimeString(),
             'user_id' => $regularUser->id,
@@ -93,15 +93,16 @@ test('a non admin cannot reject a player tag', function () {
     $regularUser = User::factory()->create(['super_admin' => false]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
-    $playerTag = PlayerTag::create(['player_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
+    $signerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
 
-    $this->freezeTime(function () use ($player, $tag, $regularUser, $playerTag) {
-        $regularUser->rejectTag($playerTag);
+    $this->freezeTime(function () use ($player, $tag, $regularUser, $signerTag) {
+        $regularUser->rejectTag($signerTag);
 
-        $this->assertDatabaseHas('player_tag', [
-            'player_id' => $player->id,
+        $this->assertDatabaseHas('signer_tag', [
+            'signer_id' => $player->signer->id,
             'tag_id' => $tag->id,
             'user_id' => $regularUser->id,
+            'approved_at' => null,
         ]);
     });
 });
