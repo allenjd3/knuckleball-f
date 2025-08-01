@@ -59,6 +59,7 @@ class PlayerResource extends Resource
                 DatePicker::make('published_at'),
                 DatePicker::make('retired_at')
                     ->default(fn (?Player $record) => $record?->retired_at),
+                DatePicker::make('deceased_at'),
                 FileUpload::make('url')
                     ->directory('avatars')
                     ->avatar(),

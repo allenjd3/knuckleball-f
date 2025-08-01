@@ -14,15 +14,12 @@
                 <h1 class="text-3xl">{{ $player->name }}</h1>
                 @php
                 $actions = [];
-                if (auth()->user()?->isSuperAdmin()) {
+                if (auth()->user()?->isSuperAdmin() && auth()->user()?->can('update', $player)) {
                     array_push($actions, $this->editPlayer);
                 }
 
                 if (auth()->user()?->can('update', $player)) {
                     array_push($actions, $this->createFee);
-                }
-
-                if (auth()->user()?->can('assign', App\Models\Tag::class)) {
                     array_push($actions, $this->associateTag);
                 }
 
@@ -51,19 +48,25 @@
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
                 @if ($this->address?->exists || $this->address?->exists && $this->hasUnpublishedAddress)
-                    @can('viewAny', App\Models\Address::class)
-                        <p>{{ $this->address->address_1 }}</p>
-                        <p>{{ $this->address->address_2 }}</p>
-                        <p>{{ $this->address->city }}, {{ $this->address->state }}</p>
-                        <p>{{ $this->address->postal_code }}</p>
+                    @can('view', $this->address)
+                        @can('viewAny', App\Models\Address::class)
+                            <p>{{ $this->address->address_1 }}</p>
+                            <p>{{ $this->address->address_2 }}</p>
+                            <p>{{ $this->address->city }}, {{ $this->address->state }}</p>
+                            <p>{{ $this->address->postal_code }}</p>
+                        @else
+                            <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
+                            <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
+                            <p>Only authorized users can view addresses.
+                            @guest
+                                <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a>
+                            @endguest
+                            </p>
+                        @endcan
                     @else
                         <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                         <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
-                        <p>Only authorized users can view addresses.
-                        @guest
-                            <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a>
-                        @endguest
-                        </p>
+                        <p>This player's address has been archived</p>
                     @endcan
                     @if ($this->hasUnpublishedAddress)
                         <p class="font-bold text-green-500">Thanks for your submission. It is in review!</p>
@@ -78,7 +81,7 @@
                     <p class="font-bold text-green-500">There is an unpublished address for your review. <a href="{{ route('filament.cp.resources.addresses.edit', ['record' => data_get($unpublishedAddress, 'id')]) }}" class="text-black hover:underline">Review It</a></p>
                 @endif
 
-                @can('create', App\Models\Address::class)
+                @can('update', $player)
                     <div class="mt-2">{{ $this->createAddress }}</div>
                 @endcan
                 @can('update', $player)
@@ -106,7 +109,9 @@
                     @forelse ($this->fees as $fee)
                         <div class="px-2">
                             ${{ $fee->amount }} per {{ str($fee->feeMaterial->name) }}
-                            <livewire:edit-fee wire:key="edit-fee-{{ $fee->id }}" :$fee />
+                            @can('update', $this->player)
+                                <livewire:edit-fee wire:key="edit-fee-{{ $fee->id }}" :$fee />
+                            @endcan
                         </div>
                     @empty
                         <p class="px-2">No fees yet!</p>

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\Collections\PlayerCollection;
 use App\Traits\Signable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -94,6 +95,7 @@ class Player extends Model
         return [
             'published_at' => 'datetime',
             'retired_at' => 'datetime',
+            'deceased_at' => 'datetime',
         ];
     }
 
@@ -108,6 +110,13 @@ class Player extends Model
     {
         return Attribute::make(
             get: fn () => $this->fees()->exists(),
+        );
+    }
+
+    protected function isNotDeceased(): Attribute
+    {
+        return Attribute::get(
+            get: fn (mixed $value, array $attributes) => is_null(data_get($attributes, 'deceased_at'))
         );
     }
 }
