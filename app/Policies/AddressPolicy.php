@@ -17,7 +17,7 @@ class AddressPolicy
 
     public function view(User $user, Address $address): bool
     {
-        return $user->isPublished();
+        return $user->isPublished() && $address->signer->signable->is_not_deceased;
     }
 
     public function create(User $user): bool

@@ -44,9 +44,20 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->url(fn (Player $player) => $player->path()),
                 TextColumn::make('retired_at_status')
                     ->label('Status')
-                    ->state(fn ($record) => ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active')
+                    ->state(function ($record) {
+                        if (! is_null($record->deceased_at) && $record->deceased_at?->isPast()) {
+                            return 'Deceased';
+                        }
+
+                        if (! is_null($record->retired_at) && $record->retired_at?->isPast()) {
+                            return 'Retired';
+                        }
+
+                        return 'Active';
+                    })
                     ->badge()
                     ->color(fn ($state) => match ($state) {
+                        'Deceased' => 'danger',
                         'Retired' => 'warning',
                         'Active' => 'success',
                     }),
