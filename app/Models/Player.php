@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Support\Collections\PlayerCollection;
 use App\Traits\Signable;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
