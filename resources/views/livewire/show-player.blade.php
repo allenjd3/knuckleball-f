@@ -48,7 +48,7 @@
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
                 @if ($this->address?->exists || $this->address?->exists && $this->hasUnpublishedAddress)
-                    @can('view', $this->address)
+                    @if($this->player->is_not_deceased)
                         @can('viewAny', App\Models\Address::class)
                             <p>{{ $this->address->address_1 }}</p>
                             <p>{{ $this->address->address_2 }}</p>
@@ -67,7 +67,7 @@
                         <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                         <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
                         <p>This player's address has been archived</p>
-                    @endcan
+                    @endif
                     @if ($this->hasUnpublishedAddress)
                         <p class="font-bold text-green-500">Thanks for your submission. It is in review!</p>
                     @endif
