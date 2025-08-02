@@ -11,11 +11,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Spatie\Sluggable\HasSlug;
+use Spatie\Sluggable\SlugOptions;
 
 #[CollectedBy(PlayerCollection::class)]
 class Player extends Model
 {
     use HasFactory;
+    use HasSlug;
     use Signable;
 
     protected $guarded = [];
@@ -24,10 +27,6 @@ class Player extends Model
     {
         static::created(function (Player $player) {
             $player->signer()->create();
-        });
-
-        static::saving(function (Player $player) {
-            $player->slug = str($player->name)->slug()->toString();
         });
     }
 
@@ -63,7 +62,7 @@ class Player extends Model
 
     public function path(): string
     {
-        return route('players.show', $this->id);
+        return route('players.show', $this->slug);
     }
 
     public function latestMail(): HasOne
@@ -117,5 +116,12 @@ class Player extends Model
         return Attribute::get(
             get: fn (mixed $value, array $attributes) => is_null(data_get($attributes, 'deceased_at'))
         );
+    }
+
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
     }
 }
