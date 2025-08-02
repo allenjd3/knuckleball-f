@@ -20,4 +20,3 @@ Route::get('teams/{team}', ViewPlayersFromTeam::class)->name('teams.show');
 Route::get('feed/{user:slug}', UserProfile::class)->name('users.profile');
 Route::get('players', ViewPlayers::class)->name('players.index');
 Route::get('players/{player:slug}', ShowPlayer::class)->name('players.show');
-

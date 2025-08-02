@@ -88,6 +88,13 @@ class Player extends Model
         $this->tags()->syncWithoutDetaching([$tagId => ['approved_at' => $approvedAt, 'user_id' => auth()->user()->id]]);
     }
 
+    public function getSlugOptions(): SlugOptions
+    {
+        return SlugOptions::create()
+            ->generateSlugsFrom('name')
+            ->saveSlugsTo('slug');
+    }
+
     protected function casts(): array
     {
         return [
@@ -116,12 +123,5 @@ class Player extends Model
         return Attribute::get(
             get: fn (mixed $value, array $attributes) => is_null(data_get($attributes, 'deceased_at'))
         );
-    }
-
-    public function getSlugOptions(): SlugOptions
-    {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug');
     }
 }
