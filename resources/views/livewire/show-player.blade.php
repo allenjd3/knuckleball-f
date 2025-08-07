@@ -48,7 +48,7 @@
             <div class="mb-4 p-2">
                 <h3 class="font-bold">Address:</h3>
                 @if ($this->address?->exists || $this->address?->exists && $this->hasUnpublishedAddress)
-                    @if($this->player->is_not_deceased)
+                    @if ($this->player->is_not_deceased)
                         @can('viewAny', App\Models\Address::class)
                             <p>{{ $this->address->address_1 }}</p>
                             <p>{{ $this->address->address_2 }}</p>

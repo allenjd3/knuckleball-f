@@ -238,6 +238,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
+
                         return $record;
                     }),
                 DeleteAction::make('delete')
