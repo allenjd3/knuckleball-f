@@ -234,7 +234,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 EditAction::make()
                     ->visible(fn (Model $record) => request()->user()?->can('update', $record))
                     ->form([
-                        DatePicker::make('date_sent')->required(),
                         DatePicker::make('returned_date'),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
