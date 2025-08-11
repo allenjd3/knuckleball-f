@@ -85,11 +85,18 @@ class PostalMail extends Model
         ];
     }
 
+    public function fail(): bool
+    {
+        $this->is_failed = true;
+        return $this->save();
+    }
+
     protected function casts(): array
     {
         return [
             'date_sent' => 'datetime',
             'returned_date' => 'datetime',
+            'is_failed' => 'boolean',
         ];
     }
 }

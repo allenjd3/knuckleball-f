@@ -23,6 +23,7 @@ class PostalMailFactory extends Factory
             'signer_id' => Signer::factory(),
             'date_sent' => Carbon::now(),
             'returned_date' => rand(0, 1) ? Carbon::now() : null,
+            'is_failed' => false,
             'comment' => $this->faker->words($this->faker->numberBetween(3, 6), true),
         ];
     }

@@ -19,6 +19,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Actions\Action as TableAction;
@@ -236,6 +237,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->form([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
+                        Toggle::make('is_failed')
+                            ->label("Failed to return"),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
@@ -253,7 +256,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('feeMaterials.name')->label('Item'),
                 ImageColumn::make('card.media.url'),
                 TextColumn::make('comment'),
+                TextColumn::make('is_failed')
+                    ->label('Failed delivery')
+                    ->badge()
+                    ->formatStateUsing(fn (bool $state) => $state ? 'Failed' : '')
+                    ->color(fn (bool $state) => $state ? 'danger' : 'success')
             ])
+            ->recordClasses(fn (Model $record) => $record->is_failed ? 'bg-red-100' : '')
             ->headerActions([
                 CreateTableAction::make('createPostalMail')
                     ->visible(fn () => request()?->user()?->can('create', PostalMail::class))
@@ -271,6 +280,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                                 TextInput::make('name'),
                             ])
                             ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
+                        Toggle::make('is_failed')
+                            ->label("Failed to return?"),
                         Textarea::make('comment'),
                     ])
                     ->using(function (array $data): Model {
