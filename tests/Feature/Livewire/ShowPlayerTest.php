@@ -37,27 +37,6 @@ test('it can create a fee', function () {
     $this->assertTrue($player->fresh()->fees->pluck('amount')->contains(23));
 });
 
-it('debug postal mail edit', function () {
-    $player = Player::factory()->create();
-    $postalMail = PostalMail::factory()->state(['signer_id' => $player->signer->id])->create();
-    CreateFeedItem::execute($postalMail, $postalMail->comment);
-
-    $returnedDate = now()->subDay();
-    $component = Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $player]);
-
-    // Check if the record is visible in the table
-    $component->assertCanSeeTableRecords([$postalMail]);
-
-    // Check if the action is visible
-    $component->assertTableActionVisible(EditAction::class, $postalMail);
-
-    // Then try the action
-    $component->callTableAction(EditAction::class, $postalMail, [
-        'returned_date' => $returnedDate->format('Y-m-d'),
-    ])
-        ->assertHasNoTableActionErrors();
-});
-
 it('can edit a postal mail', function () {
     $player = Player::factory()->create();
     $postalMail = PostalMail::factory()->state([
