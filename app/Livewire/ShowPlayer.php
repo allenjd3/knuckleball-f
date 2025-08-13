@@ -262,7 +262,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->formatStateUsing(fn (bool $state) => $state ? 'Failed' : '')
                     ->color(fn (bool $state) => $state ? 'danger' : 'success')
             ])
-            ->recordClasses(fn (Model $record) => $record->is_failed ? 'bg-red-100' : '')
             ->headerActions([
                 CreateTableAction::make('createPostalMail')
                     ->visible(fn () => request()?->user()?->can('create', PostalMail::class))
