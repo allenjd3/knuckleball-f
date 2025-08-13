@@ -42,11 +42,19 @@ class Signer extends Model
 
     protected function responseRate(): Attribute
     {
-        $total = $this->postalMails()->count();
-        $returned = $this->postalMails()->whereNotNull('returned_date')->count();
+        $totalReturned = $this->postalMails()->where(function ($query) {
+            $query->whereNotNull('returned_date')
+                ->orWhere('is_failed', true);
+        })->count();
+
+        $returned = $this->postalMails()->whereNotNull('returned_date')->where('is_failed', false)->count();
+        $pending = $this->postalMails()->whereNull('returned_date')->where('is_failed', false)->count();
+
+        $successRate = $totalReturned ? round(($returned / $totalReturned) * 100) . '%' : '';
+        $isOrAre = $pending === 1 ? 'is' : 'are';
 
         return Attribute::make(
-            get: fn () => $total > 3 ? round(($returned / $total) * 100) . '%' : null,
+            get: fn () => ($totalReturned ? "{$successRate} successful. " : "") . "{$pending} {$isOrAre} pending.",
         );
     }
 }

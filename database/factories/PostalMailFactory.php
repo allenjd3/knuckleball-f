@@ -43,4 +43,13 @@ class PostalMailFactory extends Factory
             'returned_date' => null,
         ]);
     }
+
+    public function failed()
+    {
+        return $this->state([
+            'date_sent' => now()->subWeeks(2),
+            'is_failed' => true,
+            'returned_date' => null
+        ]);
+    }
 }
