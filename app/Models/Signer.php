@@ -54,7 +54,7 @@ class Signer extends Model
         $isOrAre = $pending === 1 ? 'is' : 'are';
 
         return Attribute::make(
-            get: fn () => ($totalReturned ? "{$successRate} successful. " : "") . "{$pending} {$isOrAre} pending.",
+            get: fn () => ($totalReturned ? "{$successRate} successful. " : '') . "{$pending} {$isOrAre} pending.",
         );
     }
 }

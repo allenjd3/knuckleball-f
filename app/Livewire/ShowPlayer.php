@@ -238,7 +238,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
                         Toggle::make('is_failed')
-                            ->label("Failed to return"),
+                            ->label('Failed to return'),
                         Textarea::make('comment'),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
@@ -260,7 +260,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->label('Failed delivery')
                     ->badge()
                     ->formatStateUsing(fn (bool $state) => $state ? 'Failed' : '')
-                    ->color(fn (bool $state) => $state ? 'danger' : 'success')
+                    ->color(fn (bool $state) => $state ? 'danger' : 'success'),
             ])
             ->headerActions([
                 CreateTableAction::make('createPostalMail')
@@ -280,7 +280,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             ])
                             ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
                         Toggle::make('is_failed')
-                            ->label("Failed to return?"),
+                            ->label('Failed to return?'),
                         Textarea::make('comment'),
                     ])
                     ->using(function (array $data): Model {

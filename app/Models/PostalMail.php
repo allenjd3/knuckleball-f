@@ -88,6 +88,7 @@ class PostalMail extends Model
     public function fail(): bool
     {
         $this->is_failed = true;
+
         return $this->save();
     }
 
