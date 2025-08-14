@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
 use App\Forms\Schema\FeeForm;
+use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
 use App\Models\Fee;
 use App\Models\FeeMaterial;
@@ -32,7 +33,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -187,7 +187,17 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     {
         return $table
             ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user', 'card.media'))
-            ->emptyStateHeading('No TTM yet!')
+            ->emptyStateHeading('Dead quiet in this mailbox... 📪')
+            ->emptyStateActions([
+                TableAction::make('createNew')
+                    ->visible(fn () => PostalMailForm::shouldBeVisibleFor(request()->user()))
+                    ->label('Send the first letter')
+                    ->action(fn () => $this->dispatch('openCreatePostalMail')),
+                TableAction::make('logInToCreateNew')
+                    ->visible(fn () => ! request()->user())
+                    ->label('Login in to create!')
+                    ->url(route('login'))
+            ])
             ->actions([
                 TableAction::make('showCards')
                     ->label('Cards')
@@ -264,39 +274,16 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ])
             ->headerActions([
                 CreateTableAction::make('createPostalMail')
-                    ->visible(fn () => request()?->user()?->can('create', PostalMail::class))
-                    ->form([
-                        DatePicker::make('date_sent')->required(),
-                        DatePicker::make('returned_date'),
-                        Select::make('fee_material_id')
-                            ->label('Material')
-                            ->required()
-                            ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
-                            ->preload()
-                            ->searchable()
-                            ->createOptionModalHeading('Create Item')
-                            ->createOptionForm([
-                                TextInput::make('name'),
-                            ])
-                            ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
-                        Toggle::make('is_failed')
-                            ->label('Failed to return?'),
-                        Textarea::make('comment'),
-                    ])
-                    ->using(function (array $data): Model {
-                        return DB::transaction(function () use ($data) {
-                            $postalMail = request()->user()
-                                ->postalMails()
-                                ->create(array_merge($data, ['signer_id' => $this->player->signer->id]));
-
-                            $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
-
-                            CreateFeedItem::execute(feedItem: $postalMail, comment: $postalMail->comment);
-
-                            return $postalMail;
-                        });
-                    }),
+                    ->visible(fn () => PostalMailForm::shouldBeVisibleFor(request()->user()))
+                    ->form(PostalMailForm::schema())
+                    ->using(fn (array $data) => PostalMailForm::for($this->player->signer)->using($data)),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    #[On('openCreatePostalMail')]
+    public function openCreatePostalMail()
+    {
+        return $this->mountTableAction('createPostalMail');
     }
 }
