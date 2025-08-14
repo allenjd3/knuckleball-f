@@ -23,6 +23,7 @@ class PostalMailFactory extends Factory
             'signer_id' => Signer::factory(),
             'date_sent' => Carbon::now(),
             'returned_date' => rand(0, 1) ? Carbon::now() : null,
+            'is_failed' => false,
             'comment' => $this->faker->words($this->faker->numberBetween(3, 6), true),
         ];
     }
@@ -39,6 +40,15 @@ class PostalMailFactory extends Factory
     {
         return $this->state([
             'date_sent' => now()->subWeeks(2),
+            'returned_date' => null,
+        ]);
+    }
+
+    public function failed()
+    {
+        return $this->state([
+            'date_sent' => now()->subWeeks(2),
+            'is_failed' => true,
             'returned_date' => null,
         ]);
     }
