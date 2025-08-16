@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\StoreIntendedUrl;
 use App\Livewire\ShowPlayer;
 use App\Livewire\UserFeed;
 use App\Livewire\UserProfile;
@@ -19,4 +20,4 @@ Route::get('categories', ViewCategories::class)->name('categories.index');
 Route::get('teams/{team}', ViewPlayersFromTeam::class)->name('teams.show');
 Route::get('feed/{user:slug}', UserProfile::class)->name('users.profile');
 Route::get('players', ViewPlayers::class)->name('players.index');
-Route::get('players/{player:slug}', ShowPlayer::class)->name('players.show');
+Route::get('players/{player:slug}', ShowPlayer::class)->middleware([StoreIntendedUrl::class])->name('players.show');
