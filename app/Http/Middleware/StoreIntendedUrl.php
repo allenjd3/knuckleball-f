@@ -11,7 +11,7 @@ class StoreIntendedUrl
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! auth()->check() && !$request->is('login', 'register')) {
+        if (! auth()->check() && ! $request->is('login', 'register')) {
             Session::put('url.intended', $request->fullUrl());
         }
 

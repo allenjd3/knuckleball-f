@@ -2,14 +2,11 @@
 
 namespace App\Livewire;
 
-use App\Actions\CreateFeedItem;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
 use App\Models\Fee;
-use App\Models\FeeMaterial;
 use App\Models\Player;
-use App\Models\PostalMail;
 use App\Models\Tag;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -196,7 +193,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TableAction::make('logInToCreateNew')
                     ->visible(fn () => ! request()->user())
                     ->label('Login in to create!')
-                    ->url(route('login'))
+                    ->url(route('login')),
             ])
             ->actions([
                 TableAction::make('showCards')

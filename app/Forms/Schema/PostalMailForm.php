@@ -18,8 +18,7 @@ class PostalMailForm
 {
     public function __construct(
         public Signer $signer,
-    ) {
-    }
+    ) {}
 
     public static function for(Signer $signer)
     {
