@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite'
 import laravel, { refreshPaths } from 'laravel-vite-plugin'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: ['resources/css/app.css', 'resources/js/app.js', 'resources/ts/invitecode.ts', 'resources/ts/globals.d.ts'],
             refresh: [
                 ...refreshPaths,
                 'app/Filament/**',
@@ -15,5 +16,6 @@ export default defineConfig({
                 'app/Tables/Columns/**',
             ],
         }),
+        tsconfigPaths(),
     ],
 })
