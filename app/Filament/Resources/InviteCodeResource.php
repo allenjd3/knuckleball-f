@@ -13,7 +13,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction as ActionsEditAction;
-use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -47,7 +46,7 @@ class InviteCodeResource extends Resource
                     ->label('Register Link (click to copy)')
                     ->copyable()
                     ->copyMessage('Register link copied')
-                    ->copyMessageDuration(1500)
+                    ->copyMessageDuration(1500),
             ])
             ->filters([
                 //
