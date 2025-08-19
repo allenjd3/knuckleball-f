@@ -6,20 +6,25 @@
 
         <x-validation-errors class="mb-4" />
 
-        <form method="POST" action="{{ route('register') }}">
+        <form
+            method="POST"
+            action="{{ route('register') }}"
+            x-data="inviteCode"
+            x-init="getParam()"
+        >
             @csrf
 
             <div>
                 <x-label for="code" value="{{ __('Invite Code') }}" class="mb-1" />
                 <x-filament::input.wrapper>
-                    <x-filament::input id="code" type="text" name="code" :value="old('code')" required autofocus />
+                    <x-filament::input x-ref="code" id="code" type="text" x-model="code" :value="old('code')" required />
                 </x-filament::input.wrapper>
             </div>
 
             <div>
                 <x-label for="name" value="{{ __('Name') }}" class="mb-1" />
                 <x-filament::input.wrapper>
-                    <x-filament::input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+                    <x-filament::input x-ref="name" id="name" type="text" name="name" :value="old('name')" required autocomplete="name" />
                 </x-filament::input.wrapper>
             </div>
 
@@ -71,5 +76,6 @@
                 </x-filament::button>
             </div>
         </form>
+        @vite('resources/ts/invitecode.ts')
     </x-authentication-card>
 </x-guest-layout>

@@ -29,5 +29,6 @@
 
         @vite('resources/js/app.js')
         @filamentScripts
+        @livewireScripts
     </body>
 </html>
