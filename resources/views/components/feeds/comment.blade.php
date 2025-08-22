@@ -14,6 +14,6 @@
                 </div>
         </div>
         <p class="mb-2 text-sm">commented on: {{ $date_sent }}</p>
-        <div>@comment($feed->comment)</div>
+        <div>{!! str($feed->comment)->sanitizeHtml() !!}</div>
     </div>
 </article>

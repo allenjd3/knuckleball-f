@@ -6,7 +6,7 @@ use App\Actions\CreateFeedItem;
 use App\Models\Comment;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -39,8 +39,19 @@ class AddComment extends Component implements HasActions, HasForms
         return $form
             ->statePath('')
             ->schema([
-                Textarea::make('body')
-                    ->label('Comment')
+                RichEditor::make('body')
+                    ->label('Content')
+                    ->toolbarButtons([
+                        'bold',
+                        'bulletList',
+                        'italic',
+                        'link',
+                        'orderedList',
+                        'redo',
+                        'strike',
+                        'underline',
+                        'undo',
+                    ])
                     ->minLength(1)
                     ->maxLength(500),
             ]);

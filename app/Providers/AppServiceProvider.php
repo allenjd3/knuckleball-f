@@ -37,9 +37,5 @@ class AppServiceProvider extends ServiceProvider
             'success' => Color::Green,
             'warning' => Color::Amber,
         ]);
-
-        Blade::directive('comment', function (string $expression) {
-            return "<?php echo nl2br(e({$expression})); ?>";
-        });
     }
 }
