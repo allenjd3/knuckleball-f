@@ -9,11 +9,10 @@
         <form
             method="POST"
             action="{{ route('register') }}"
-            x-data="inviteCode"
+            x-data="inviteCode(@js(old('code')))"
             x-init="getParam()"
         >
             @csrf
-
             <div>
                 <x-label for="code" value="{{ __('Invite Code') }}" class="mb-1" />
                 <x-filament::input.wrapper>
