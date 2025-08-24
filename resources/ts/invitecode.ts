@@ -8,10 +8,14 @@ const getParamFromUri = (param: string) => {
 document.addEventListener('alpine:init', function () {
     Alpine.data(
         'inviteCode',
-        () => ({
-            code: {},
+        (oldInviteCode?: string) => ({
+            code: oldInviteCode || '',
             getParam() {
-                this.code = getParamFromUri('invite_code');
+                const urlCode = getParamFromUri('invite_code');
+                if (urlCode != '') {
+                    this.code = urlCode;
+                }
+
                 if (this.code) {
                     const name = this.$refs.name;
                     if (name instanceof HTMLInputElement) {
