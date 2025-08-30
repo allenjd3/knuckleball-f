@@ -40,17 +40,9 @@ class AddComment extends Component implements HasActions, HasForms
             ->statePath('')
             ->schema([
                 RichEditor::make('body')
-                    ->label('Content')
+                    ->label('Comment')
                     ->toolbarButtons([
-                        'bold',
-                        'bulletList',
-                        'italic',
                         'link',
-                        'orderedList',
-                        'redo',
-                        'strike',
-                        'underline',
-                        'undo',
                     ])
                     ->minLength(1)
                     ->maxLength(500),
