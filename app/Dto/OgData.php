@@ -14,10 +14,10 @@ class OgData
     public static function make(array $rawData)
     {
         return new self(
-            image: data_get($rawData, 'ogImageUrl'),
-            title: data_get($rawData, 'ogTitle'),
-            description: data_get($rawData, 'ogDescription'),
-            url: data_get($rawData, 'lastLinkUrl')
+            image: data_get($rawData, 'ogImageUrl', ''),
+            title: data_get($rawData, 'ogTitle', ''),
+            description: data_get($rawData, 'ogDescription', ''),
+            url: data_get($rawData, 'lastLinkUrl', '')
         );
     }
 

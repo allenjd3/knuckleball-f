@@ -32,7 +32,9 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                 </svg>
             </button>
-            <img src="{{ $ogData->image }}" />
+            @if ($ogData->image)
+                <img src="{{ $ogData->image }}" alt="{{ $ogData->title }}"/>
+            @endif
             <div class="p-2">
                 <p class="font-bold">{{ $ogData->title }}</p>
                 <p class="line-clamp-2">{{ $ogData->description }}</p>
