@@ -18,6 +18,7 @@ class CreateFeedItem
                 'ogImageUrl' => Storage::disk($ogProperties->disk)->url($ogProperties->path),
                 'ogTitle' => $ogProperties->title,
                 'ogDescription' => $ogProperties->description,
+                'lastLinkUrl' => $ogProperties->url,
             ];
         }
 
