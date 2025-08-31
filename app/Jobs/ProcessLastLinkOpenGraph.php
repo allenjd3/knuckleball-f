@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Actions\OpenGraph\GetLinkMetadata;
-use App\Actions\MoveImageToStorage;
-use App\Actions\ProcessImage;
+use App\Actions\OpenGraph\MoveImageToStorage;
+use App\Actions\OpenGraph\ProcessImage;
 use App\Models\Feed;
 use App\Models\OpenGraph;
 use Illuminate\Contracts\Queue\ShouldQueue;
