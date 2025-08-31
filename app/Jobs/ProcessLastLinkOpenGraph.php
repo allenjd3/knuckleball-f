@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Actions\GetLinkMetadata;
+use App\Actions\OpenGraph\GetLinkMetadata;
 use App\Actions\MoveImageToStorage;
 use App\Actions\ProcessImage;
 use App\Models\Feed;
