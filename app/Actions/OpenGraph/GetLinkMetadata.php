@@ -22,7 +22,12 @@ class GetLinkMetadata
         $fileName = array_slice(explode('/', $ogProperties->get('og:image')), -1)[0];
         $image = Http::get($ogProperties->get('og:image'))->body();
 
-        Storage::disk('temp')->put($fileName, $image);
+        if (! is_string($image) || $image === '') {
+            $fileName = '';
+        } elseif (! Storage::disk('temp')->put($fileName, $image)) {
+            $fileName = '';
+        }
+
         return $next([
             'url' => $url,
             'image' => $fileName,
