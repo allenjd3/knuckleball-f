@@ -13,6 +13,7 @@ trait ProcessLastLinkable
     public static function processLastLink(PostalMail|Comment $feedItem, Feed $feed)
     {
         if ($lastLink = self::getLastLink($feedItem)) {
+            lockTempDir();
             ProcessLastLinkOpenGraph::dispatch(url: $lastLink, feed: $feed);
         }
     }
