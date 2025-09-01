@@ -26,6 +26,7 @@ class FeedFactory extends Factory
     public function comment()
     {
         $user ??= User::factory()->create();
+
         return $this->state([
             'followable_id' => $user->id,
             'meta' => [

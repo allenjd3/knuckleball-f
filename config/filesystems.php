@@ -48,7 +48,7 @@ return [
         'temp' => [
             'driver' => 'local',
             'root' => storage_path('app/temp'),
-            'url' => env('APP_URL'). '/storage/temp',
+            'url' => env('APP_URL') . '/storage/temp',
             'visibility' => 'private',
         ],
 

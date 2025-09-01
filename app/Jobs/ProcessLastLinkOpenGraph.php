@@ -20,8 +20,7 @@ class ProcessLastLinkOpenGraph implements ShouldQueue
     public function __construct(
         public string $url,
         public Feed $feed,
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {
@@ -32,7 +31,7 @@ class ProcessLastLinkOpenGraph implements ShouldQueue
                     ProcessImage::class,
                     MoveImageToStorage::class,
                 ])
-                ->then(fn($ogProperties) => count($ogProperties) ? OpenGraph::create([
+                ->then(fn ($ogProperties) => count($ogProperties) ? OpenGraph::create([
                     'url' => data_get($ogProperties, 'url'),
                     'path' => data_get($ogProperties, 'image'),
                     'disk' => config('filesystems.default', 'public'),

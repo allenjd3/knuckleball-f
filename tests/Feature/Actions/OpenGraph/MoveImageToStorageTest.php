@@ -16,7 +16,7 @@ test('it moves the processed image to the final disk', function () {
         ],
         fn ($val) => expect($val)->toBe([
             'url' => 'https://jamesdallen.me',
-            'image' => '/opengraph/someimage.png',
+            'image' => 'opengraph/someimage.png',
             'title' => 'Example Title',
             'description' => 'Example Description',
         ]),

@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use Closure;
 use Exception;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -18,7 +17,8 @@ class GetLastLinkFromBody
                 ->last()
                 ->link()
                 ->getUri();
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         return $lastUrl;
     }

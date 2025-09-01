@@ -17,7 +17,7 @@ class GetLinkMetadata
         $ogProperties = collect();
 
         $linkSource->filter('meta[property]')
-            ->each(fn ($node) => $ogProperties->put($node->attr("property"), $node->attr("content")));
+            ->each(fn ($node) => $ogProperties->put($node->attr('property'), $node->attr('content')));
 
         $fileName = array_slice(explode('/', $ogProperties->get('og:image')), -1)[0];
         $image = Http::get($ogProperties->get('og:image'))->body();

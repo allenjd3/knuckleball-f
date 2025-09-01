@@ -14,7 +14,7 @@ test('it queries the metadata', function () {
         '*' => Http::response('fake', 200),
     ]);
 
-    $getLinkMetadata = new GetLinkMetadata();
+    $getLinkMetadata = new GetLinkMetadata;
     $getLinkMetadata(
         'https://jamesdallen.me',
         fn ($val) => expect($val)->toBe([

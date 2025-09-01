@@ -19,11 +19,13 @@ class CleanTempDirectory extends Command
 
         if ($allFiles->isEmpty()) {
             $this->warn('there are no files to process at this time');
+
             return;
         }
 
         if (isTempDirLocked()) {
             $this->warn('currently processing files');
+
             return;
         }
 
