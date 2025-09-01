@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
+use Throwable;
 
 class GetLinkMetadata
 {
@@ -20,7 +21,17 @@ class GetLinkMetadata
             ->each(fn ($node) => $ogProperties->put($node->attr('property'), $node->attr('content')));
 
         $fileName = array_slice(explode('/', $ogProperties->get('og:image')), -1)[0];
-        $image = Http::get($ogProperties->get('og:image'))->body();
+
+        $image = '';
+
+        try {
+            $imgResponse = Http::get($ogProperties->get('og:image', ''));
+            if ($imgResponse->ok()) {
+                $image = $imgResponse->body();
+            } else {
+                return;
+            }
+        } catch (Throwable $e) {}
 
         if (! is_string($image) || $image === '') {
             $fileName = '';
