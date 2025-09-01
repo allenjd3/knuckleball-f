@@ -69,7 +69,7 @@ class PostalMail extends Model
         return $this->user_id;
     }
 
-    public function generateMeta()
+    public function generateMeta(array $overrides = [])
     {
         $user = $this->user;
         $player = $this->player;
@@ -82,6 +82,7 @@ class PostalMail extends Model
             'player_path' => $player->path(),
             'date_sent' => $this->date_sent,
             'date_returned' => $this->returned_date,
+            ...$overrides,
         ];
     }
 

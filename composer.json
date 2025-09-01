@@ -21,7 +21,9 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^3.0",
         "predis/predis": "^2.3",
-        "spatie/laravel-sluggable": "^3.7"
+        "spatie/image": "^3.8",
+        "spatie/laravel-sluggable": "^3.7",
+        "symfony/dom-crawler": "^7.3"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",
@@ -40,7 +42,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Support/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -45,7 +45,7 @@ class Comment extends Model
         return $this->user_id;
     }
 
-    public function generateMeta()
+    public function generateMeta(array $overrides = [])
     {
         $user = $this->user;
 
@@ -54,6 +54,7 @@ class Comment extends Model
             'user' => $user->name,
             'user_path' => $user->path(),
             'date_sent' => $this->date_sent,
+            ...$overrides,
         ];
     }
 
