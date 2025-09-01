@@ -10,11 +10,11 @@ class MoveImageToStorage
     public function __invoke(array $ogProperties, Closure $next)
     {
         $fileName = data_get($ogProperties, 'image');
-        Storage::put('/opengraph/' . $fileName, Storage::disk('temp')->get($fileName));
+        Storage::put('opengraph/' . $fileName, Storage::disk('temp')->get($fileName));
 
         return $next([
             ...$ogProperties,
-            'image' => '/opengraph/' . $fileName,
+            'image' => 'opengraph/' . $fileName,
         ]);
     }
 }

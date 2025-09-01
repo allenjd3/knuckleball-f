@@ -23,6 +23,20 @@ class FeedFactory extends Factory
         ];
     }
 
+    public function comment()
+    {
+        $user ??= User::factory()->create();
+        return $this->state([
+            'followable_id' => $user->id,
+            'meta' => [
+                'photo' => $user->profile_photo_url,
+                'user' => $user->name,
+                'user_path' => $user->path(),
+                'date_sent' => now()->subWeek(),
+            ],
+        ]);
+    }
+
     public function postalMail(?Player $player = null, ?User $user = null)
     {
         $user ??= User::factory()->create();
