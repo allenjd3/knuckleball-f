@@ -57,7 +57,7 @@ class AddressResource extends Resource
                     ->label('Signer')
                     ->options(
                         fn () => Signer::where('signable_type', 'player')
-                            ->with('signable')
+                            ->withWhereHas('signable')
                             ->get()
                             ->mapWithKeys(fn ($signer) => [$signer->id => $signer->signable->name])
                     )
