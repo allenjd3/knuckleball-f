@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Actions\ReplacePastedLinks;
 use App\Models\Comment;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -56,9 +57,14 @@ class AddComment extends Component implements HasActions, HasForms
             'body' => 'required|min:1|max:500',
         ]);
 
+        $bodyWithReplacedLinks = ReplacePastedLinks::handle($validated['body']);
+
         $comment = auth()->user()
             ?->comments()
-            ->create(['body' => $validated['body'], 'comment_id' => $this->commentId]);
+            ->create([
+                'body' => $bodyWithReplacedLinks,
+                'comment_id' => $this->commentId,
+            ]);
 
         CreateFeedItem::execute($comment, $comment->body);
 
