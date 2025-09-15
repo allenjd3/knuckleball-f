@@ -2,10 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Comment;
-use App\Models\Fee;
 use App\Models\Feed;
-use App\Models\PostalMail;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -26,7 +23,7 @@ class MentionFactory extends Factory
 
     public function forUser(User $user, string $type, ?string $comment)
     {
-        $feed = match($type) {
+        $feed = match ($type) {
             $type === 'comment' => Feed::factory()->forUser($user)->comment($comment ?? "Mentioned @{$user->handle}")->create(),
             $type === 'postal_mail' => Feed::factory()->forUser($user)->postalMail()->create(),
         };

@@ -9,7 +9,6 @@ use App\Models\Feed;
 use App\Models\OpenGraph;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Pipeline;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

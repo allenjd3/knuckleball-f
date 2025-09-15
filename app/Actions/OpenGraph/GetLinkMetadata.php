@@ -31,7 +31,8 @@ class GetLinkMetadata
             } else {
                 return;
             }
-        } catch (Throwable $e) {}
+        } catch (Throwable $e) {
+        }
 
         if (! is_string($image) || $image === '') {
             $fileName = '';
