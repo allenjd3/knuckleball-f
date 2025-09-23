@@ -11,6 +11,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('handle')->nullable();
+            $table->index(['handle']);
         });
 
         User::whereNull('handle')

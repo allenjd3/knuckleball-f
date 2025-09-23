@@ -43,7 +43,7 @@ class User extends Authenticatable implements FilamentUser
     {
         static::creating(function (User $user) {
             $user->slug = User::generateSlug($user->name);
-            // $user->handle = str($user->slug)->camel();
+            $user->handle = str($user->slug)->camel();
         });
     }
 
