@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('comments', function(Blueprint $table) {
+        Schema::table('comments', function (Blueprint $table) {
             $table->string('body', 1000)->change();
         });
     }

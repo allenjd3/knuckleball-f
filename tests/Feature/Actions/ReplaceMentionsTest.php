@@ -3,7 +3,7 @@
 use App\Actions\ReplaceMentions;
 use App\Models\User;
 
-test("it replaces mentions", function () {
+test('it replaces mentions', function () {
     $user = User::factory()->create();
     $user2 = User::factory()->create();
     $html = "I'm mentioning @{$user->handle} and @{$user2->handle}";

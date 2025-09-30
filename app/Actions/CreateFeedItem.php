@@ -3,7 +3,6 @@
 namespace App\Actions;
 
 use App\Models\Comment;
-use App\Models\Feed;
 use App\Models\PostalMail;
 use App\Traits\ProcessLastLinkable;
 

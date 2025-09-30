@@ -49,7 +49,7 @@ class Feed extends Model
         $this->mentions()->create([
             'user_id' => $user->id,
             'mentioned_by_id' => $this->followable_id,
-            'feed_type' => $this->feedable_type
+            'feed_type' => $this->feedable_type,
         ]);
     }
 }

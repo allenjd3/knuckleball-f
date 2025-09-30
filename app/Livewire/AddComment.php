@@ -8,7 +8,6 @@ use App\Models\Comment;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -23,9 +22,9 @@ use Livewire\Component;
 
 class AddComment extends Component implements HasActions, HasForms
 {
+    use HasFormMentions;
     use InteractsWithActions;
     use InteractsWithForms;
-    use HasFormMentions;
 
     public $body;
 
