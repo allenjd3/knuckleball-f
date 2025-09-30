@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Mention extends Model
 {
@@ -13,13 +12,13 @@ class Mention extends Model
 
     protected $guarded = [];
 
-    public function feeds(): HasMany
+    public function feed(): BelongsTo
     {
-        return $this->hasMany(Feed::class);
+        return $this->belongsTo(Feed::class);
     }
 
-    public function user(): HasOne
+    public function user(): BelongsTo
     {
-        return $this->hasOne(User::class);
+        return $this->belongsTo(User::class);
     }
 }

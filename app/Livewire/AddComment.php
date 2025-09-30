@@ -68,13 +68,14 @@ class AddComment extends Component implements HasActions, HasForms
     public function save()
     {
         $this->authorize('create', Comment::class);
-        $mentionIds = $this->extractMentionIds($this->body);
 
         $validator = Validator::make([
             'body' => TiptapConverter::asHTML($this->body),
         ], [
             'body' => ['min:1', 'max:500', 'required'],
         ]);
+
+        $mentionIds = $this->extractMentionIds($this->body);
 
         $body = data_get($validator->validated(), 'body');
 
@@ -88,7 +89,11 @@ class AddComment extends Component implements HasActions, HasForms
             ]);
 
         $feed = CreateFeedItem::execute($comment, $comment->body);
-        $mentionIds->each(fn ($id) => $feed->mention(User::find($id)));
+        $mentionIds->each(function ($id) use ($feed) {
+            if ($user = User::find($id)) {
+                $feed->mention($user);
+            }
+        });
 
         $this->dispatch('feed-updated');
         unset($this->body);

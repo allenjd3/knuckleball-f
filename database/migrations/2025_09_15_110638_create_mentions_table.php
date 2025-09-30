@@ -15,6 +15,8 @@ return new class extends Migration
             $table->foreignId('mentioned_by_id');
             $table->string('feed_type');
             $table->timestamps();
+
+            $table->index(['feed_id', 'user_id']);
         });
     }
 };
