@@ -19,18 +19,8 @@ class CreateFeedItem
             'meta' => $feedItem->generateMeta(),
         ]);
 
-        static::createMentions($comment, $feed);
-
         self::processLastLink($feedItem, $feed);
-    }
 
-    private static function createMentions(string $comment, Feed $feed)
-    {
-        $mentions = GetMentions::handle($comment);
-        $mentions->map(fn ($user) => $feed->mention($user));
-
-        $feed->update([
-            'comment' => ReplaceMentions::handle($feed->comment, $mentions)
-        ]);
+        return $feed;
     }
 }
