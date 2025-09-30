@@ -21,7 +21,7 @@ class ViewPlayersFromTeam extends ViewPlayers
         int $team
     ) {
         $this->teamId = $team;
-        $teamModel = Team::firstWhere('id', $this->teamId);
+        $teamModel = Team::where('id', $this->teamId)->firstOrFail();
         $this->teamName = $teamModel->name;
         $this->mediaUrl = $teamModel->media?->url;
     }

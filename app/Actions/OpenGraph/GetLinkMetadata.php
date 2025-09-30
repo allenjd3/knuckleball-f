@@ -20,7 +20,7 @@ class GetLinkMetadata
         $linkSource->filter('meta[property]')
             ->each(fn ($node) => $ogProperties->put($node->attr('property'), $node->attr('content')));
 
-        $fileName = array_slice(explode('/', $ogProperties->get('og:image')), -1)[0];
+        $fileName = basename(parse_url(array_slice(explode('/', $ogProperties->get('og:image')), -1)[0]), PHP_URL_PATH);
 
         $image = '';
 
