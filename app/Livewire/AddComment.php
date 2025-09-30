@@ -69,14 +69,16 @@ class AddComment extends Component implements HasActions, HasForms
         $this->authorize('create', Comment::class);
 
         $validator = Validator::make([
-            'body' => TiptapConverter::asHTML($this->body),
+            'body' => TiptapConverter::asText($this->body),
         ], [
             'body' => ['min:1', 'max:500', 'required'],
         ]);
 
+        $validator->validated();
+
         $mentionIds = $this->extractMentionIds($this->body);
 
-        $body = data_get($validator->validated(), 'body');
+        $body = TiptapConverter::asHTML($this->body);
 
         $bodyWithReplacedLinks = ReplacePastedLinks::handle($body);
 
