@@ -19,5 +19,7 @@ class CreateFeedItem
         ]);
 
         self::processLastLink($feedItem, $feed);
+
+        return $feed;
     }
 }

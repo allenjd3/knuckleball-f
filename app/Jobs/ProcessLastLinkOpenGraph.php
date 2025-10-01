@@ -24,7 +24,7 @@ class ProcessLastLinkOpenGraph implements ShouldQueue
 
     public function handle(): void
     {
-        OpenGraph::where('url', $this->url)->first()
+        $openGraph = OpenGraph::where('url', $this->url)->first()
             ?? Pipeline::send($this->url)
                 ->through([
                     GetLinkMetadata::class,
@@ -42,20 +42,20 @@ class ProcessLastLinkOpenGraph implements ShouldQueue
                         return;
                     }
 
-                    $openGraph = OpenGraph::create([
+                    return OpenGraph::create([
                         'url' => data_get($ogProperties, 'url'),
                         'path' => data_get($ogProperties, 'image'),
                         'disk' => config('filesystems.default', 'public'),
                         'title' => Str::limit(data_get($ogProperties, 'title'), 230),
                         'description' => Str::limit(data_get($ogProperties, 'description'), 230),
                     ]);
-
-                    $this->feed->update([
-                        'meta->ogImageUrl' => Storage::disk($openGraph->disk)->url($openGraph->path),
-                        'meta->ogDescription' => $openGraph->description,
-                        'meta->ogTitle' => $openGraph->title,
-                        'meta->lastLinkUrl' => $openGraph->url,
-                    ]);
                 });
+
+        $this->feed->update([
+            'meta->ogImageUrl' => Storage::disk($openGraph->disk)->url($openGraph->path),
+            'meta->ogDescription' => $openGraph->description,
+            'meta->ogTitle' => $openGraph->title,
+            'meta->lastLinkUrl' => $openGraph->url,
+        ]);
     }
 }

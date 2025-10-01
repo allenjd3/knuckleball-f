@@ -37,7 +37,9 @@ class UserProfile extends Component
     public function feeds()
     {
         return Feed::query()
-            ->where('followable_id', $this->user->id)
+            ->where(fn ($query) => $query->where('followable_id', $this->user->id)
+                ->orWhereHas('mentions', fn ($query) => $query->where('user_id', $this->user->id))
+            )
             ->orderByDesc('created_at')
             ->simplepaginate();
     }

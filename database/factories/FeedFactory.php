@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Comment;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
@@ -23,11 +24,19 @@ class FeedFactory extends Factory
         ];
     }
 
-    public function comment()
+    public function comment(?User $user = null, ?string $comment = null)
     {
         $user ??= User::factory()->create();
+        $model = Comment::class;
+
+        $override = [];
+        if ($comment) {
+            $override = ['comment' => $comment];
+        }
 
         return $this->state([
+            'feedable_id' => $model::factory()->create(),
+            'feedable_type' => $model,
             'followable_id' => $user->id,
             'meta' => [
                 'photo' => $user->profile_photo_url,
@@ -35,6 +44,7 @@ class FeedFactory extends Factory
                 'user_path' => $user->path(),
                 'date_sent' => now()->subWeek(),
             ],
+            ...$override,
         ]);
     }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Feed extends Model
@@ -32,5 +33,23 @@ class Feed extends Model
             $this->feedable_type === PostalMail::class => 'feeds.postal-mail',
             $this->feedable_type === Comment::class => 'feeds.comment',
         };
+    }
+
+    public function mentions(): HasMany
+    {
+        return $this->hasMany(Mention::class);
+    }
+
+    public function mention(User $user)
+    {
+        if ($this->mentions()->where('user_id', $user->id)->exists()) {
+            return;
+        }
+
+        $this->mentions()->create([
+            'user_id' => $user->id,
+            'mentioned_by_id' => $this->followable_id,
+            'feed_type' => $this->feedable_type,
+        ]);
     }
 }
