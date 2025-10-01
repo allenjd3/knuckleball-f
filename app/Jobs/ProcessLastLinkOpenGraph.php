@@ -51,11 +51,13 @@ class ProcessLastLinkOpenGraph implements ShouldQueue
                     ]);
                 });
 
-        $this->feed->update([
-            'meta->ogImageUrl' => Storage::disk($openGraph->disk)->url($openGraph->path),
-            'meta->ogDescription' => $openGraph->description,
-            'meta->ogTitle' => $openGraph->title,
-            'meta->lastLinkUrl' => $openGraph->url,
-        ]);
+        if ($openGraph) {
+            $this->feed->update([
+                'meta->ogImageUrl' => Storage::disk($openGraph->disk)->url($openGraph->path),
+                'meta->ogDescription' => $openGraph->description,
+                'meta->ogTitle' => $openGraph->title,
+                'meta->lastLinkUrl' => $openGraph->url,
+            ]);
+        }
     }
 }
