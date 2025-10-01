@@ -4,6 +4,7 @@ namespace App\Actions\OpenGraph;
 
 use Closure;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
@@ -20,7 +21,7 @@ class GetLinkMetadata
         $linkSource->filter('meta[property]')
             ->each(fn ($node) => $ogProperties->put($node->attr('property'), $node->attr('content')));
 
-        $fileName = basename(parse_url(array_slice(explode('/', $ogProperties->get('og:image')), -1)[0]), PHP_URL_PATH);
+        $fileName = basename(parse_url($ogProperties->get('og:image'), PHP_URL_PATH));
 
         $image = '';
 
