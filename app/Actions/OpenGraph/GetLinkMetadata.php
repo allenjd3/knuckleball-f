@@ -4,7 +4,6 @@ namespace App\Actions\OpenGraph;
 
 use Closure;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\DomCrawler\Crawler;
 use Throwable;

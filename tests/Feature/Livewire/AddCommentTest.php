@@ -61,37 +61,37 @@ function commentContent(string $body, ?User $userMention = null)
 {
     $mention = $userMention
         ? [
-                'type' => 'mention',
-                'attrs' => [
-                    'id' => $userMention?->id,
-                    'label' => "{$userMention?->id} (@{$userMention?->handle})",
-                    'href' => $userMention?->path(),
-                    'type' => null,
-                    'target' => '_blank',
-                    'data' => [],
-                ]
-            ]
+            'type' => 'mention',
+            'attrs' => [
+                'id' => $userMention?->id,
+                'label' => "{$userMention?->id} (@{$userMention?->handle})",
+                'href' => $userMention?->path(),
+                'type' => null,
+                'target' => '_blank',
+                'data' => [],
+            ],
+        ]
         : [];
 
     $content = [
-            [
-                'type' => 'text',
-                'text' => $body,
-            ],
-            ...$mention,
-        ];
+        [
+            'type' => 'text',
+            'text' => $body,
+        ],
+        ...$mention,
+    ];
 
     return [
-            'type' => 'doc',
-            'content' => [
-                [
-                    'type' => 'paragraph',
-                    'attrs' => [
-                        'class' => null,
-                        'style' => null,
-                    ],
-                    'content' => $content,
-                ]
-            ]
-        ];
+        'type' => 'doc',
+        'content' => [
+            [
+                'type' => 'paragraph',
+                'attrs' => [
+                    'class' => null,
+                    'style' => null,
+                ],
+                'content' => $content,
+            ],
+        ],
+    ];
 }
