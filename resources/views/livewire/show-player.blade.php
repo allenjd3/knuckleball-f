@@ -74,7 +74,7 @@
                 @else
                     <div class="text-center p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">
                         <p>This player doesn't have an address yet.</p>
-                        <p>Help us find this one! Know Where to reach them?</p>
+                        <p>Help us find this one! Know where to reach them?</p>
                         @guest
                             <x-filament::button
                                 tag="a"
@@ -85,7 +85,7 @@
                             </x-filament::button>
                         @else
                             @can('update', $player)
-                                <div class="mt-2">{{ $this->createAddress }}</div>
+                                <div class="mt-4">{{ $this->createAddress }}</div>
                             @endcan
                         @endguest
                     </div>
