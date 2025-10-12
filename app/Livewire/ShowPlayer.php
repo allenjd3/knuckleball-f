@@ -79,6 +79,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     public function createAddressAction(): Action
     {
         return CreateAction::make('createAddress')
+            ->label(fn () => $this->address?->exists ? 'Suggest New Address' : 'Add the address!')
             ->model(Address::class)
             ->authorize(fn () => request()->user()?->can('create', Address::class))
             ->form([
