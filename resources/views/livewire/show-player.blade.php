@@ -72,16 +72,34 @@
                 @elseif ($this->hasUnpublishedAddress)
                     <p class="p-8 border-4 rounded-lg border-green-200 border-dashed text-green-500 font-bold">Thanks for your submission. It is in review!</p>
                 @else
-                    <p class="p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">This player doesn't have an address yet.</p>
+                    <div class="text-center p-8 border-4 rounded-lg border-gray-200 border-dashed text-gray-500">
+                        <p>This player doesn't have an address yet.</p>
+                        <p>Help us find this one! Know where to reach them?</p>
+                        @guest
+                            <x-filament::button
+                                tag="a"
+                                class="mt-4"
+                                :href="route('login')"
+                            >
+                                Add the address!
+                            </x-filament::button>
+                        @else
+                            @can('update', $player)
+                                <div class="mt-4">{{ $this->createAddress }}</div>
+                            @endcan
+                        @endguest
+                    </div>
                 @endif
 
                 @if (isset($unpublishedAddress))
                     <p class="font-bold text-green-500">There is an unpublished address for your review. <a href="{{ route('filament.cp.resources.addresses.edit', ['record' => data_get($unpublishedAddress, 'id')]) }}" class="text-black hover:underline">Review It</a></p>
                 @endif
 
-                @can('update', $player)
-                    <div class="mt-2">{{ $this->createAddress }}</div>
-                @endcan
+                @if ($this->address?->exists)
+                    @can('update', $player)
+                        <div class="mt-2">{{ $this->createAddress }}</div>
+                    @endcan
+                @endif
                 @can('update', $player)
                     <x-filament-actions::modals />
                 @endcan
