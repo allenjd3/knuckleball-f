@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Enums\Role;
 use Illuminate\Support\Facades\DB;
 
 test('it generates a slug for new users', function () {
@@ -86,4 +87,19 @@ test('a user can get a list of everyone they are following', function () {
     $user1->follow($user3);
 
     expect($user1->following->pluck('id')->toArray())->toEqual([$user2->id, $user3->id]);
+});
+
+test('users have a default role', function () {
+    $user = User::factory()->create();
+
+    expect($user->fresh()->role)->toEqual(Role::USER);
+});
+
+test('users can be set to admin', function () {
+    $user = User::factory()->create();
+    $user->role = Role::ADMIN;
+
+    $user->save();
+
+    expect($user->fresh()->role)->toEqual(Role::ADMIN);
 });
