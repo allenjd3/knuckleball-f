@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Role;
 use App\Traits\HasProfilePhoto;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -143,6 +144,7 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'published_at' => 'datetime',
             'super_admin' => 'bool',
+            'role' => Role::class,
         ];
     }
 }
