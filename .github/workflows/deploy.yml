@@ -1,0 +1,15 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main  # or 'master' or 'production'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Envoyer Deploy
+        run: curl -s -X POST "$ENVOYER_DEPLOY_URL"
+        env:
+          ENVOYER_DEPLOY_URL: ${{ secrets.ENVOYER_DEPLOY_URL }}
