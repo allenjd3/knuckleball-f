@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 test('it generates a slug for new users', function () {
