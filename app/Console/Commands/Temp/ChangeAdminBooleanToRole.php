@@ -15,8 +15,6 @@ class ChangeAdminBooleanToRole extends Command
     public function handle()
     {
         User::where('super_admin', true)
-            ->get()
-            ->each
             ->update([
                 'role' => Role::ADMIN,
             ]);
