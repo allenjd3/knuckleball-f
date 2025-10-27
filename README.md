@@ -6,7 +6,7 @@ https://knuckleball.app is a "through the mail" website that allows users to vie
 
 ## 🧰 Tech Stack
 - **Language:** e.g., PHP / JavaScript
-- **Framework:** e.g., Laravel / React / Django
+- **Framework:** e.g., Laravel
 - **Database:** e.g., MySQL
 - **Other Tools:** e.g., TailwindCSS
 
