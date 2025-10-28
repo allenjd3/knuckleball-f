@@ -19,6 +19,6 @@ enum Role: string implements HasLabel
 
     public function isAdmin(): bool
     {
-        return self::ADMIN === $this;
+        return $this === self::ADMIN;
     }
 }
