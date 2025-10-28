@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Livewire\UserFeed;
 use App\Models\Feed;
 use App\Models\FeeMaterial;
@@ -16,7 +17,7 @@ it('renders successfully', function () {
 test('it creates a feed when adding postal mail', function () {
     $this->freezeTime(function () {
         $player = Player::factory()->create();
-        $user = User::factory()->state(['super_admin' => true])->create();
+        $user = User::factory()->state(['role' => Role::ADMIN])->create();
         $feeMaterial = FeeMaterial::factory()->create();
         Livewire::actingAs($user)->test('ShowPlayer', ['player' => $player])
             ->callTableAction('createPostalMail', data: [

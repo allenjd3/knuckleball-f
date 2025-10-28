@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
@@ -39,7 +40,7 @@ test('Players can be sorted by name', function () {
 test('Players can be updated by super admins', function () {
     $team = Team::factory()->create();
     $team2 = Team::factory()->create();
-    $user = User::factory()->state(['super_admin' => rand(0, 1) ? true : false])->create();
+    $user = User::factory()->state(['role' => rand(0, 1) ? Role::ADMIN : Role::USER])->create();
 
     $oldData = [
         'name' => 'Joe DeScoobio',

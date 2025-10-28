@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Livewire\ViewTeams;
 use App\Models\Team;
 use App\Models\User;
@@ -60,7 +61,7 @@ test('approved teams are still visible', function () {
 
 test('an admin is emailed if new teams are added', function () {
     Notification::fake([PendingApprovals::class]);
-    User::factory()->state(['super_admin' => true])->create();
+    User::factory()->state(['role' => Role::ADMIN])->create();
 
     $this->artisan('notify:pending-approvals');
 

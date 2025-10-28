@@ -23,7 +23,6 @@ class EditUser extends EditRecord
                 TextInput::make('name'),
                 TextInput::make('email'),
                 DatePicker::make('published_at'),
-                Checkbox::make('super_admin')->columnSpan(2),
                 Select::make('role')
                     ->options(Role::class),
             ]);

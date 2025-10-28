@@ -1,12 +1,13 @@
 <?php
 
+use App\Enums\Role;
 use App\Filament\Resources\InviteCodeResource\Pages\CreateInviteCode;
 use App\Models\InviteCode;
 use App\Models\User;
 
 test('it can save an invite code', function () {
     InviteCode::factory()->make();
-    $user = User::factory()->state(['super_admin' => true])->create();
+    $user = User::factory()->state(['role' => Role::ADMIN])->create();
 
     Livewire::actingAs($user)
         ->test(CreateInviteCode::class)
@@ -21,7 +22,7 @@ test('it can save an invite code', function () {
 
 test('it requires the code', function () {
     InviteCode::factory()->make();
-    $user = User::factory()->state(['super_admin' => true])->create();
+    $user = User::factory()->state(['role' => Role::ADMIN])->create();
 
     Livewire::actingAs($user)
         ->test(CreateInviteCode::class)
