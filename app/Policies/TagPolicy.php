@@ -24,16 +24,16 @@ class TagPolicy
 
     public function create(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function update(User $user, Tag $tag): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function delete(User $user, Tag $tag): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 }

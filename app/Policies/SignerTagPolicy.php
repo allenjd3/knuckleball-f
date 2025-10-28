@@ -23,11 +23,11 @@ class SignerTagPolicy
 
     public function update(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function delete(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 }

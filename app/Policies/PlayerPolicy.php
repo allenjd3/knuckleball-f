@@ -15,7 +15,9 @@ class PlayerPolicy
         return true;
     }
 
-    public function view(User $user, Player $player): bool {}
+    public function view(User $user, Player $player): bool {
+        return $user->isPublished();
+    }
 
     public function create(User $user): bool
     {
@@ -29,15 +31,19 @@ class PlayerPolicy
 
     public function delete(User $user, Player $player): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function manage(User $user): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
-    public function restore(User $user, Player $player): bool {}
+    public function restore(User $user, Player $player): bool {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
 
-    public function forceDelete(User $user, Player $player): bool {}
+    public function forceDelete(User $user, Player $player): bool {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
 }

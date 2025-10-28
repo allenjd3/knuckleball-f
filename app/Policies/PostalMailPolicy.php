@@ -27,15 +27,21 @@ class PostalMailPolicy
 
     public function update(User $user, PostalMail $postalMail): bool
     {
-        return $user->id === $postalMail->user_id || $user->isSuperAdmin();
+        return $user->id === $postalMail->user_id || $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function delete(User $user, PostalMail $postalMail): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
-    public function restore(User $user, PostalMail $postalMail): bool {}
+    public function restore(User $user, PostalMail $postalMail): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
 
-    public function forceDelete(User $user, PostalMail $postalMail): bool {}
+    public function forceDelete(User $user, PostalMail $postalMail): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
 }

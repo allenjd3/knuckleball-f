@@ -20,7 +20,7 @@ class CardPolicy
      */
     public function view(User $user, Card $card): bool
     {
-        return $card->user->id === $user->id;
+        return $card->user->id === $user->id || $user->isSuperAdmin() || $user->isEditor();
     }
 
     /**
@@ -44,7 +44,7 @@ class CardPolicy
      */
     public function delete(User $user, Card $card): bool
     {
-        return $card->user->id === $user->id;
+        return $card->user->id === $user->id || $user->isSuperAdmin() || $user->isEditor();
     }
 
     /**
@@ -52,7 +52,7 @@ class CardPolicy
      */
     public function restore(User $user, Card $card): bool
     {
-        return $card->user->id === $user->id;
+        return $card->user->id === $user->id || $user->isSuperAdmin() || $user->isEditor();
     }
 
     /**
@@ -60,6 +60,6 @@ class CardPolicy
      */
     public function forceDelete(User $user, Card $card): bool
     {
-        return $card->user->id === $user->id;
+        return $card->user->id === $user->id || $user->isSuperAdmin() || $user->isEditor();
     }
 }

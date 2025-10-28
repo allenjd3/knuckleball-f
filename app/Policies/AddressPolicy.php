@@ -27,7 +27,7 @@ class AddressPolicy
 
     public function update(User $user, Address $address): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function delete(User $user, Address $address): bool

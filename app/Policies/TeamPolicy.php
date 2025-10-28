@@ -15,7 +15,9 @@ class TeamPolicy
         return true;
     }
 
-    public function view(User $user, Team $team): bool {}
+    public function view(User $user, Team $team): bool {
+        return $user->isPublished();
+    }
 
     public function create(User $user): bool
     {
@@ -29,10 +31,18 @@ class TeamPolicy
 
     public function delete(User $user, Team $team): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
-    public function restore(User $user, Team $team): bool {}
+    public function restore(User $user, Team $team): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
 
-    public function forceDelete(User $user, Team $team): bool {}
+
+    public function forceDelete(User $user, Team $team): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
+
 }

@@ -32,16 +32,16 @@ class FeePolicy
 
     public function delete(User $user, Fee $fee): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function restore(User $user, Fee $fee): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function forceDelete(User $user, Fee $fee): bool
     {
-        return $user->isSuperAdmin();
+        return $user->isSuperAdmin() || $user->isEditor();
     }
 }
