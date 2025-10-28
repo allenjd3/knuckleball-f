@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
             User::factory()->create([
                 'name' => 'Brittany Allen',
                 'email' => 'britt@example.com',
-                'role' => Role::ADMIN,
+                'role' => Role::USER,
             ]);
 
             $teams = Team::factory(10)
