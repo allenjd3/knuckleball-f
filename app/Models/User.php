@@ -60,7 +60,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function isSuperAdmin(): bool
     {
-        return (bool) $this->super_admin;
+        return (bool) $this->role->isAdmin();
     }
 
     public function isPublished(): bool
@@ -143,7 +143,6 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'published_at' => 'datetime',
-            'super_admin' => 'bool',
             'role' => Role::class,
         ];
     }

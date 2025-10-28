@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -37,13 +38,14 @@ class UserFactory extends Factory
             'profile_photo_path' => null,
             'current_team_id' => null,
             'published_at' => now()->subMonth(),
+            'role' => Role::USER,
         ];
     }
 
     public function isSuperAdmin()
     {
         return $this->state([
-            'super_admin' => true,
+            'role' => Role::ADMIN,
         ]);
     }
 

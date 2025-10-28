@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Notification;
 
+use App\Enums\Role;
 use App\Models\Address;
 use App\Models\Player;
 use App\Models\Team;
@@ -37,7 +38,7 @@ class PendingApprovals extends Command
             ->where('rejected', false)
             ->count();
 
-        User::where('super_admin', true)->get()
+        User::where('role', Role::ADMIN)->get()
             ->each(
                 fn ($user) => $user->notify(
                     new NotificationsPendingApprovals(

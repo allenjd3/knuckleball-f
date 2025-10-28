@@ -5,7 +5,6 @@ namespace App\Filament\Resources\UserResource\Pages;
 use App\Enums\Role;
 use App\Filament\Resources\UserResource;
 use Filament\Actions\DeleteAction;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -23,7 +22,6 @@ class EditUser extends EditRecord
                 TextInput::make('name'),
                 TextInput::make('email'),
                 DatePicker::make('published_at'),
-                Checkbox::make('super_admin')->columnSpan(2),
                 Select::make('role')
                     ->options(Role::class),
             ]);

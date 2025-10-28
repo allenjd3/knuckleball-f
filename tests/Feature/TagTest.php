@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Livewire\ShowPlayer;
 use App\Models\Player;
 use App\Models\SignerTag;
@@ -36,7 +37,7 @@ test('an unpublished user cannot associate tag with player', function () {
 
 test('an admin can approve tag player association', function () {
 
-    $admin = User::factory()->create(['super_admin' => true]);
+    $admin = User::factory()->create(['role' => Role::ADMIN]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
     $playerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
@@ -54,7 +55,7 @@ test('an admin can approve tag player association', function () {
 });
 
 test('an admin can reject tag player association', function () {
-    $admin = User::factory()->create(['super_admin' => true]);
+    $admin = User::factory()->create(['role' => Role::ADMIN]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
     $signerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $admin->id]);
@@ -72,7 +73,7 @@ test('an admin can reject tag player association', function () {
 
 // A non-admin cannot approve tag player association
 test('a non admin cannot approve tag player association', function () {
-    $regularUser = User::factory()->create(['super_admin' => false]);
+    $regularUser = User::factory()->create(['role' => Role::USER]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
     $signerTag = SignerTag::create(['signer_id' => $player->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);
@@ -90,7 +91,7 @@ test('a non admin cannot approve tag player association', function () {
 });
 
 test('a non admin cannot reject a player tag', function () {
-    $regularUser = User::factory()->create(['super_admin' => false]);
+    $regularUser = User::factory()->create(['role' => Role::USER]);
     $player = Player::factory()->create();
     $tag = Tag::factory()->create(['published_at' => now()]);
     $signerTag = SignerTag::create(['signer_id' => $player->signer->id, 'tag_id' => $tag->id, 'user_id' => $regularUser->id]);

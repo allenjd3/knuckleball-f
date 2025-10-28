@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -22,7 +23,7 @@ class CreateSuperUserCommand extends Command
             'password' => $password,
         ]);
 
-        $user->super_admin = true;
+        $user->role = Role::ADMIN;
         $user->published_at = now();
 
         if ($user->save()) {
