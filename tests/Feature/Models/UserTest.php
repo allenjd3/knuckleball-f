@@ -13,6 +13,7 @@ use App\Models\SignerTag;
 use App\Models\Tag;
 use App\Models\Team;
 use App\Models\User;
+use Filament\Panel;
 use Illuminate\Support\Facades\DB;
 
 test('it generates a slug for new users', function () {
@@ -208,4 +209,9 @@ test('editors cannot update or delete users', function () {
     $editor = User::factory()->state(['role' => Role::EDITOR])->create();
 
     $this->assertFalse($editor->can('viewAny', User::class));
+});
+
+test('editors can access panel', function () {
+    $editor = User::factory()->state(['role' => Role::EDITOR])->create();
+    $this->assertTrue($editor->canAccessPanel(new Panel));
 });
