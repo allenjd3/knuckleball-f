@@ -34,11 +34,11 @@ class CommentPolicy
 
     public function restore(User $user, Comment $comment): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 
     public function forceDelete(User $user, Comment $comment): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 }

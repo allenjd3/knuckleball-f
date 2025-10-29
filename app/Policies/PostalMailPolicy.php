@@ -37,11 +37,11 @@ class PostalMailPolicy
 
     public function restore(User $user, PostalMail $postalMail): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 
     public function forceDelete(User $user, PostalMail $postalMail): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 }

@@ -37,11 +37,11 @@ class TeamPolicy
 
     public function restore(User $user, Team $team): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 
     public function forceDelete(User $user, Team $team): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 }

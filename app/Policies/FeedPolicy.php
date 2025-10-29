@@ -52,7 +52,7 @@ class FeedPolicy
      */
     public function restore(User $user, Feed $feed): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 
     /**
