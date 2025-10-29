@@ -15,7 +15,8 @@ class TeamPolicy
         return true;
     }
 
-    public function view(User $user, Team $team): bool {
+    public function view(User $user, Team $team): bool
+    {
         return $user->isPublished();
     }
 
@@ -39,10 +40,8 @@ class TeamPolicy
         return $user->isSuperAdmin() || $user->isEditor();
     }
 
-
     public function forceDelete(User $user, Team $team): bool
     {
         return $user->isSuperAdmin() || $user->isEditor();
     }
-
 }

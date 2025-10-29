@@ -15,7 +15,8 @@ class PlayerPolicy
         return true;
     }
 
-    public function view(User $user, Player $player): bool {
+    public function view(User $user, Player $player): bool
+    {
         return $user->isPublished();
     }
 
@@ -39,11 +40,13 @@ class PlayerPolicy
         return $user->isSuperAdmin() || $user->isEditor();
     }
 
-    public function restore(User $user, Player $player): bool {
+    public function restore(User $user, Player $player): bool
+    {
         return $user->isSuperAdmin() || $user->isEditor();
     }
 
-    public function forceDelete(User $user, Player $player): bool {
+    public function forceDelete(User $user, Player $player): bool
+    {
         return $user->isSuperAdmin() || $user->isEditor();
     }
 }
