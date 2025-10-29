@@ -27,7 +27,7 @@ class PostalMailPolicy
 
     public function update(User $user, PostalMail $postalMail): bool
     {
-        return $user->id === $postalMail->user_id || $user->isSuperAdmin() || $user->isEditor();
+        return $user->id === $postalMail->user_id || $user->isSuperAdmin();
     }
 
     public function delete(User $user, PostalMail $postalMail): bool
