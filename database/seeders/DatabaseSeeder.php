@@ -34,6 +34,12 @@ class DatabaseSeeder extends Seeder
                 'role' => Role::USER,
             ]);
 
+            User::factory()->create([
+                'name' => 'Ruby',
+                'email' => 'ruby@example.com',
+                'role' => Role::EDITOR,
+            ]);
+
             $teams = Team::factory(10)
                 ->for($user)
                 ->create();

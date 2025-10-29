@@ -29,7 +29,7 @@ class CommentPolicy
 
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->id === $comment->user_id || $user->isSuperAdmin();
+        return $user->id === $comment->user_id || $user->isSuperAdmin() || $user->isEditor();
     }
 
     public function restore(User $user, Comment $comment): bool

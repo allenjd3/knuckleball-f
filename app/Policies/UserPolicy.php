@@ -2,25 +2,24 @@
 
 namespace App\Policies;
 
-use App\Models\Feed;
 use App\Models\User;
 
-class FeedPolicy
+class UserPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->isSuperAdmin();
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Feed $feed): bool
+    public function view(User $user, User $model): bool
     {
-        return true;
+        return $user->isSuperAdmin();
     }
 
     /**
@@ -28,29 +27,29 @@ class FeedPolicy
      */
     public function create(User $user): bool
     {
-        return $user->isPublished();
+        return $user->isSuperAdmin();
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Feed $feed): bool
+    public function update(User $user, User $model): bool
     {
-        return $user->isPublished();
+        return $user->isSuperAdmin();
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Feed $feed): bool
+    public function delete(User $user, User $model): bool
     {
-        return $user->isSuperAdmin() || $user->isEditor();
+        return $user->isSuperAdmin();
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Feed $feed): bool
+    public function restore(User $user, User $model): bool
     {
         return $user->isSuperAdmin();
     }
@@ -58,7 +57,7 @@ class FeedPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Feed $feed): bool
+    public function forceDelete(User $user, User $model): bool
     {
         return $user->isSuperAdmin();
     }

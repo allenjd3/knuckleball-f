@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckSuperAdmin
+class CheckAdminOrEditor
 {
     /**
      * Handle an incoming request.
@@ -15,7 +15,7 @@ class CheckSuperAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()?->isSuperAdmin()) {
+        if (! $request->user()?->isSuperAdmin() && ! $request->user()?->isEditor()) {
             return redirect()->route('users.feed');
         }
 

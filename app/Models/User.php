@@ -63,6 +63,11 @@ class User extends Authenticatable implements FilamentUser
         return (bool) $this->role->isAdmin();
     }
 
+    public function isEditor(): bool
+    {
+        return (bool) $this->role->isEditor();
+    }
+
     public function isPublished(): bool
     {
         return $this->published_at?->isPast() ?? false;
@@ -70,7 +75,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isSuperAdmin();
+        return $this->isEditor() || $this->isSuperAdmin();
     }
 
     public function follow(User $user): array

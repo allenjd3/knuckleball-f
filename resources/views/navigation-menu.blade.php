@@ -25,7 +25,7 @@
                         <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
                             {{ __('Categories') }}
                         </x-nav-link>
-                        @if (auth()->user()?->isSuperAdmin())
+                        @if (auth()->user()?->isSuperAdmin() || auth()->user()?->isEditor())
                             <x-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
                                 {{ __('Admin Panel') }}
                             </x-nav-link>
