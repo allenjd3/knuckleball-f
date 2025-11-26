@@ -30,9 +30,9 @@ class CreateNewUser implements CreatesNewUsers
             ->decrement('remaining');
 
         return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => Hash::make($input['password']),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'published_at' => now(),
         ]);
     }
