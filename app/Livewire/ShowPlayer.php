@@ -44,18 +44,18 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
     public function render()
     {
+        $address = $this->player
+            ->addresses()
+            ->unpublished()
+            ->notRejected()
+            ->latest()
+            ->first();
+
         return view(
             'livewire.show-player',
-            collect([])->when(request()->user()?->isSuperAdmin(),
-                fn ($collection) => $collection->merge([
-                    'unpublishedAddress' => $this->player
-                        ->addresses()
-                        ->unpublished()
-                        ->notRejected()
-                        ->latest()
-                        ->first(),
-                ]),
-            )->toArray(),
+            request()->user()?->can('update', $address)
+                ? ['unpublishedAddress' => $address]
+                : [],
         );
     }
 
