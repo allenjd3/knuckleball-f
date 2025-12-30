@@ -43,7 +43,7 @@ class PostalMailForm
                 ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
             Toggle::make('is_failed')
                 ->label('Failed to return?'),
-            Textarea::make('comment'),
+            Textarea::make('comment')->maxLength(255),
         ];
     }
 

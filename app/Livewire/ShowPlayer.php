@@ -247,7 +247,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         DatePicker::make('returned_date'),
                         Toggle::make('is_failed')
                             ->label('Failed to return'),
-                        Textarea::make('comment'),
+                        Textarea::make('comment')->maxLength(255),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
 
