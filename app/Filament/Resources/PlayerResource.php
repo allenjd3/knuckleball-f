@@ -13,6 +13,7 @@ use App\Support\Collections\PlayerCollection;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -40,6 +41,7 @@ class PlayerResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')->required(),
+                Textarea::make('note')->nullable()->maxLength(500),
                 Select::make('team_id')
                     ->relationship(name: 'team', titleAttribute: 'name')
                     ->required(),

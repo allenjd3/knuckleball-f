@@ -5,10 +5,17 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 test('it queries the metadata', function () {
-    Storage::fake();
+    Storage::shouldReceive('disk')
+        ->with('temp')
+        ->andReturnSelf();
+
+    Storage::shouldReceive('put')
+        ->once()
+        ->andReturn(true);
+
     $fakeMeta = '<meta property="og:title" content="Example Title" />';
     $fakeMeta .= '<meta property="og:description" content="Example Description" />';
-    $fakeMeta .= '<meta property="og:image" content="https://example.com/someimage.png"';
+    $fakeMeta .= '<meta property="og:image" content="https://example.com/someimage.png" />';
     Http::fake([
         'https://jamesdallen.me' => Http::response($fakeMeta, 200),
         '*' => Http::response('fake', 200),
