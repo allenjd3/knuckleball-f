@@ -134,6 +134,12 @@
                     @endforelse
                 </div>
             </div>
+            @if ($this->player->note)
+                <div>
+                    <h3 class="font-bold px-2 mt-8">Note:</h3>
+                    <div>{!! nl2br($this->player->note) !!}</div>
+                </div>
+            @endif
         </div>
     </div>
     <div class="mt-4">
