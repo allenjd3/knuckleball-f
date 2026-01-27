@@ -8,6 +8,9 @@ export default {
     theme: {
         fontFamily: {
             'display': ['industry-inc-base', 'sans-serif'],
+            'mono': ['monospace'],
+            'sans': 'sans-serif',
+            'serif': 'serif',
         }
     }
 }

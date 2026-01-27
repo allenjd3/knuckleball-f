@@ -30,7 +30,7 @@ class EditFee extends Component implements HasActions, HasForms
             ->link()
             ->authorize(fn () => request()->user()?->can('update', $this->fee))
             ->record($this->fee)
-            ->form(FeeForm::schema())
+            ->schema(FeeForm::schema())
             ->using(function (Fee $record, $data) {
                 $record->update($data);
 

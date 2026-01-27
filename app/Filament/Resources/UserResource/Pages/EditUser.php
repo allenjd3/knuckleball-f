@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use Filament\Schemas\Schema;
 use App\Enums\Role;
 use App\Filament\Resources\UserResource;
 use Filament\Actions\DeleteAction;
@@ -15,10 +16,10 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name'),
                 TextInput::make('email'),
                 DatePicker::make('published_at'),

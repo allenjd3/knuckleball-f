@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\FeedFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Feed extends Model
 {
-    /** @use HasFactory<\Database\Factories\FeedFactory> */
+    /** @use HasFactory<FeedFactory> */
     use HasFactory;
 
     protected $guarded = [];

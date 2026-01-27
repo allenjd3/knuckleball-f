@@ -23,16 +23,6 @@ trait HasProfilePhoto
 
     private function createColorValue(int $shade): string
     {
-        return $this->generateHexValue($this->generateRgbString($shade));
-    }
-
-    private function generateRgbString(int $shade): string
-    {
-        return 'rgb(' . data_get(Color::hex(self::BASE_HEX), $shade) . ')';
-    }
-
-    private function generateHexValue(string $rgbString): string
-    {
-        return substr(Rgb::fromString($rgbString)->toHex(), 1);
+        return Color::hex(self::BASE_HEX)[$shade];
     }
 }

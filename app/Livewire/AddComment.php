@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use Filament\Schemas\Schema;
 use App\Actions\CreateFeedItem;
 use App\Actions\ReplacePastedLinks;
 use App\Models\Comment;
@@ -10,7 +11,6 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use FilamentTiptapEditor\Concerns\HasFormMentions;
 use FilamentTiptapEditor\Data\MentionItem;
 use FilamentTiptapEditor\Enums\TiptapOutput;
@@ -41,10 +41,10 @@ class AddComment extends Component implements HasActions, HasForms
         return view('livewire.add-comment');
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TiptapEditor::make('body')
                     ->label('Comment')
                     ->getMentionItemsUsing(

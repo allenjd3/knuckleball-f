@@ -2,6 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\TeamResource\Pages\CreateTeam;
 use App\Filament\Resources\TeamResource\Pages\EditTeam;
 use App\Filament\Resources\TeamResource\Pages\ListTeams;
@@ -10,12 +15,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -25,12 +25,12 @@ class TeamResource extends Resource
 {
     protected static ?string $model = Team::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name'),
                 Select::make('category_id')
                     ->relationship(name: 'category', titleAttribute: 'name')
@@ -54,7 +54,7 @@ class TeamResource extends Resource
             ->filters([
                 TernaryFilter::make('rejected'),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
             ])
             ->headerActions([
@@ -62,7 +62,7 @@ class TeamResource extends Resource
                     ->outlined()
                     ->url(route('teams.index')),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

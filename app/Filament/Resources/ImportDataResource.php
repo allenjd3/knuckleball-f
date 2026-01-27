@@ -2,6 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\EditAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\ImportDataResource\Pages\CreateImportData;
 use App\Filament\Resources\ImportDataResource\Pages\EditImportData;
 use App\Filament\Resources\ImportDataResource\Pages\ListImportData;
@@ -9,12 +14,7 @@ use App\Jobs\ProcessPlayerData;
 use App\Models\ImportData;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -22,12 +22,12 @@ class ImportDataResource extends Resource
 {
     protected static ?string $model = ImportData::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 KeyValue::make('data'),
                 TextInput::make('errors')->nullable(),
             ]);
@@ -45,7 +45,7 @@ class ImportDataResource extends Resource
                 TextColumn::make('data'),
                 TextColumn::make('errors'),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
             ])
             ->headerActions([
@@ -54,7 +54,7 @@ class ImportDataResource extends Resource
                     ->requiresConfirmation()
                     ->action(fn () => ProcessPlayerData::dispatch()),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

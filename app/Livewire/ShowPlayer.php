@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
@@ -20,10 +22,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\CreateAction as CreateTableAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -82,7 +80,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->label(fn () => $this->address?->exists ? 'Suggest New Address' : 'Add the address!')
             ->model(Address::class)
             ->authorize(fn () => request()->user()?->can('create', Address::class))
-            ->form([
+            ->schema([
                 TextInput::make('address_1')->required(),
                 TextInput::make('address_2'),
                 TextInput::make('city')->required(),
@@ -112,8 +110,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createFee')
             ->model(Fee::class)
             ->authorize(fn () => request()->user()?->can('create', Fee::class))
-            ->form(FeeForm::schema())
-            ->mutateFormDataUsing(function (array $data) {
+            ->schema(FeeForm::schema())
+            ->mutateDataUsing(function (array $data) {
                 data_set($data, 'user_id', request()->user()?->id);
                 data_set($data, 'published_at', now()->subDay());
 
@@ -135,7 +133,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return Action::make('associateTag')
             ->icon('heroicon-o-tag')
             ->authorize(fn () => request()->user()?->can('assign', Tag::class))
-            ->form([
+            ->schema([
                 Select::make('tag_id')
                     ->label('Tag')
                     ->options(
@@ -187,24 +185,24 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->relationship(fn () => $this->player->postalMails()->with('feeMaterials', 'user', 'card.media'))
             ->emptyStateHeading('Dead quiet in this mailbox... 📪')
             ->emptyStateActions([
-                TableAction::make('createNew')
+                Action::make('createNew')
                     ->visible(fn () => PostalMailForm::shouldBeVisibleFor(request()->user()))
                     ->label('Send the first letter')
                     ->action(fn () => $this->dispatch('openCreatePostalMail')),
-                TableAction::make('logInToCreateNew')
+                Action::make('logInToCreateNew')
                     ->visible(fn () => ! request()->user())
                     ->label('Login in to create!')
                     ->url(route('login')),
             ])
-            ->actions([
-                TableAction::make('showCards')
+            ->recordActions([
+                Action::make('showCards')
                     ->label('Cards')
                     ->icon('heroicon-o-rectangle-stack')
                     ->visible(fn (Model $record) => $record->card->exists)
                     ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
                     ->slideOver()
                     ->modalSubmitActionLabel('Ok'),
-                CreateTableAction::make('createCard')
+                CreateAction::make('createCard')
                     ->modalHeading('Create Card')
                     ->label('Add Card')
                     ->icon('heroicon-o-plus-circle')
@@ -215,7 +213,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
 
                         return request()->user()?->can('update', $record);
                     })
-                    ->form([
+                    ->schema([
                         TextInput::make('manufacturer')->maxLength(255)->required(),
                         TextInput::make('series')->maxLength(255)->required(),
                         TextInput::make('year')->numeric()->required(),
@@ -242,7 +240,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     }),
                 EditAction::make()
                     ->visible(fn (Model $record) => request()->user()?->can('update', $record))
-                    ->form([
+                    ->schema([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
                         Toggle::make('is_failed')
@@ -271,9 +269,9 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->color(fn (bool $state) => $state ? 'danger' : 'success'),
             ])
             ->headerActions([
-                CreateTableAction::make('createPostalMail')
+                CreateAction::make('createPostalMail')
                     ->visible(fn () => PostalMailForm::shouldBeVisibleFor(request()->user()))
-                    ->form(PostalMailForm::schema())
+                    ->schema(PostalMailForm::schema())
                     ->using(fn (array $data) => PostalMailForm::for($this->player->signer)->using($data)),
             ])
             ->defaultSort('created_at', 'desc');
