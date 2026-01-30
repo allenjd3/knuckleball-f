@@ -9,20 +9,17 @@ use App\Models\Comment;
 use App\Models\User;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\RichEditor\MentionProvider;
+use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use FilamentTiptapEditor\Concerns\HasFormMentions;
-use FilamentTiptapEditor\Data\MentionItem;
-use FilamentTiptapEditor\Enums\TiptapOutput;
-use FilamentTiptapEditor\Facades\TiptapConverter;
-use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class AddComment extends Component implements HasActions, HasForms
 {
-    use HasFormMentions;
     use InteractsWithActions;
     use InteractsWithForms;
 
@@ -45,22 +42,23 @@ class AddComment extends Component implements HasActions, HasForms
     {
         return $schema
             ->components([
-                TiptapEditor::make('body')
+                RichEditor::make('body')
                     ->label('Comment')
-                    ->getMentionItemsUsing(
-                        fn ($query) => User::where('handle', 'like', $query . '%')
-                            ->limit(10)
-                            ->get()
-                            ->map(fn ($user) => new MentionItem(
-                                id: $user->id,
-                                label: "{$user->name} (@{$user->handle})",
-                                href: $user->path(),
-                            ))
-                            ->toArray()
-                    )
-                    ->profile('none')
-                    ->output(TiptapOutput::Html)
-                    ->maxContentWidth('5xl'),
+                    ->toolbarButtons([])
+                    ->mentions([
+                        MentionProvider::make('@')
+                            ->getSearchResultsUsing(fn (string $search) => User::where('handle', 'like', $search . '%')
+                                ->limit(10)
+                                ->get()
+                                ->pluck('name', 'id')
+                                ->all()
+                            )
+                            ->getLabelsUsing(fn (array $ids) => User::query()
+                                ->whereIn('id', $ids)
+                                ->pluck('name', 'id')
+                                ->all()
+                            )
+                    ])
             ]);
     }
 
@@ -68,19 +66,26 @@ class AddComment extends Component implements HasActions, HasForms
     {
         $this->authorize('create', Comment::class);
 
-        $validator = Validator::make([
-            'body' => TiptapConverter::asText($this->body),
-        ], [
-            'body' => ['min:1', 'max:500', 'required'],
+        $data = $this->form->getState();
+        $validator = Validator::make($data, [
+            'body' => ['required', 'string', 'min:1', 'max:500'], // Now it's a string (HTML)
         ]);
+        $validated = $validator->validated();
 
-        $validator->validated();
+        $htmlBody = RichContentRenderer::make($validated['body'])
+            ->mentions([
+                MentionProvider::make('@')
+                    ->url(fn (string $id, string $label): string =>
+                        route('users.profile', [
+                            'user' => User::find($id),
+                        ])
+                    )
+            ])
+            ->toHtml();
 
         $mentionIds = $this->extractMentionIds($this->body);
 
-        $body = TiptapConverter::asHTML($this->body);
-
-        $bodyWithReplacedLinks = ReplacePastedLinks::handle($body);
+        $bodyWithReplacedLinks = ReplacePastedLinks::handle($htmlBody);
 
         $comment = auth()->user()
             ?->comments()

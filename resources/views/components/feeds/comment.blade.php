@@ -17,7 +17,11 @@
                 </div>
         </div>
         <p class="mb-2 text-sm">commented on: {{ $date_sent }}</p>
-        <div class="prose break-words">{!! str($feed->comment)->sanitizeHtml() !!}</div>
+        <div class="prose break-words">
+            {!!
+                str($feed->comment)->sanitizeHtml()
+            !!}
+        </div>
         @php
             use App\Dto\OgData;
 
