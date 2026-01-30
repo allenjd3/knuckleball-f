@@ -10,19 +10,12 @@ trait HasProfilePhoto
 {
     use JetstreamHasProfilePhoto;
 
-    const BASE_HEX = '#d83c40';
-
     protected function defaultProfilePhotoUrl()
     {
         $name = trim(collect(explode(' ', $this->name))->map(function ($segment) {
             return mb_substr($segment, 0, 1);
         })->join(' '));
 
-        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=' . $this->createColorValue(shade: 800) . '&background=' . $this->createColorValue(shade: 200);
-    }
-
-    private function createColorValue(int $shade): string
-    {
-        return Color::hex(self::BASE_HEX)[$shade];
+        return 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&color=822326&background=F5CECF';
     }
 }
