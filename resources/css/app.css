@@ -41,144 +41,144 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
-}
 
-h1,
-h2,
-h3,
-h4 {
-    @apply font-display;
-    font-weight: 400;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 6px;
-}
-
-h1 {
-  font-size: 2.5rem;    /* 40px if base font is 16px */
-}
-
-h2 {
-  font-size: 2rem;      /* 32px if base font is 16px */
-}
-
-h3 {
-  font-size: 1.75rem;   /* 28px if base font is 16px */
-}
-
-h4 {
-  font-size: 1.5rem;    /* 24px if base font is 16px */
-}
-
-.tag {
-    display: inline-block;
-    margin: 10px;
-    border-radius: 8px;
-    color: #101010;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.verified, .tag.verified:hover {
-    background-color: #007BFF; /* Bright Royal Blue */
-}
-
-.hall-of-famer, .tag.hall-of-famer:hover {
-    background-color: #FFC107; /* Vibrant Gold */
-}
-
-.ttm-legend, .tag.ttm-legend:hover {
-    background-color: #4AFAFF; /* Electric Aqua */
-}
-
-.fan-favorite, .tag.fan-favorite:hover {
-    background-color: #00C853; /* Stadium Green */
-}
-
-.generous-gem, .tag.generous-gem:hover {
-    background-color: #B261FF; /* Grape */
-}
-
-.quick-draw, .tag.quick-draw:hover {
-    background-color: #FF5D22; /* Bengals Orange */
-}
-
-.sharpie-whisperer, .tag.sharpie-whisperer:hover {
-    background-color: #29B6F6; /* Sky Blue */
-}
-
-.gold-standard, .tag.gold-standard:hover {
-    background-color: #BBA53D; /* Classic Gold */
-}
-
-.sticker-shock, .tag.sticker-shock:hover {
-    background-color: #FF2709; /* Shock Orange */
-}
-
-.pay-to-play, .tag.pay-to-play:hover {
-    background-color: #B3E5FC; /* Deep Slate Blue */
-}
-
-.rare-returner, .tag.rare-returner:hover {
-    background-color: #6879D9; /* Lost Mail Purple */
-}
-
-.in-person-only, .tag.in-person-only:hover {
-    background-color: #FF6ADB; /* Anxiety Pink */
-}
-
-.premium-signer, .tag.premium-signer:hover {
-    background-color: #FF0124; /* Paychecks Gone Red */
-}
-
-.under-contract, .tag.under-contract:hover {
-    background-color: #B8FF00; /* Return to Sender Green */
-}
-
-.wild-card, .tag.wild-card:hover {
-    background: linear-gradient(45deg, #FF6D00, #F50057, #FFEB3B, #00E676, #29B6F6, #007BFF); /* Rainbow Gradient */
-    background-size: 400% 400%;
-    animation: rainbow 2s ease-in-out infinite; /* Increased speed and smoother animation */
-}
-.return-roulette, .tag.return-roulette:hover {
-    background-color: #BFEBFF; /* Blue */
-}
-
-.snail-mailer, .tag.snail-mailer:hover {
-    background-color: #CCBC2F; /* Slug Yellow */
-}
-
-.elusive-signer, .tag.elusive-signer:hover {
-    background-color: #FA0000; /* High-Alert Red */
-}
-
-.hard-to-land, .tag.hard-to-land:hover {
-    background-color: #85C9FF; /* Inconsisten Blue */
-}
-
-.graffiti-artist, .tag.graffiti-artist:hover {
-    background-color: #BFD838; /* Ugly Sharpie */
-}
-
-.mystery-ink, .tag.mystery-ink:hover {
-    background-color: #00BAC6; /* Flordia Green */
-}
-
- /* Keyframe for rainbow animation */
-@keyframes rainbow {
-    0% {
-        background-position: 0% 50%;
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display;
+        font-weight: 400;
+        font-style: normal;
+        font-weight: 400;
+        letter-spacing: 6px;
     }
-    25% {
-        background-position: 100% 50%;
+
+    h1 {
+    font-size: 2.5rem;    /* 40px if base font is 16px */
     }
-    50% {
-        background-position: 100% 100%;
+
+    h2 {
+    font-size: 2rem;      /* 32px if base font is 16px */
     }
-    75% {
-        background-position: 0% 100%;
+
+    h3 {
+    font-size: 1.75rem;   /* 28px if base font is 16px */
     }
-    100% {
-        background-position: 0% 50%;
+
+    h4 {
+    font-size: 1.5rem;    /* 24px if base font is 16px */
+    }
+
+    .tag {
+        display: inline-block;
+        margin: 10px;
+        border-radius: 8px;
+        color: #101010;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .verified, .tag.verified:hover {
+        background-color: #007BFF; /* Bright Royal Blue */
+    }
+
+    .hall-of-famer, .tag.hall-of-famer:hover {
+        background-color: #FFC107; /* Vibrant Gold */
+    }
+
+    .ttm-legend, .tag.ttm-legend:hover {
+        background-color: #4AFAFF; /* Electric Aqua */
+    }
+
+    .fan-favorite, .tag.fan-favorite:hover {
+        background-color: #00C853; /* Stadium Green */
+    }
+
+    .generous-gem, .tag.generous-gem:hover {
+        background-color: #B261FF; /* Grape */
+    }
+
+    .quick-draw, .tag.quick-draw:hover {
+        background-color: #FF5D22; /* Bengals Orange */
+    }
+
+    .sharpie-whisperer, .tag.sharpie-whisperer:hover {
+        background-color: #29B6F6; /* Sky Blue */
+    }
+
+    .gold-standard, .tag.gold-standard:hover {
+        background-color: #BBA53D; /* Classic Gold */
+    }
+
+    .sticker-shock, .tag.sticker-shock:hover {
+        background-color: #FF2709; /* Shock Orange */
+    }
+
+    .pay-to-play, .tag.pay-to-play:hover {
+        background-color: #B3E5FC; /* Deep Slate Blue */
+    }
+
+    .rare-returner, .tag.rare-returner:hover {
+        background-color: #6879D9; /* Lost Mail Purple */
+    }
+
+    .in-person-only, .tag.in-person-only:hover {
+        background-color: #FF6ADB; /* Anxiety Pink */
+    }
+
+    .premium-signer, .tag.premium-signer:hover {
+        background-color: #FF0124; /* Paychecks Gone Red */
+    }
+
+    .under-contract, .tag.under-contract:hover {
+        background-color: #B8FF00; /* Return to Sender Green */
+    }
+
+    .wild-card, .tag.wild-card:hover {
+        background: linear-gradient(45deg, #FF6D00, #F50057, #FFEB3B, #00E676, #29B6F6, #007BFF); /* Rainbow Gradient */
+        background-size: 400% 400%;
+        animation: rainbow 2s ease-in-out infinite; /* Increased speed and smoother animation */
+    }
+    .return-roulette, .tag.return-roulette:hover {
+        background-color: #BFEBFF; /* Blue */
+    }
+
+    .snail-mailer, .tag.snail-mailer:hover {
+        background-color: #CCBC2F; /* Slug Yellow */
+    }
+
+    .elusive-signer, .tag.elusive-signer:hover {
+        background-color: #FA0000; /* High-Alert Red */
+    }
+
+    .hard-to-land, .tag.hard-to-land:hover {
+        background-color: #85C9FF; /* Inconsisten Blue */
+    }
+
+    .graffiti-artist, .tag.graffiti-artist:hover {
+        background-color: #BFD838; /* Ugly Sharpie */
+    }
+
+    .mystery-ink, .tag.mystery-ink:hover {
+        background-color: #00BAC6; /* Flordia Green */
+    }
+
+    /* Keyframe for rainbow animation */
+    @keyframes rainbow {
+        0% {
+            background-position: 0% 50%;
+        }
+        25% {
+            background-position: 100% 50%;
+        }
+        50% {
+            background-position: 100% 100%;
+        }
+        75% {
+            background-position: 0% 100%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
     }
 }

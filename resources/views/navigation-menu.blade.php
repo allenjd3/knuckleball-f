@@ -6,7 +6,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('players.index') }}" class="font-bold">
                         {{-- <x-application-mark class="block h-9 w-auto" /> --}}
-                        <h3 style="--c-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
+                        <h3 style="--color-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
                     </a>
                 </div>
 
