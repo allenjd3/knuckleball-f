@@ -76,7 +76,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                             ->default(fn (Player $record) => $record->team_id),
                         Select::make('last_team_id')
                             ->label('Last Played For')
-                            ->options(fn (Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === $record->team_id)->toArray())
+                            ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
                             ->default(fn (Player $record) => $record->last_team_id),
                         DatePicker::make('published_at')
                             ->default(fn (Player $record) => $record->published_at),

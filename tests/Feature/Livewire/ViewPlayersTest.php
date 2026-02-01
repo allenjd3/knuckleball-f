@@ -1,10 +1,12 @@
 <?php
 
 use App\Enums\Role;
+use App\Livewire\ViewPlayers;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\Testing\TestAction;
 
 test('Unauthenticated users can view players', function () {
     $this->get('players')->assertOk();
@@ -33,14 +35,14 @@ test('Players can be sorted by name', function () {
     $players = Player::factory(10)->published()->create();
 
     Livewire::test('ViewPlayers')
-        ->sortTable('title')
-        ->assertCanSeeTableRecords($players->sortBy('title'), inOrder: true);
+        ->sortTable('name')
+        ->assertCanSeeTableRecords($players->sortBy('name'), inOrder: true);
 });
 
 test('Players can be updated by super admins', function () {
     $team = Team::factory()->create();
     $team2 = Team::factory()->create();
-    $user = User::factory()->state(['role' => rand(0, 1) ? Role::ADMIN : Role::USER])->create();
+    $user = User::factory()->isSuperAdmin()->create();
 
     $oldData = [
         'name' => 'Joe DeScoobio',
@@ -58,12 +60,15 @@ test('Players can be updated by super admins', function () {
         'last_team_id' => $team->id,
     ];
 
-    $livewireTest = Livewire::actingAs($user)->test('ViewPlayers');
+    Livewire::actingAs($user)
+        ->test(ViewPlayers::class)
+        ->callAction(TestAction::make('edit')->table($player), $updatedData)
+        ->assertHasNoFormErrors();
 
-    $livewireTest->callTableAction(EditAction::class, $player, data: $updatedData);
     $this->assertDatabaseHas('players', $updatedData);
 });
 
 test('Players cannot be updated by non-users', function () {
-    Livewire::test('ViewPlayers')->assertTableActionHidden(EditAction::class);
+    $player = Player::factory()->create();
+    Livewire::test('ViewPlayers')->assertActionHidden(TestAction::make('edit')->table($player));
 });
