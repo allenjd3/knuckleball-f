@@ -6,13 +6,14 @@ use App\Filament\Resources\InviteCodeResource\Pages\CreateInviteCode;
 use App\Filament\Resources\InviteCodeResource\Pages\EditInviteCode;
 use App\Filament\Resources\InviteCodeResource\Pages\ListInviteCodes;
 use App\Models\InviteCode;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction as ActionsEditAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -21,12 +22,12 @@ class InviteCodeResource extends Resource
 {
     protected static ?string $model = InviteCode::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('code')->required(),
                 TextInput::make('remaining')->numeric()->default(0),
                 Checkbox::make('is_unlimited')->label('Unlimited Uses?'),
@@ -51,10 +52,10 @@ class InviteCodeResource extends Resource
             ->filters([
                 //
             ])
-            ->actions([
-                ActionsEditAction::make(),
+            ->recordActions([
+                EditAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

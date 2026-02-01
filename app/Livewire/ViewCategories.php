@@ -3,11 +3,11 @@
 namespace App\Livewire;
 
 use App\Models\Category;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -34,7 +34,7 @@ class ViewCategories extends Component implements HasActions, HasForms, HasTable
                     ->sortable()
                     ->searchable(),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('show_teams')
                     ->label('Teams')
                     ->url(fn (Category $record) => route('categories.teams.index', $record)),

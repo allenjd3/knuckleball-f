@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use DOMDocument;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ReplacePastedLinks
@@ -21,23 +22,31 @@ class ReplacePastedLinks
             $html,
         );
 
-        return $replacePastedLinks->replaceExistingLinks($newHtml);
+        return $replacePastedLinks->replaceExistingLinks(trim($newHtml, "\n"));
     }
 
     private function stripExistingLinks(string $html)
     {
-        $crawler = new Crawler($html);
-        $modifiedHtml = $html;
-        $linkIndex = 0;
-        $crawler->filter('a[href]')
-            ->each(function (Crawler $link) use (&$modifiedHtml, &$linkIndex) {
-                $linkHtml = $link->outerHtml();
-                $placeholder = "{{LINK_PLACEHOLDER_{$linkIndex}}}";
-                $this->extractedLinks[$placeholder] = $linkHtml;
+        $dom = new DOMDocument;
+        @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
-                $modifiedHtml = str_replace($linkHtml, $placeholder, $modifiedHtml);
+        $crawler = new Crawler($dom);
+        $linkIndex = 0;
+
+        $crawler->filter('a[href]')
+            ->each(function (Crawler $link) use (&$linkIndex) {
+                $placeholder = "{{LINK_PLACEHOLDER_{$linkIndex}}}";
+                $this->extractedLinks[$placeholder] = $link->outerHtml();
+
+                // Replace the actual DOM node
+                $node = $link->getNode(0);
+                $textNode = $node->ownerDocument->createTextNode($placeholder);
+                $node->parentNode->replaceChild($textNode, $node);
+
                 $linkIndex++;
             });
+
+        $modifiedHtml = $dom->saveHTML();
 
         return $modifiedHtml;
     }

@@ -4,10 +4,10 @@ namespace App\Filament\Resources\PlayerResource\Pages;
 
 use App\Filament\Resources\PlayerResource;
 use App\Models\SignerTag;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Resources\Pages\Page;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -21,7 +21,7 @@ class ApproveTags extends Page implements HasActions, HasTable
 
     protected static string $resource = PlayerResource::class;
 
-    protected static string $view = 'filament.resources.player-resource.pages.approve-tags';
+    protected string $view = 'filament.resources.player-resource.pages.approve-tags';
 
     public function table(Table $table): Table
     {
@@ -34,7 +34,7 @@ class ApproveTags extends Page implements HasActions, HasTable
                     ->url(fn (Model $record) => $record->signer->signable->path()),
                 TextColumn::make('tag.label'),
             ])
-            ->actions([
+            ->recordActions([
                 Action::make('approve')
                     ->label('Approve')
                     ->action(fn (Model $record) => auth()->user()->approveTag($record)),

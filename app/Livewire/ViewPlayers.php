@@ -8,13 +8,13 @@ use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -66,9 +66,9 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->label('Retired Year')
                     ->state(fn ($record) => $record->retired_at?->format('Y') ?? ''),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make()
-                    ->form([
+                    ->schema([
                         TextInput::make('name'),
                         Select::make('team_id')
                             ->label('Team')
@@ -76,7 +76,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                             ->default(fn (Player $record) => $record->team_id),
                         Select::make('last_team_id')
                             ->label('Last Played For')
-                            ->options(fn (Player $record) => Team::get()->pluck('name', 'id')->reject(fn ($team, $id) => $id === $record->team_id)->toArray())
+                            ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
                             ->default(fn (Player $record) => $record->last_team_id),
                         DatePicker::make('published_at')
                             ->default(fn (Player $record) => $record->published_at),
@@ -104,7 +104,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make()
             ->model(Player::class)
             ->label(__('New Player'))
-            ->form([
+            ->schema([
                 TextInput::make('name'),
                 Select::make('team_id')
                     ->label('Team')

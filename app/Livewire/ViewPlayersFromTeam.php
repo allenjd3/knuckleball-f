@@ -39,7 +39,7 @@ class ViewPlayersFromTeam extends ViewPlayers
         return CreateAction::make()
             ->model(Player::class)
             ->label(__('New Player'))
-            ->form([
+            ->schema([
                 TextInput::make('name'),
                 FileUpload::make('url')
                     ->directory('avatars')

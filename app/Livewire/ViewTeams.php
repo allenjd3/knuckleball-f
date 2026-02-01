@@ -40,7 +40,7 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createTeam')
             ->model(Team::class)
             ->authorize(fn () => auth()->user()?->can('create', Team::class))
-            ->form([
+            ->schema([
                 TextInput::make('name')->required()->maxLength(255)->minLength(1),
             ]);
     }

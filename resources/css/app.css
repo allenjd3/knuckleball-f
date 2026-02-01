@@ -1,6 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config "../../tailwind.config.js";
+/* Required by all components */
+@import '../../vendor/filament/support/resources/css/index.css';
+
+/* Required by actions and tables */
+@import '../../vendor/filament/actions/resources/css/index.css';
+
+/* Required by actions, forms and tables */
+@import '../../vendor/filament/forms/resources/css/index.css';
+
+/* Required by actions and infolists */
+@import '../../vendor/filament/infolists/resources/css/index.css';
+
+/* Required by notifications */
+@import '../../vendor/filament/notifications/resources/css/index.css';
+
+/* Required by actions, infolists, forms, schemas and tables */
+@import '../../vendor/filament/schemas/resources/css/index.css';
+
+/* Required by tables */
+@import '../../vendor/filament/tables/resources/css/index.css';
+
+/* Required by widgets */
+@import '../../vendor/filament/widgets/resources/css/index.css';
+
+@variant dark (&:where(.dark, .dark *));
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
@@ -17,33 +41,33 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
-}
 
-h1,
-h2,
-h3,
-h4 {
-    @apply font-display;
-    font-weight: 400;
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 6px;
-}
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display;
+        font-weight: 400;
+        font-style: normal;
+        font-weight: 400;
+        letter-spacing: 6px;
+    }
 
-h1 {
-  font-size: 2.5rem;    /* 40px if base font is 16px */
-}
+    h1 {
+    font-size: 2.5rem;    /* 40px if base font is 16px */
+    }
 
-h2 {
-  font-size: 2rem;      /* 32px if base font is 16px */
-}
+    h2 {
+    font-size: 2rem;      /* 32px if base font is 16px */
+    }
 
-h3 {
-  font-size: 1.75rem;   /* 28px if base font is 16px */
-}
+    h3 {
+    font-size: 1.75rem;   /* 28px if base font is 16px */
+    }
 
-h4 {
-  font-size: 1.5rem;    /* 24px if base font is 16px */
+    h4 {
+    font-size: 1.5rem;    /* 24px if base font is 16px */
+    }
 }
 
 .tag {
@@ -140,7 +164,7 @@ h4 {
     background-color: #00BAC6; /* Flordia Green */
 }
 
- /* Keyframe for rainbow animation */
+/* Keyframe for rainbow animation */
 @keyframes rainbow {
     0% {
         background-position: 0% 50%;

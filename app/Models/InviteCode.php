@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\InviteCodeFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InviteCode extends Model
 {
-    /** @use HasFactory<\Database\Factories\InviteCodeFactory> */
+    /** @use HasFactory<InviteCodeFactory> */
     use HasFactory;
 
     protected $guarded = [];

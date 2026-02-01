@@ -1,7 +1,4 @@
-import preset from './vendor/filament/support/tailwind.config.preset'
-
 export default {
-    presets: [preset],
     content: [
         './app/Filament/**/*.php',
         './resources/views/**/*.blade.php',
@@ -11,6 +8,9 @@ export default {
     theme: {
         fontFamily: {
             'display': ['industry-inc-base', 'sans-serif'],
+            'mono': ['monospace'],
+            'sans': 'sans-serif',
+            'serif': 'serif',
         }
     }
 }

@@ -9,16 +9,17 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public function form(\Filament\Forms\Form $form): \Filament\Forms\Form
+    public function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name'),
                 TextInput::make('email'),
                 DatePicker::make('published_at'),
