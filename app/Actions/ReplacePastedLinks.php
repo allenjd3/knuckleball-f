@@ -22,7 +22,7 @@ class ReplacePastedLinks
             $html,
         );
 
-        return $replacePastedLinks->replaceExistingLinks($newHtml);
+        return $replacePastedLinks->replaceExistingLinks(trim($newHtml, "\n"));
     }
 
     private function stripExistingLinks(string $html)
