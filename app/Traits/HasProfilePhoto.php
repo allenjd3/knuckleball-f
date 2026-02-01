@@ -2,9 +2,7 @@
 
 namespace App\Traits;
 
-use Filament\Support\Colors\Color;
 use Laravel\Jetstream\HasProfilePhoto as JetstreamHasProfilePhoto;
-use Spatie\Color\Rgb;
 
 trait HasProfilePhoto
 {

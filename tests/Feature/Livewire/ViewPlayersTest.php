@@ -1,11 +1,9 @@
 <?php
 
-use App\Enums\Role;
 use App\Livewire\ViewPlayers;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
-use Filament\Actions\EditAction;
 use Filament\Actions\Testing\TestAction;
 
 test('Unauthenticated users can view players', function () {

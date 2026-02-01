@@ -7,7 +7,6 @@ use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
-use Filament\Tables\Actions\EditAction;
 
 test('it can create addresses', function () {
     $user = User::factory()->isSuperAdmin()->create();

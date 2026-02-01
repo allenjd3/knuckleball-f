@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use Filament\Actions\Action;
 use App\Models\Category;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;

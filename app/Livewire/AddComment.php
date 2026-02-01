@@ -2,7 +2,6 @@
 
 namespace App\Livewire;
 
-use Filament\Schemas\Schema;
 use App\Actions\CreateFeedItem;
 use App\Actions\ReplacePastedLinks;
 use App\Models\Comment;
@@ -14,6 +13,7 @@ use Filament\Forms\Components\RichEditor\MentionProvider;
 use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -57,8 +57,8 @@ class AddComment extends Component implements HasActions, HasForms
                                 ->whereIn('id', $ids)
                                 ->pluck('name', 'id')
                                 ->all()
-                            )
-                    ])
+                            ),
+                    ]),
             ]);
     }
 
@@ -75,11 +75,10 @@ class AddComment extends Component implements HasActions, HasForms
         $htmlBody = RichContentRenderer::make($data['body'])
             ->mentions([
                 MentionProvider::make('@')
-                    ->url(fn (string $id, string $label): string =>
-                        route('users.profile', [
-                            'user' => User::find($id),
-                        ])
-                    )
+                    ->url(fn (string $id, string $label): string => route('users.profile', [
+                        'user' => User::find($id),
+                    ])
+                    ),
             ])
             ->toHtml();
 

@@ -27,7 +27,7 @@ class ReplacePastedLinks
 
     private function stripExistingLinks(string $html)
     {
-        $dom = new DOMDocument();
+        $dom = new DOMDocument;
         @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
 
         $crawler = new Crawler($dom);
