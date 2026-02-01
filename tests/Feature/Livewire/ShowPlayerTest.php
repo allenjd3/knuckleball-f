@@ -6,6 +6,7 @@ use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Filament\Tables\Actions\EditAction;
 
 test('it can create addresses', function () {
@@ -49,12 +50,8 @@ it('can edit a postal mail', function () {
     $returnedDate = now()->subDay();
 
     Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $postalMail->player])
-        ->mountTableAction(EditAction::class, $postalMail)
-        ->setTableActionData([
-            'returned_date' => $returnedDate->format('Y-m-d'),
-        ])
-        ->callMountedTableAction()
-        ->assertHasNoTableActionErrors();
+        ->callAction(TestAction::make('edit')->table($postalMail), ['returned_date' => $returnedDate->format('Y-m-d')])
+        ->assertHasNoActionErrors();
 
     $this->assertEquals($returnedDate?->format('Y-m-d'), $postalMail->fresh()->returned_date?->format('Y-m-d'));
 });
@@ -69,7 +66,7 @@ it('can mark a postal mail as failed', function () {
     CreateFeedItem::execute($postalMail, $postalMail->comment);
 
     Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $postalMail->player])
-        ->callTableAction(EditAction::class, $postalMail, [
+        ->callAction(TestAction::make('edit')->table($postalMail), [
             'is_failed' => true,
         ])
         ->assertHasNoActionErrors();

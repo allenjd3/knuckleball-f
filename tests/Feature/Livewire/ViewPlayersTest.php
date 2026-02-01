@@ -69,6 +69,6 @@ test('Players can be updated by super admins', function () {
 });
 
 test('Players cannot be updated by non-users', function () {
-    $player = Player::factory()->create();
+    $player = Player::factory()->published()->create();
     Livewire::test('ViewPlayers')->assertActionHidden(TestAction::make('edit')->table($player));
 });

@@ -6,7 +6,6 @@ test('replies are shown as threaded under the parent comment', function () {})->
 test('the user can like a comment', function () {})->toDo();
 test('the user can unlike a comment', function () {})->toDo();
 test('the user cannot like the same comment twice', function () {})->toDo();
-test('the comment is not saved without content', function () {})->toDo();
 test('the comment content has a maximum length', function () {})->toDo();
 test('comments are paginated', function () {})->toDo();
 test('the comment content is sanitized for HTML', function () {})->toDo();

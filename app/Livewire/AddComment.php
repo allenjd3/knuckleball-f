@@ -67,12 +67,12 @@ class AddComment extends Component implements HasActions, HasForms
         $this->authorize('create', Comment::class);
 
         $data = $this->form->getState();
-        $validator = Validator::make($data, [
-            'body' => ['required', 'string', 'min:1', 'max:500'], // Now it's a string (HTML)
+        $validator = Validator::make(['body' => RichContentRenderer::make($this->body)->toText()], [
+            'body' => ['required', 'string', 'min:1', 'max:500'],
         ]);
-        $validated = $validator->validated();
+        $validator->validated();
 
-        $htmlBody = RichContentRenderer::make($validated['body'])
+        $htmlBody = RichContentRenderer::make($data['body'])
             ->mentions([
                 MentionProvider::make('@')
                     ->url(fn (string $id, string $label): string =>
