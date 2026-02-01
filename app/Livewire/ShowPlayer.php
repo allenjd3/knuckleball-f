@@ -220,6 +220,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         TextInput::make('number')->nullable(),
                         TextInput::make('variation')->nullable(),
                         FileUpload::make('url')
+                            ->label('Card Image')
                             ->required()
                             ->directory('cards')
                             ->image(),
