@@ -18,4 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 app('honeybadger')->notify($e, app('request'));
             }
         });
+
+        $exceptions->renderable(static function (TypeError $e, $request) {
+            if (str_contains($request->path(), 'livewire/update')) {
+                return redirect()->back();
+            }
+        });
     })->create();
