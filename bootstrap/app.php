@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->renderable(static function (TypeError $e, $request) {
+        $exceptions->renderable(static function (Error $e, $request) {
             if (str_contains($request->path(), 'livewire/update')) {
                 return redirect()->back();
             }

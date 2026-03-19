@@ -12,10 +12,20 @@ it('redirects instead of 500 when a TypeError is thrown during a livewire update
     expect($response->getStatusCode())->toBe(302);
 });
 
-it('does not redirect TypeErrors on non-livewire paths', function () {
+it('redirects instead of 500 when an array-to-string Error is thrown during a livewire update', function () {
+    $handler = app(Illuminate\Contracts\Debug\ExceptionHandler::class);
+    $request = Request::create('/livewire/update', 'POST');
+    $e = new Error('Array to string conversion');
+
+    $response = $handler->render($request, $e);
+
+    expect($response->getStatusCode())->toBe(302);
+});
+
+it('does not redirect Errors on non-livewire paths', function () {
     $handler = app(Illuminate\Contracts\Debug\ExceptionHandler::class);
     $request = Request::create('/players', 'GET');
-    $e = new TypeError('some type error');
+    $e = new Error('Array to string conversion');
 
     $response = $handler->render($request, $e);
 
