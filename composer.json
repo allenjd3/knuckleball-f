@@ -32,6 +32,7 @@
         "fakerphp/faker": "^1.23",
         "filament/upgrade": "^4.0",
         "fly-apps/dockerfile-laravel": "^1.0",
+        "laravel/boost": "^2.3",
         "laravel/pail": "^1.2",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
