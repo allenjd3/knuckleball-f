@@ -22,7 +22,7 @@
                         <x-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                             {{ __('Teams') }}
                         </x-nav-link>
-                        <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
+                        <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('categories.index')">
                             {{ __('Categories') }}
                         </x-nav-link>
                         @if (auth()->user()?->isSuperAdmin() || auth()->user()?->isEditor())
