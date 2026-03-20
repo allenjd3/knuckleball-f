@@ -169,7 +169,7 @@
             <x-responsive-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                 {{ __('Teams') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
+            <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('categories.index')">
                 {{ __('Categories') }}
             </x-responsive-nav-link>
             @if (auth()->user()?->isSuperAdmin())
