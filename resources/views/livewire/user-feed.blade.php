@@ -11,12 +11,12 @@
                 <p class="text-xs text-gray-500 mt-1">Joined {{ auth()->user()->created_at?->format('M d, Y') }}</p>
                 <div class="flex justify-center gap-4 mt-3 text-sm">
                     <div>
-                        <p class="font-bold text-gray-900">{{ auth()->user()->following_count }}</p>
+                        <p class="font-bold text-gray-900">{{ auth()->user()->following()->count() }}</p>
                         <p class="text-xs text-gray-500">Following</p>
                     </div>
                     <div class="w-px bg-gray-200"></div>
                     <div>
-                        <p class="font-bold text-gray-900">{{ auth()->user()->followers_count }}</p>
+                        <p class="font-bold text-gray-900">{{ auth()->user()->followers()->count() }}</p>
                         <p class="text-xs text-gray-500">Followers</p>
                     </div>
                 </div>
