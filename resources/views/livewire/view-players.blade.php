@@ -1,4 +1,4 @@
-<div>
+<div class="px-4">
     <div class="max-w-7xl py-16 mx-auto">
         <div class="flex justify-center">
         @if (isset($mediaUrl))
