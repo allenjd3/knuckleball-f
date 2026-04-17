@@ -21,12 +21,19 @@
     <body class="font-sans antialiased">
         <x-banner />
 
-        <div class="min-h-screen">
+        <div class="min-h-screen flex flex-col">
             @livewire('navigation-menu')
 
-            <!-- Page Heading -->
+            <main class="grow">
+                {{ $slot }}
+            </main>
 
-            {{ $slot }}
+            <footer class="border-t border-gray-200 bg-white">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500">
+                    <span>&copy; {{ date('Y') }} Knuckleball. All rights reserved.</span>
+                    <a href="{{ route('dmca') }}" class="hover:text-gray-700 underline">DMCA Policy</a>
+                </div>
+            </footer>
         </div>
 
         @stack('modals')
