@@ -39,6 +39,7 @@ it('can create a player', function () {
         'name' => 'Test Player',
         'team_id' => $team->id,
         'note' => 'Test note',
+        'dmca_certification' => true,
     ];
 
     Livewire::test(PlayerResource\Pages\CreatePlayer::class)
@@ -91,6 +92,7 @@ it('can update a player', function () {
         'name' => 'Updated Name',
         'team_id' => $team->id,
         'note' => 'Updated note',
+        'dmca_certification' => true,
     ];
 
     Livewire::test(PlayerResource\Pages\EditPlayer::class, [
@@ -210,6 +212,7 @@ it('can set dates for player', function () {
             'published_at' => $publishedAt,
             'retired_at' => $retiredAt,
             'deceased_at' => $deceasedAt,
+            'dmca_certification' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -231,6 +234,7 @@ it('can associate player with user', function () {
             'name' => 'Test Player',
             'team_id' => $team->id,
             'user_id' => $user->id,
+            'dmca_certification' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
