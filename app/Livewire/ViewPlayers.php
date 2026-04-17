@@ -9,6 +9,7 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -130,6 +131,10 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->directory('avatars')
                     ->nullable()
                     ->avatar(),
+                Checkbox::make('dmca_certification')
+                    ->label('I certify that I own this image or have a legitimate license/permission to share it. I understand that Knuckleball follows a strict DMCA policy and will remove infringing content and terminate repeat infringer accounts.')
+                    ->rules(['accepted'])
+                    ->dehydrated(false),
             ])
             ->using(function (array $data): Model {
                 $data = collect($data);

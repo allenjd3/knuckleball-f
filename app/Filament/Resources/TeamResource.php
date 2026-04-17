@@ -11,6 +11,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
@@ -40,6 +41,10 @@ class TeamResource extends Resource
                 FileUpload::make('url')
                     ->directory('teams')
                     ->avatar(),
+                Checkbox::make('dmca_certification')
+                    ->label('I certify that I own this image or have a legitimate license/permission to share it. I understand that Knuckleball follows a strict DMCA policy and will remove infringing content and terminate repeat infringer accounts.')
+                    ->rules(['accepted'])
+                    ->dehydrated(false),
             ]);
     }
 

@@ -70,6 +70,22 @@
     }
 }
 
+.prose-reset {
+    & h1, & h2, & h3, & h4 {
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        letter-spacing: normal;
+        font-weight: 600;
+    }
+
+    & h1 { font-size: 1.875rem; line-height: 2.25rem; margin-bottom: 1rem; }
+    & h2 { font-size: 1.25rem; line-height: 1.75rem; margin-top: 1.75rem; margin-bottom: 0.5rem; }
+
+    & p { line-height: 1.75; margin-bottom: 1.25rem; }
+
+    & ol { padding-left: 1.5rem; list-style-type: decimal; }
+    & li { line-height: 1.75; margin-bottom: 0.5rem; }
+}
+
 .tag {
     display: inline-block;
     margin: 10px;

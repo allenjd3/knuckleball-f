@@ -208,7 +208,8 @@
 					<li><a href="https://www.instagram.com/knuckleballapp/" class="fa fa-instagram wow fadeIn" data-wow-delay="0.9s"></a></li>
 				</ul>
 				<hr>
-				<p><b>Copyright © 2025 Knuckleball  | All right Reserved | Made in the USA </p></b>
+				<p><b>Copyright © 2025 Knuckleball  | All right Reserved | Made in the USA</b></p>
+				<p><a href="{{ route('dmca') }}" style="color: inherit;">DMCA Policy</a></p>
 			</div>
 
 		</div>
