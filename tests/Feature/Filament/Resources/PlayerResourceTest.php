@@ -4,6 +4,8 @@ use App\Filament\Resources\PlayerResource;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -243,4 +245,32 @@ it('can associate player with user', function () {
         'name' => 'Test Player',
         'user_id' => $user->id,
     ]);
+});
+
+it('does not require dmca certification when no image is uploaded', function () {
+    $team = Team::factory()->create();
+
+    Livewire::test(PlayerResource\Pages\CreatePlayer::class)
+        ->fillForm([
+            'name' => 'Test Player',
+            'team_id' => $team->id,
+            'dmca_certification' => false,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+});
+
+it('requires dmca certification when an image is uploaded', function () {
+    Storage::fake('public');
+    $team = Team::factory()->create();
+
+    Livewire::test(PlayerResource\Pages\CreatePlayer::class)
+        ->fillForm([
+            'name' => 'Test Player',
+            'team_id' => $team->id,
+            'url' => UploadedFile::fake()->image('avatar.jpg'),
+            'dmca_certification' => false,
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['dmca_certification' => 'accepted']);
 });
