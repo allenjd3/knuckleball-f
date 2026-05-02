@@ -20,6 +20,8 @@
         @filamentStyles
         @vite('resources/css/app.css')
 
+        @stack('header-scripts')
+
         <!-- Styles -->
     </head>
     <body>

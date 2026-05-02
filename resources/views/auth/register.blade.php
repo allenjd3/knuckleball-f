@@ -1,4 +1,8 @@
 <x-guest-layout>
+    @pushOnce('header-scripts')
+        <x-turnstile.scripts />
+    @endPushOnce
+
     <x-authentication-card>
         <x-slot name="logo">
             <h3 style="--color-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
@@ -64,6 +68,9 @@
                     </x-label>
                 </div>
             @endif
+            <div class="mt-4">
+                <x-turnstile />
+            </div>
 
             <div class="flex items-center justify-end mt-4 gap-4">
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('dmca') }}" target="_blank">

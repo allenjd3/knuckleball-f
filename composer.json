@@ -23,6 +23,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^4.0",
         "predis/predis": "^2.3",
+        "ryangjchandler/laravel-cloudflare-turnstile": "^3.0",
         "spatie/image": "^3.8",
         "spatie/laravel-sluggable": "^3.7",
         "symfony/dom-crawler": "^7.3"
