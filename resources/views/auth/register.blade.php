@@ -18,13 +18,6 @@
         >
             @csrf
             <div>
-                <x-label for="code" value="{{ __('Invite Code') }}" class="mb-1" />
-                <x-filament::input.wrapper>
-                    <x-filament::input x-ref="code" id="code" type="text" x-model="code" name="code" required />
-                </x-filament::input.wrapper>
-            </div>
-
-            <div>
                 <x-label for="name" value="{{ __('Name') }}" class="mb-1" />
                 <x-filament::input.wrapper>
                     <x-filament::input x-ref="name" id="name" type="text" name="name" :value="old('name')" required autocomplete="name" />
