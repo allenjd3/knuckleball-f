@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\Reaction;
 
 class Feed extends Model
 {
@@ -31,9 +32,31 @@ class Feed extends Model
     public function componentName(): string
     {
         return match (true) {
-            $this->feedable_type === PostalMail::class => 'feeds.postal-mail',
+            $this->feedable_type === PostalMail::class => $this->postalMailComponentName(),
             $this->feedable_type === Comment::class => 'feeds.comment',
+            default => 'feeds.send-card',
         };
+    }
+
+    private function postalMailComponentName(): string
+    {
+        if (data_get($this->meta, 'date_returned')) {
+            return 'feeds.celebration-card';
+        }
+        if (!empty(data_get($this->meta, 'card_photos', []))) {
+            return 'feeds.media-card';
+        }
+        return 'feeds.send-card';
+    }
+
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(Reaction::class);
+    }
+
+    public function feedComments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function mentions(): HasMany

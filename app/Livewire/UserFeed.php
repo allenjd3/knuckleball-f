@@ -80,7 +80,7 @@ class UserFeed extends Component
                             fn ($query) => $query->selectRaw('0'),
                         ), 'is_following'
                 )
-                ->orderByRaw('(is_following * 0.95 + RAND() * 0.05) DESC')
+                ->orderByRaw('(is_following * 0.95 + ' . (config('database.default') === 'sqlite' ? 'RANDOM()' : 'RAND()') . ' * 0.05) DESC')
                 ->orderByDesc('created_at')
                 ->limit($followCount * 3)
                 ->pluck('id')

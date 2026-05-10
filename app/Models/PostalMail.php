@@ -73,6 +73,10 @@ class PostalMail extends Model
     {
         $user = $this->user;
         $player = $this->player;
+        $cardPhotos = $this->cards()->with('media')->get()
+            ->flatMap(fn ($card) => $card->media)
+            ->pluck('url')
+            ->toArray();
 
         return [
             'photo' => $user->profile_photo_url,
@@ -82,6 +86,10 @@ class PostalMail extends Model
             'player_path' => $player->path(),
             'date_sent' => $this->date_sent,
             'date_returned' => $this->returned_date,
+            'turnaround_days' => $this->returned_date && $this->date_sent
+                ? (int) $this->date_sent->diffInDays($this->returned_date)
+                : null,
+            'card_photos' => $cardPhotos,
             ...$overrides,
         ];
     }
