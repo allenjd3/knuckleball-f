@@ -200,7 +200,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->icon('heroicon-o-rectangle-stack')
                     ->visible(fn (Model $record) => $record->card->exists)
                     ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
-                    ->slideOver()
                     ->modalSubmitActionLabel('Ok'),
                 CreateAction::make('createCard')
                     ->modalHeading('Create Card')
