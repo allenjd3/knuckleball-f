@@ -113,6 +113,10 @@
                                     {{ __('Manage Account') }}
                                 </div>
 
+                                <x-dropdown-link href="{{ route('users.profile', Auth::user()) }}">
+                                    {{ __('Profile') }}
+                                </x-dropdown-link>
+
                                 <x-dropdown-link href="{{ route('profile.show') }}">
                                     {{ __('Settings') }}
                                 </x-dropdown-link>
@@ -199,8 +203,12 @@
             @auth
                 <div class="mt-3 space-y-1">
                     <!-- Account Management -->
-                    <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                    <x-responsive-nav-link href="{{ route('users.profile', Auth::user()) }}" :active="request()->routeIs('users.profile')">
                         {{ __('Profile') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
+                        {{ __('Settings') }}
                     </x-responsive-nav-link>
 
                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())

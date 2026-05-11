@@ -13,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
@@ -42,7 +41,7 @@ class ViewWantLists extends Component implements HasActions, HasForms, HasTable
             ->emptyStateHeading('No want lists yet')
             ->emptyStateDescription('Create your first want list to start tracking players you want TTMs from.')
             ->emptyStateActions([
-                TableAction::make('create')
+                Action::make('create')
                     ->label('Create a list')
                     ->action(fn () => $this->mountAction('createList')),
             ])
@@ -74,7 +73,7 @@ class ViewWantLists extends Component implements HasActions, HasForms, HasTable
                     ->authorize(fn (WantList $record) => auth()->user()?->can('delete', $record)),
             ])
             ->headerActions([
-                TableAction::make('create')
+                Action::make('create')
                     ->label('New List')
                     ->action(fn () => $this->mountAction('createList')),
             ]);

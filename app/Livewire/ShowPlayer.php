@@ -8,7 +8,7 @@ use App\Models\Address;
 use App\Models\Fee;
 use App\Models\Player;
 use App\Models\Tag;
-use App\Models\WantList;
+use App\Models\Pack;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -153,21 +153,21 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             });
     }
 
-    public function addToWantListAction(): Action
+    public function addToPackAction(): Action
     {
-        return Action::make('addToWantList')
-            ->label('Add to Want List')
+        return Action::make('addToPack')
+            ->label('Add to Pack')
             ->icon('heroicon-o-bookmark')
             ->authorize(fn () => request()->user()?->isPublished())
             ->schema([
-                Select::make('want_list_id')
-                    ->label('Want List')
+                Select::make('pack_id')
+                    ->label('Pack')
                     ->required()
-                    ->options(fn () => auth()->user()->wantLists()->pluck('name', 'id'))
+                    ->options(fn () => auth()->user()->packs()->pluck('name', 'id'))
                     ->createOptionForm([
                         TextInput::make('name')->required()->maxLength(255),
                     ])
-                    ->createOptionUsing(fn (array $data) => auth()->user()->wantLists()->create($data)->id),
+                    ->createOptionUsing(fn (array $data) => auth()->user()->packs()->create($data)->id),
                 Textarea::make('note')
                     ->label('Note')
                     ->placeholder('e.g. Send 3 cards, include SASE')
@@ -175,8 +175,8 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->maxLength(500),
             ])
             ->action(function (array $data) {
-                $wantList = WantList::findOrFail($data['want_list_id']);
-                $wantList->addPlayer($this->player, $data['note'] ?? null);
+                $pack = Pack::findOrFail($data['pack_id']);
+                $pack->addPlayer($this->player, $data['note'] ?? null);
             });
     }
 

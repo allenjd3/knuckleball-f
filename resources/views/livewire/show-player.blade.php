@@ -35,9 +35,9 @@
                             </button>
                         @endif
                         @if ($showWantList)
-                            <button wire:click="mountAction('addToWantList')" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
+                            <button wire:click="mountAction('addToPack')" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
                                 <x-heroicon-o-bookmark class="size-4 text-gray-500 shrink-0" />
-                                Add to Want List
+                                Add to Pack
                             </button>
                         @endif
                     </div>

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\Pack;
 use App\Models\Reaction;
 
 class Feed extends Model
@@ -33,8 +34,9 @@ class Feed extends Model
     {
         return match (true) {
             $this->feedable_type === PostalMail::class => $this->postalMailComponentName(),
-            $this->feedable_type === Comment::class => 'feeds.comment',
-            default => 'feeds.send-card',
+            $this->feedable_type === Pack::class       => 'feeds.pack-card',
+            $this->feedable_type === Comment::class    => 'feeds.comment',
+            default                                    => 'feeds.send-card',
         };
     }
 

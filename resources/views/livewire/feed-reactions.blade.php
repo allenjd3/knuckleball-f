@@ -1,15 +1,15 @@
-<div class="flex items-center gap-2 flex-wrap">
+<div class="flex items-center gap-3">
     @foreach ($emojis as $type => $emoji)
         <button
             wire:click="toggle('{{ $type }}')"
-            class="flex items-center gap-1 text-sm px-2 py-0.5 rounded-full border transition-colors
-                {{ $userReacted[$type]
-                    ? 'border-gray-400 bg-gray-100 font-semibold'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50' }}"
+            class="flex items-center gap-1 text-sm transition-colors
+                {{ $userReacted[$type] ? 'font-bold' : 'text-gray-400 hover:text-gray-700' }}"
         >
-            {{ $emoji }}
+            <span>{{ $emoji }}</span>
             @if ($counts[$type] > 0)
-                <span class="text-xs text-gray-500">{{ $counts[$type] }}</span>
+                <span class="text-xs {{ $userReacted[$type] ? 'text-gray-700' : 'text-gray-400' }}">
+                    {{ $counts[$type] }}
+                </span>
             @endif
         </button>
     @endforeach
