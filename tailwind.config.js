@@ -9,7 +9,7 @@ export default {
         fontFamily: {
             'display': ['industry-inc-base', 'sans-serif'],
             'mono': ['monospace'],
-            'sans': 'sans-serif',
+            'sans': ['mundial', 'sans-serif'],
             'serif': 'serif',
         }
     }

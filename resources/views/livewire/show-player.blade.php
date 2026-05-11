@@ -1,6 +1,6 @@
 <div class="max-w-7xl mx-auto py-12">
     <div class="flex flex-col md:flex-row gap-8 justify-center max-w-3xl mx-auto">
-        <div class="mx-auto">
+        <div class="mx-auto flex flex-col items-center gap-3 min-w-36">
             @if ($this->player->media?->url)
                 <img src="{{ Storage::url($this->player->media?->url) }}" alt="{{ $player->name }}" class="size-44 rounded-full" />
             @else
@@ -8,31 +8,45 @@
                     <p class="">No photo</p>
                 </div>
             @endif
+
+            @auth
+                @php
+                    $showEdit = auth()->user()->isSuperAdmin() && auth()->user()->can('update', $player);
+                    $showAdmin = auth()->user()->can('update', $player);
+                    $showWantList = auth()->user()->isPublished();
+                    $hasAny = $showEdit || $showAdmin || $showWantList;
+                @endphp
+                @if ($hasAny)
+                    <div class="w-full bg-white border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-100">
+                        @if ($showEdit)
+                            <a href="{{ route('filament.cp.resources.players.edit', $player) }}" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full">
+                                <x-heroicon-o-pencil-square class="size-4 text-gray-500 shrink-0" />
+                                Edit player
+                            </a>
+                        @endif
+                        @if ($showAdmin)
+                            <button wire:click="mountAction('createFee')" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
+                                <x-heroicon-o-currency-dollar class="size-4 text-gray-500 shrink-0" />
+                                New fee
+                            </button>
+                            <button wire:click="mountAction('associateTag')" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
+                                <x-heroicon-o-tag class="size-4 text-gray-500 shrink-0" />
+                                Associate tag
+                            </button>
+                        @endif
+                        @if ($showWantList)
+                            <button wire:click="mountAction('addToWantList')" class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
+                                <x-heroicon-o-bookmark class="size-4 text-gray-500 shrink-0" />
+                                Add to Want List
+                            </button>
+                        @endif
+                    </div>
+                @endif
+            @endauth
         </div>
         <div class="flex-1">
             <div class="flex gap-2 items-center">
                 <h1 class="text-3xl">{{ $player->name }}</h1>
-                @php
-                $actions = [];
-                if (auth()->user()?->isSuperAdmin() && auth()->user()?->can('update', $player)) {
-                    array_push($actions, $this->editPlayer);
-                }
-
-                if (auth()->user()?->can('update', $player)) {
-                    array_push($actions, $this->createFee);
-                    array_push($actions, $this->associateTag);
-                }
-
-                @endphp
-
-                @if (count($actions))
-                    <x-filament-actions::group
-                        :actions="$actions"
-                        label="Player Actions"
-                        icon="heroicon-o-plus-circle"
-                        tooltip="Player Actions"
-                    />
-                @endif
             </div>
             <div class="border-b border-black"></div>
             <div class="mb-4 text-lg">
@@ -100,9 +114,7 @@
                         <div class="mt-2">{{ $this->createAddress }}</div>
                     @endcan
                 @endif
-                @can('update', $player)
-                    <x-filament-actions::modals />
-                @endcan
+                <x-filament-actions::modals />
             </div>
             <div>
                 @if (auth()->check() && $this->tags->count())

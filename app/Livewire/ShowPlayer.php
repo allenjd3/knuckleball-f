@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\Fee;
 use App\Models\Player;
 use App\Models\Tag;
+use App\Models\WantList;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -110,6 +111,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createFee')
             ->model(Fee::class)
             ->authorize(fn () => request()->user()?->can('create', Fee::class))
+            ->icon('heroicon-o-currency-dollar')
             ->schema(FeeForm::schema())
             ->mutateDataUsing(function (array $data) {
                 data_set($data, 'user_id', request()->user()?->id);
@@ -148,6 +150,33 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ])
             ->action(function (array $data) {
                 $this->player->addTag(data_get($data, 'tag_id'));
+            });
+    }
+
+    public function addToWantListAction(): Action
+    {
+        return Action::make('addToWantList')
+            ->label('Add to Want List')
+            ->icon('heroicon-o-bookmark')
+            ->authorize(fn () => request()->user()?->isPublished())
+            ->schema([
+                Select::make('want_list_id')
+                    ->label('Want List')
+                    ->required()
+                    ->options(fn () => auth()->user()->wantLists()->pluck('name', 'id'))
+                    ->createOptionForm([
+                        TextInput::make('name')->required()->maxLength(255),
+                    ])
+                    ->createOptionUsing(fn (array $data) => auth()->user()->wantLists()->create($data)->id),
+                Textarea::make('note')
+                    ->label('Note')
+                    ->placeholder('e.g. Send 3 cards, include SASE')
+                    ->nullable()
+                    ->maxLength(500),
+            ])
+            ->action(function (array $data) {
+                $wantList = WantList::findOrFail($data['want_list_id']);
+                $wantList->addPlayer($this->player, $data['note'] ?? null);
             });
     }
 
