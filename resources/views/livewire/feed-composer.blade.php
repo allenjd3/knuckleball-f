@@ -16,7 +16,15 @@
             Post
         </button>
     </form>
+
     @error('body')
         <p class="text-xs text-red-500 mt-1 pl-4">{{ $message }}</p>
     @enderror
+
+    <div class="flex items-center gap-5 mt-2 px-4">
+        {{ $this->logSendAction }}
+        {{ $this->logReturnAction }}
+    </div>
+
+    <x-filament-actions::modals />
 </div>
