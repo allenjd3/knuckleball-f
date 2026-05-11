@@ -50,16 +50,7 @@
 
                 {{-- Compose --}}
                 @auth
-                    <div class="bg-white rounded-2xl border border-gray-100 p-3 flex items-center gap-3">
-                        <img src="{{ auth()->user()->profile_photo_url }}" class="size-9 rounded-full shrink-0" />
-                        <span class="flex-1 text-sm text-gray-400 bg-gray-50 rounded-full px-4 py-2">
-                            Log a new send, return, or comment…
-                        </span>
-                        <button class="px-4 py-2 text-sm font-semibold text-white rounded-full"
-                                style="background-color:#D93C3F;">
-                            Post
-                        </button>
-                    </div>
+                    <livewire:add-comment />
                 @endauth
 
                 {{-- Trending Returns Strip --}}
