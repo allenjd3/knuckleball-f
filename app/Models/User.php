@@ -58,6 +58,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(WantList::class);
     }
 
+    public function packs(): HasMany
+    {
+        return $this->hasMany(Pack::class);
+    }
+
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);
@@ -150,10 +155,11 @@ class User extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'published_at' => 'datetime',
-            'role' => Role::class,
+            'email_verified_at'  => 'datetime',
+            'password'           => 'hashed',
+            'published_at'       => 'datetime',
+            'handle_changed_at'  => 'datetime',
+            'role'               => Role::class,
         ];
     }
 }

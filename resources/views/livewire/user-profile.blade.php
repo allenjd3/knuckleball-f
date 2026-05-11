@@ -1,27 +1,240 @@
-<div class="max-w-5xl mx-auto flex flex-col items-center md:items-start md:flex-row gap-8 mt-8">
-    <aside class="flex flex-col justify-center w-max">
-        <div class="rounded-full size-32 overflow-hidden">
-            <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="object-cover w-full h-full"/>
-        </div>
+<div class="max-w-5xl mx-auto pb-16">
 
-        <div class="font-bold text-center mt-4">
-        <div>{{ $this->user->name }}</div>
-        <div class="text-xs space-y-4">
-            <div>Joined: {{ $this->user->created_at?->format('M d, Y') }}</div>
-            <div>Following: {{ $this->user->following_count }} Followers: {{ $this->user->followers_count }}</div>
-            @if (auth()->check() && $this->user->id !== auth()->user()?->id)
-                @if (! $this->isFollowing)
-                    <button wire:click="follow">Follow</button>
+    {{-- Cover + Avatar --}}
+    <div class="relative">
+        <div class="h-48 md:h-56 bg-gray-200 overflow-hidden">
+            @if ($this->user->cover_photo)
+                <img src="{{ Storage::url($this->user->cover_photo) }}" class="w-full h-full object-cover" alt="Cover" />
+            @else
+                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
+            @endif
+        </div>
+        <div class="absolute bottom-0 left-6 translate-y-1/2">
+            <div class="size-24 rounded-full ring-4 ring-white overflow-hidden bg-gray-100">
+                <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="w-full h-full object-cover" />
+            </div>
+        </div>
+    </div>
+
+    {{-- Profile info --}}
+    <div class="pt-16 pb-4 px-6 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold">{{ $this->user->name }}</h1>
+            <p class="text-gray-500 text-sm">@{{ $this->user->handle }} · Joined {{ $this->user->created_at?->format('M Y') }}</p>
+            @if ($this->user->bio)
+                <p class="mt-2 text-gray-700 text-sm max-w-md">{{ $this->user->bio }}</p>
+            @endif
+        </div>
+        <div class="flex items-center gap-2 shrink-0 mt-1">
+            @if ($this->isOwner)
+                {{ $this->editProfile }}
+                {{ $this->changeHandle }}
+            @elseif (auth()->check())
+                @if ($this->isFollowing)
+                    <button wire:click="unfollow" class="px-4 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Unfollow</button>
                 @else
-                    <button wire:click="unfollow">Unfollow</button>
+                    <button wire:click="follow" class="px-4 py-1.5 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-700">Follow</button>
                 @endif
             @endif
         </div>
-    </aside>
-    <div class="divide-y w-full">
-        @foreach ($this->feeds as $feed)
-            <x-dynamic-component :component="$feed->componentName()" :$feed />
-        @endforeach
-        {{ $this->feeds->links() }}
     </div>
+
+    <div class="px-4 space-y-8 mt-4">
+
+        {{-- Stats card --}}
+        <div class="rounded-2xl p-8 md:p-10 text-white" style="background-color:#D93C3F; font-family:'Inter',sans-serif;">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between mb-10">
+                <p class="text-xs font-bold uppercase tracking-widest">All-Time Stats</p>
+                <a href="{{ route('users.snapshot', [$this->user, now()->year]) }}"
+                   class="bg-white rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors"
+                   style="color:#D93C3F;">
+                    Share Snapshot ↗
+                </a>
+            </div>
+
+            {{-- 4 headline numbers --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_sends'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Sends</p>
+                </div>
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_returns'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Returns</p>
+                </div>
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['success_rate'] }}<span class="text-4xl font-black">%</span></p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Success</p>
+                </div>
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['unique_players'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Players</p>
+                </div>
+            </div>
+
+            {{-- Divider --}}
+            <div class="border-t border-white/20 mb-6"></div>
+
+            {{-- Detail rows --}}
+            <div class="space-y-4">
+                @if ($this->stats['fastest_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-bolt class="size-5 text-white/70 shrink-0" />
+                            Fastest Return
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['fastest_return']['player_name'] }} · {{ $this->stats['fastest_return']['days'] }} days</span>
+                    </div>
+                @endif
+                @if ($this->stats['longest_wait'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-clock class="size-5 text-white/70 shrink-0" />
+                            Longest Wait
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['longest_wait']['player_name'] }} · {{ $this->stats['longest_wait']['days'] }} days</span>
+                    </div>
+                @endif
+                @if ($this->stats['favorite_team'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-trophy class="size-5 text-white/70 shrink-0" />
+                            Favorite Team
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['favorite_team'] }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['favorite_category'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-tag class="size-5 text-white/70 shrink-0" />
+                            Top Category
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['favorite_category'] }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['most_reacted_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-s-heart class="size-5 text-white/70 shrink-0" />
+                            Most Reacted
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['most_reacted_return']['player_name'] }} · {{ $this->stats['most_reacted_return']['reaction_count'] }} reactions</span>
+                    </div>
+                @endif
+                @if ($this->stats['first_send'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-paper-airplane class="size-5 text-white/70 shrink-0" />
+                            First Send
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['first_send']->format('M j, Y') }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['most_recent_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-inbox-arrow-down class="size-5 text-white/70 shrink-0" />
+                            Latest Return
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['most_recent_return']->format('M j, Y') }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['total_sends'] === 0)
+                    <p class="text-white/50 text-sm text-center py-2">No activity yet — send some mail to see stats here.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Past Snapshots --}}
+        @if ($this->snapshots->isNotEmpty())
+            <div>
+                <h2 class="text-sm uppercase tracking-widest text-gray-500 font-medium mb-3">Snapshots</h2>
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    @foreach ($this->snapshots as $snapshot)
+                        <a href="{{ route('users.snapshot', [$this->user, $snapshot->year]) }}"
+                           class="shrink-0 bg-gray-950 text-white rounded-xl p-4 w-36 hover:opacity-80 transition-opacity">
+                            <p class="text-3xl font-black">{{ $snapshot->year }}</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ data_get($snapshot->data, 'total_sends', 0) }} sends</p>
+                            <p class="text-xs text-gray-400">{{ data_get($snapshot->data, 'success_rate', 0) }}% success</p>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+    </div>
+
+    {{-- Tabs --}}
+    <div x-data="{ tab: 'activity' }" class="mt-6">
+
+        {{-- Tab nav --}}
+        <div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-4">
+            <div class="flex gap-6">
+                <button
+                    @click="tab = 'activity'"
+                    :class="tab === 'activity'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Activity
+                </button>
+                <button
+                    @click="tab = 'packs'"
+                    :class="tab === 'packs'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Packs
+                </button>
+            </div>
+        </div>
+
+        {{-- Activity tab --}}
+        <div x-show="tab === 'activity'" x-cloak class="px-4 pt-6 pb-16 flex flex-col gap-3">
+            @forelse ($this->feeds as $feed)
+                <x-dynamic-component :component="$feed->componentName()" :$feed />
+            @empty
+                <p class="text-gray-400 text-sm text-center py-8">No activity yet.</p>
+            @endforelse
+            {{ $this->feeds->links() }}
+        </div>
+
+        {{-- Packs tab --}}
+        <div x-show="tab === 'packs'" x-cloak class="px-4 pt-6 pb-16">
+            @if ($this->packs->isNotEmpty())
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">{{ $this->packs->count() }} {{ Str::plural('Pack', $this->packs->count()) }}</p>
+                    @if ($this->isOwner)
+                        <a href="{{ route('packs.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+                    @endif
+                </div>
+                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    @foreach ($this->packs as $pack)
+                        <a href="{{ $pack->path() }}" class="group block">
+                            <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-100 group-hover:opacity-90 transition-opacity">
+                                @if ($pack->cover_image)
+                                    <img src="{{ Storage::url($pack->cover_image) }}" alt="{{ $pack->name }}" class="w-full h-full object-cover" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center h-full text-gray-400 p-2 text-center gap-1">
+                                        <x-heroicon-o-rectangle-stack class="size-6" />
+                                        <span class="text-xs leading-tight">{{ $pack->name }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <p class="text-xs font-medium truncate mt-1.5">{{ $pack->name }}</p>
+                            <p class="text-xs text-gray-400">{{ $pack->players_count }} {{ Str::plural('player', $pack->players_count) }}</p>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-400 text-sm text-center py-8">No packs yet.</p>
+            @endif
+        </div>
+
+    </div>
+
+    <x-filament-actions::modals />
 </div>
