@@ -41,7 +41,7 @@
             0%   { transform: translateX(0); }
             100% { transform: translateX(-50%); }
         }
-        .animate-scroll { animation: scroll 30s linear infinite; }
+        .animate-scroll { animation: scroll 80s linear infinite; }
         .animate-scroll:hover { animation-play-state: paused; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
