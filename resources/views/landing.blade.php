@@ -38,7 +38,7 @@
     <!-- NAVBAR -->
     <nav class="bg-[#CB504B] text-white">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="text-2xl font-black tracking-tighter">
+            <div class="text-2xl tracking-tighter" style="font-family: 'industry-inc-base', sans-serif;">
                 KNUCKLEBALL
             </div>
             <div class="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wider">
@@ -282,7 +282,7 @@
     <!-- FOOTER -->
     <footer id="contact" class="bg-gray-900 text-gray-400 py-12 px-6 border-t border-gray-800 text-sm">
         <div class="max-w-7xl mx-auto flex flex-col items-center">
-            <div class="text-2xl font-black tracking-tighter text-white mb-8">
+            <div class="text-2xl text-white mb-8" style="font-family: 'industry-inc-base', sans-serif;">
                 KNUCKLEBALL
             </div>
 
