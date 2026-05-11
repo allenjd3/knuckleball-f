@@ -50,7 +50,7 @@
 
                 {{-- Compose --}}
                 @auth
-                    <livewire:add-comment />
+                    <livewire:feed-composer />
                 @endauth
 
                 {{-- Trending Returns Strip --}}
