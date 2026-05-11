@@ -248,15 +248,14 @@
         <div class="max-w-7xl mx-auto px-6 relative">
             <div class="overflow-hidden rounded-2xl shadow-2xl bg-black border border-gray-800 relative aspect-[16/9] md:aspect-[21/9]">
                 <div id="carouselTrack" class="flex w-full h-full transition-transform duration-700 ease-in-out">
-                    <img src="{{ asset('images/vault/mark-grace.png') }}"    onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Mark+Grace';"    class="w-full h-full object-cover flex-shrink-0" alt="Mark Grace Return" />
-                    <img src="{{ asset('images/vault/wade-boggs.png') }}"    onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Wade+Boggs';"    class="w-full h-full object-cover flex-shrink-0" alt="Wade Boggs Return" />
-                    <img src="{{ asset('images/vault/bill-mazeroski.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Bill+Mazeroski';" class="w-full h-full object-cover flex-shrink-0" alt="Bill Mazeroski Return" />
-                    <img src="{{ asset('images/vault/ted-kazanski.png') }}"   onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Ted+Kazanski';"   class="w-full h-full object-cover flex-shrink-0" alt="Ted Kazanski Return" />
-                    <img src="{{ asset('images/vault/jim-palmer.png') }}"     onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Jim+Palmer';"     class="w-full h-full object-cover flex-shrink-0" alt="Jim Palmer Return" />
-                    <img src="{{ asset('images/vault/bobby-richardson.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Bobby+Richardson';" class="w-full h-full object-cover flex-shrink-0" alt="Bobby Richardson Return" />
-                    <img src="{{ asset('images/vault/vern-law.png') }}"       onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Vern+Law';"       class="w-full h-full object-cover flex-shrink-0" alt="Vern Law Return" />
-                    <img src="{{ asset('images/vault/bill-bradley-1.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Bill+Bradley';"   class="w-full h-full object-cover flex-shrink-0" alt="Bill Bradley Return" />
-                    <img src="{{ asset('images/vault/bill-bradley-2.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/1200x514/111827/374151?text=Bill+Bradley+2';" class="w-full h-full object-cover flex-shrink-0" alt="Bill Bradley Return 2" />
+                    <img src="{{ asset('images/vault/mark-grace.png') }}"       class="w-full h-full object-cover flex-shrink-0" alt="Mark Grace Return" />
+                    <img src="{{ asset('images/vault/wade-boggs.png') }}"       class="w-full h-full object-cover flex-shrink-0" alt="Wade Boggs Return" />
+                    <img src="{{ asset('images/vault/ted-kazanski.png') }}"     class="w-full h-full object-cover flex-shrink-0" alt="Ted Kazanski Return" />
+                    <img src="{{ asset('images/vault/vern-law.png') }}"         class="w-full h-full object-cover flex-shrink-0" alt="Vern Law Return" />
+                    <img src="{{ asset('images/vault/bill-mazeroski.png') }}"   class="w-full h-full object-cover flex-shrink-0" alt="Bill Mazeroski Return" />
+                    <img src="{{ asset('images/vault/jim-palmer.png') }}"       class="w-full h-full object-cover flex-shrink-0" alt="Jim Palmer Return" />
+                    <img src="{{ asset('images/vault/bill-bradley.jpg') }}"     class="w-full h-full object-cover flex-shrink-0" alt="Bill Bradley Return" />
+                    <img src="{{ asset('images/vault/bobby-richardson.jpg') }}" class="w-full h-full object-cover flex-shrink-0" alt="Bobby Richardson Return" />
                 </div>
             </div>
         </div>
