@@ -147,21 +147,49 @@
         <div class="absolute right-0 w-16 h-full bg-gradient-to-l from-gray-900 to-transparent z-10"></div>
 
         <div class="inline-block animate-scroll text-sm font-medium">
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @james_ttm:</span> Peyton Manning (8 Days)</span>
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-yellow-400">🏆</span> <span class="font-bold">@bailey_collects secured:</span> Briana Scurry (22 Days)</span>
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @raulnino:</span> Sid Bream (14 Days)</span>
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-green-400">📬</span> <span class="font-bold">@david_cards sent:</span> Tim Tebow (Football)</span>
+            @forelse ($tickerItems as $item)
+                <span class="mx-4 text-gray-400">•</span>
+                @if ($item['isReturn'])
+                    <span>
+                        <span class="text-orange-400">🔥</span>
+                        <span class="font-bold">Mail day for @{{ $item['slug'] }}:</span>
+                        {{ $item['player'] }}{{ $item['days'] ? ' (' . $item['days'] . ' Days)' : '' }}
+                    </span>
+                @else
+                    <span>
+                        <span class="text-green-400">📬</span>
+                        <span class="font-bold">@{{ $item['slug'] }} sent:</span>
+                        {{ $item['player'] }}
+                    </span>
+                @endif
+            @empty
+                <span class="mx-4 text-gray-400">•</span>
+                <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @raulnino:</span> Rollie Fingers (14 Days)</span>
+                <span class="mx-4 text-gray-400">•</span>
+                <span><span class="text-green-400">📬</span> <span class="font-bold">@collector sent:</span> Wade Boggs</span>
+            @endforelse
             {{-- Duplicate for seamless scroll loop --}}
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @james_ttm:</span> Peyton Manning (8 Days)</span>
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-yellow-400">🏆</span> <span class="font-bold">@bailey_collects secured:</span> Briana Scurry (22 Days)</span>
-            <span class="mx-4 text-gray-400">•</span>
-            <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @raulnino:</span> Sid Bream (14 Days)</span>
+            @forelse ($tickerItems as $item)
+                <span class="mx-4 text-gray-400">•</span>
+                @if ($item['isReturn'])
+                    <span>
+                        <span class="text-orange-400">🔥</span>
+                        <span class="font-bold">Mail day for @{{ $item['slug'] }}:</span>
+                        {{ $item['player'] }}{{ $item['days'] ? ' (' . $item['days'] . ' Days)' : '' }}
+                    </span>
+                @else
+                    <span>
+                        <span class="text-green-400">📬</span>
+                        <span class="font-bold">@{{ $item['slug'] }} sent:</span>
+                        {{ $item['player'] }}
+                    </span>
+                @endif
+            @empty
+                <span class="mx-4 text-gray-400">•</span>
+                <span><span class="text-orange-400">🔥</span> <span class="font-bold">Mail day for @raulnino:</span> Rollie Fingers (14 Days)</span>
+                <span class="mx-4 text-gray-400">•</span>
+                <span><span class="text-green-400">📬</span> <span class="font-bold">@collector sent:</span> Wade Boggs</span>
+            @endforelse
         </div>
     </div>
 

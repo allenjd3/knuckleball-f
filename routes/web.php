@@ -1,9 +1,15 @@
 <?php
 
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SnapshotCardController;
 use App\Http\Middleware\StoreIntendedUrl;
+use App\Livewire\BrowsePacks;
 use App\Livewire\BrowseWantLists;
+use App\Livewire\ShowPack;
+use App\Livewire\ViewPacks;
 use App\Livewire\ShowPlayer;
 use App\Livewire\ShowWantList;
+use App\Livewire\TrendingFeed;
 use App\Livewire\UserFeed;
 use App\Livewire\UserProfile;
 use App\Livewire\ViewCategories;
@@ -14,16 +20,21 @@ use App\Livewire\ViewTeams;
 use App\Livewire\ViewWantLists;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing')->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::get('feed', UserFeed::class)->name('users.feed');
+Route::get('trending', TrendingFeed::class)->name('users.trending');
 Route::get('teams', ViewTeams::class)->name('teams.index');
 Route::get('categories/{category}/teams', ViewTeams::class)->name('categories.teams.index');
 Route::get('categories/{category}/players', ViewPlayersFromCategory::class)->name('categories.players.index');
 Route::get('categories', ViewCategories::class)->name('categories.index');
 Route::get('teams/{team}', ViewPlayersFromTeam::class)->name('teams.show');
 Route::get('feed/{user:slug}', UserProfile::class)->name('users.profile');
+Route::get('feed/{user:slug}/snapshot/{year}', [SnapshotCardController::class, 'show'])->name('users.snapshot');
 Route::get('players', ViewPlayers::class)->name('players.index');
 Route::get('players/{player:slug}', ShowPlayer::class)->middleware([StoreIntendedUrl::class])->name('players.show');
+Route::get('packs', ViewPacks::class)->middleware(['auth'])->name('packs.index');
+Route::get('packs/browse', BrowsePacks::class)->name('packs.browse');
+Route::get('packs/{pack:slug}', ShowPack::class)->name('packs.show');
 Route::get('want-lists', ViewWantLists::class)->middleware(['auth'])->name('wantLists.index');
 Route::get('want-lists/browse', BrowseWantLists::class)->name('wantLists.browse');
 Route::get('want-lists/{wantList:slug}', ShowWantList::class)->name('wantLists.show');
