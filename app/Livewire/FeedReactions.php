@@ -54,12 +54,17 @@ class FeedReactions extends Component
             return;
         }
 
-        $deleted = Reaction::where('feed_id', $this->feedId)
+        $existing = Reaction::where('feed_id', $this->feedId)
             ->where('user_id', auth()->id())
-            ->where('type', $type)
+            ->first();
+
+        $alreadyThisType = $existing?->type === $type;
+
+        Reaction::where('feed_id', $this->feedId)
+            ->where('user_id', auth()->id())
             ->delete();
 
-        if (! $deleted) {
+        if (! $alreadyThisType) {
             Reaction::create([
                 'feed_id' => $this->feedId,
                 'user_id' => auth()->id(),
