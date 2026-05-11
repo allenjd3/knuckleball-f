@@ -67,9 +67,9 @@ class FeedComposer extends Component implements HasActions, HasForms
                     ->default(now()),
                 Select::make('fee_material_id')
                     ->label('Material')
+                    ->required()
                     ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
-                    ->searchable()
-                    ->nullable(),
+                    ->searchable(),
                 Textarea::make('comment')
                     ->label('Note')
                     ->placeholder('Anything worth noting about the send…')
@@ -80,14 +80,13 @@ class FeedComposer extends Component implements HasActions, HasForms
                 $player = Player::with('signer')->findOrFail($data['player_id']);
 
                 $postalMail = auth()->user()->postalMails()->create([
-                    'signer_id' => $player->signer->id,
-                    'date_sent'  => $data['date_sent'],
-                    'comment'    => $data['comment'] ?? null,
+                    'signer_id'       => $player->signer->id,
+                    'date_sent'       => $data['date_sent'],
+                    'fee_material_id' => $data['fee_material_id'],
+                    'comment'         => $data['comment'] ?? null,
                 ]);
 
-                if (! empty($data['fee_material_id'])) {
-                    $postalMail->feeMaterials()->attach($data['fee_material_id']);
-                }
+                $postalMail->feeMaterials()->attach($data['fee_material_id']);
 
                 CreateFeedItem::execute($postalMail, $postalMail->comment);
                 $this->dispatch('feed-updated');
