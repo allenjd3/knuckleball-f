@@ -1,24 +1,34 @@
-<article class="bg-white border border-gray-200 rounded-lg p-4" {{ $attributes }}>
-    <div class="flex items-start gap-3">
-        <img class="size-10 rounded-full flex-shrink-0" src="{{ $photo }}" alt="{{ $user }}" />
-        <div class="flex-1 min-w-0">
-            <p class="text-sm text-gray-500">
-                <a href="{{ $userPath }}" class="font-semibold text-gray-800 hover:underline">{{ $user }}</a>
-                sent mail to
-            </p>
-            <p class="font-bold text-xl leading-tight mt-0.5">
-                <a href="{{ $playerPath }}" class="hover:underline">{{ $player }}</a>
-            </p>
-            @if ($feed->comment)
-                <p class="text-sm text-gray-600 mt-1">{{ $feed->comment }}</p>
-            @endif
-            <p class="flex items-center gap-1 text-sm text-gray-400 mt-2">
-                <x-heroicon-o-envelope class="size-4 flex-shrink-0" />
-                Sent {{ $dateSent }}
-            </p>
+<article class="bg-white border border-gray-100 rounded-2xl overflow-hidden" {{ $attributes }}>
+    <div class="p-4">
+        <div class="flex items-start gap-3">
+            <img class="size-9 rounded-full flex-shrink-0 object-cover" src="{{ $photo }}" alt="{{ $user }}" />
+            <div class="flex-1 min-w-0">
+                <p class="text-sm leading-snug">
+                    <a href="{{ $userPath }}" class="font-semibold text-gray-900 hover:underline">{{ $user }}</a>
+                    <span class="text-gray-500"> sent mail to </span>
+                    <a href="{{ $playerPath }}" class="font-semibold text-gray-900 hover:underline">{{ $player }}</a>
+                </p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                    {{ $dateSent }}
+                    @if ($cardsCount > 0)
+                        <span class="mx-1">·</span>{{ $cardsCount }} {{ Str::plural('item', $cardsCount) }}
+                    @endif
+                    @if ($category)
+                        <span class="mx-1">·</span>{{ $category }}
+                    @endif
+                </p>
+            </div>
+            <button class="text-gray-300 hover:text-gray-500 transition-colors shrink-0">
+                <x-heroicon-o-ellipsis-horizontal class="size-5" />
+            </button>
         </div>
+
+        @if ($feed->comment)
+            <p class="text-sm text-gray-600 mt-2 ml-12">{{ $feed->comment }}</p>
+        @endif
     </div>
-    <div class="mt-4 pt-3 border-t border-gray-100 space-y-2">
+
+    <div class="px-4 pb-3 flex items-center justify-between border-t border-gray-50 pt-3">
         <livewire:feed-reactions :feed="$feed" wire:key="reactions-{{ $feed->id }}" />
         <livewire:feed-comments :feed="$feed" wire:key="comments-{{ $feed->id }}" />
     </div>
