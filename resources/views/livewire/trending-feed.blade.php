@@ -48,7 +48,11 @@
                 {{-- Trending Returns --}}
                 <div>
                     <div class="flex items-center justify-between mb-3 px-1">
-                        <p class="text-xs font-bold uppercase tracking-widest text-gray-400">🔥 Trending Returns <span class="normal-case font-normal text-gray-400 tracking-normal">· Last 30 days</span></p>
+                        <div class="flex items-center gap-2">
+                            <x-heroicon-o-fire class="size-4 text-[#C0544F]" />
+                            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">Trending Returns</span>
+                            <span class="text-xs text-gray-400 normal-case font-normal tracking-normal">· Last 30 days</span>
+                        </div>
                         <div class="flex gap-2">
                             @foreach (['reactions' => 'Most Reacted', 'fastest' => 'Fastest', 'comments' => 'Most Comments'] as $key => $label)
                                 <button wire:click="setSort('{{ $key }}')"

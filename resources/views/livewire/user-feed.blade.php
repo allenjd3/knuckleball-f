@@ -57,8 +57,8 @@
                 @if ($this->trendingStrip->isNotEmpty())
                     <div class="bg-white rounded-2xl border border-gray-100 p-4">
                         <div class="flex items-center gap-2 mb-3">
-                            <span>🔥</span>
-                            <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Trending Returns</span>
+                            <x-heroicon-o-fire class="size-4 text-[#C0544F]" />
+                            <span class="text-xs font-bold uppercase tracking-widest text-gray-900">Trending Returns</span>
                         </div>
                         <div class="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1">
                             @foreach ($this->trendingStrip as $item)
