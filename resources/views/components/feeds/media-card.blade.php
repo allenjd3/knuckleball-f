@@ -37,8 +37,12 @@
         @endif
     </div>
 
-    <div class="px-4 pb-3 flex items-center justify-between border-t border-gray-50 pt-3">
-        <livewire:feed-reactions :feed="$feed" wire:key="reactions-{{ $feed->id }}" />
-        <livewire:feed-comments :feed="$feed" wire:key="comments-{{ $feed->id }}" />
+    <div class="px-4 border-t border-gray-50">
+        <div class="flex items-center justify-between py-2.5">
+            <livewire:feed-reactions :feed="$feed" wire:key="reactions-{{ $feed->id }}" />
+        </div>
+        <div class="pb-3">
+            <livewire:feed-comments :feed="$feed" wire:key="comments-{{ $feed->id }}" />
+        </div>
     </div>
 </article>

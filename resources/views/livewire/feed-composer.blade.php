@@ -27,4 +27,80 @@
     </div>
 
     <x-filament-actions::modals />
+
+    {{-- Share return card prompt --}}
+    @if ($shareOpen && $shareMailId)
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center px-4 py-6 overflow-y-auto"
+             wire:key="share-modal-{{ $shareMailId }}">
+            <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md" @click.stop>
+
+                {{-- Header --}}
+                <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">Share Your Return!</h2>
+                        <p class="text-sm text-gray-500 mt-0.5">Download a card or copy the link to share.</p>
+                    </div>
+                    <button wire:click="closeShare"
+                            class="size-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                        <x-heroicon-o-x-mark class="size-5" />
+                    </button>
+                </div>
+
+                <div class="p-6 space-y-4">
+
+                    {{-- Card preview --}}
+                    @php $preview = $this->sharePreviewUrl(); @endphp
+                    @if ($preview)
+                        <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-md">
+                            <img src="{{ $preview }}" alt="Return card preview" class="w-full" />
+                        </div>
+                    @else
+                        <div class="rounded-2xl bg-gray-900 flex items-center justify-center" style="aspect-ratio:1;">
+                            <div class="animate-spin size-8 border-2 border-white/30 border-t-white rounded-full"></div>
+                        </div>
+                    @endif
+
+                    {{-- Download buttons --}}
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="{{ $this->shareSquareUrl() }}" download
+                           class="flex flex-col items-center gap-1 px-4 py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 text-center"
+                           style="background-color:#D93C3F;">
+                            <x-heroicon-o-arrow-down-tray class="size-4" />
+                            <span>Square</span>
+                            <span class="text-xs font-normal opacity-80">1080 × 1080</span>
+                        </a>
+                        <a href="{{ $this->shareStoryUrl() }}" download
+                           class="flex flex-col items-center gap-1 px-4 py-3 rounded-xl text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-center">
+                            <x-heroicon-o-arrow-down-tray class="size-4" />
+                            <span>Story</span>
+                            <span class="text-xs font-normal text-gray-400">1080 × 1920</span>
+                        </a>
+                    </div>
+
+                    {{-- Copy link --}}
+                    <div x-data="{ copied: false }"
+                         class="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-3 bg-gray-50">
+                        <x-heroicon-o-link class="size-4 text-gray-400 shrink-0" />
+                        <input type="text" readonly value="{{ $this->sharePublicUrl() }}"
+                               class="flex-1 text-xs text-gray-500 bg-transparent border-0 outline-none min-w-0" />
+                        <button @click="navigator.clipboard.writeText('{{ $this->sharePublicUrl() }}'); copied = true; setTimeout(() => copied = false, 2500)"
+                                class="shrink-0 text-sm font-bold transition-colors"
+                                :class="copied ? 'text-green-600' : 'text-[#D93C3F]'">
+                            <span x-show="!copied">Copy Link</span>
+                            <span x-show="copied">Copied!</span>
+                        </button>
+                    </div>
+
+                    {{-- View page link --}}
+                    <div class="text-center">
+                        <a href="{{ $this->sharePublicUrl() }}" target="_blank"
+                           class="text-xs text-gray-400 hover:text-gray-600 hover:underline transition-colors">
+                            View public return page →
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

@@ -16,6 +16,8 @@
         "filament/tables": "^4.0",
         "filament/widgets": "^4.0",
         "honeybadger-io/honeybadger-laravel": "^4.4",
+        "intervention/image": "^3.0",
+        "laravel/cashier": "^16.5",
         "laravel/framework": "^12.0",
         "laravel/jetstream": "^5.2",
         "laravel/sanctum": "^4.0",

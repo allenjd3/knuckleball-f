@@ -3,9 +3,11 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Http\Controllers\ReturnCardController;
 use App\Models\Comment;
 use App\Models\FeeMaterial;
 use App\Models\Player;
+use App\Services\ReturnCardService;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -24,6 +26,11 @@ class FeedComposer extends Component implements HasActions, HasForms
 
     #[Validate('required|string|min:1|max:500')]
     public string $body = '';
+
+    // Share return prompt
+    public ?int  $shareMailId    = null;
+    public bool  $shareOpen      = false;
+    public bool  $shareGenerating = false;
 
     public function submit(): void
     {
@@ -142,7 +149,44 @@ class FeedComposer extends Component implements HasActions, HasForms
                 // PostalMail::booted() updated hook calls UpdateFeedItem automatically,
                 // which upgrades the feed card from send-card to celebration-card.
                 $this->dispatch('feed-updated');
+
+                // Trigger the share prompt
+                $this->shareMailId = $postalMail->id;
+                $this->shareOpen   = true;
+                app(ReturnCardService::class)->generate($postalMail);
             });
+    }
+
+    public function closeShare(): void
+    {
+        $this->shareOpen   = false;
+        $this->shareMailId = null;
+    }
+
+    public function shareSquareUrl(): string
+    {
+        if (! $this->shareMailId) return '#';
+        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        return $mail ? ReturnCardController::signedUrl($mail, 'square') : '#';
+    }
+
+    public function shareStoryUrl(): string
+    {
+        if (! $this->shareMailId) return '#';
+        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        return $mail ? ReturnCardController::signedUrl($mail, 'story') : '#';
+    }
+
+    public function sharePreviewUrl(): ?string
+    {
+        if (! $this->shareMailId) return null;
+        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        return $mail ? app(ReturnCardService::class)->previewUrl($mail, 'square') : null;
+    }
+
+    public function sharePublicUrl(): string
+    {
+        return $this->shareMailId ? route('returns.show', $this->shareMailId) : '#';
     }
 
     public function render()

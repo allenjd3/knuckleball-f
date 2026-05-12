@@ -20,9 +20,20 @@
                     @endif
                 </p>
             </div>
-            <button class="text-gray-300 hover:text-gray-500 transition-colors shrink-0">
-                <x-heroicon-o-ellipsis-horizontal class="size-5" />
-            </button>
+
+            {{-- Share / ellipsis --}}
+            <div class="flex items-center gap-1 shrink-0">
+                @if ($feed->feedable_id)
+                    <a href="{{ route('returns.show', $feed->feedable_id) }}"
+                       class="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-[#D93C3F] transition-colors px-2 py-1 rounded-lg hover:bg-red-50">
+                        <x-heroicon-o-share class="size-4" />
+                        Share
+                    </a>
+                @endif
+                <button class="text-gray-300 hover:text-gray-500 transition-colors p-1">
+                    <x-heroicon-o-ellipsis-horizontal class="size-5" />
+                </button>
+            </div>
         </div>
 
         @if ($heroPhoto)
@@ -39,8 +50,12 @@
         @endif
     </div>
 
-    <div class="px-4 pb-3 flex items-center justify-between border-t border-gray-50 pt-3">
-        <livewire:feed-reactions :feed="$feed" wire:key="reactions-{{ $feed->id }}" />
-        <livewire:feed-comments :feed="$feed" wire:key="comments-{{ $feed->id }}" />
+    <div class="px-4 border-t border-gray-50">
+        <div class="flex items-center justify-between py-2.5">
+            <livewire:feed-reactions :feed="$feed" wire:key="reactions-{{ $feed->id }}" />
+        </div>
+        <div class="pb-3">
+            <livewire:feed-comments :feed="$feed" wire:key="comments-{{ $feed->id }}" />
+        </div>
     </div>
 </article>
