@@ -65,6 +65,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Pack::class);
     }
 
+    public function cardSets(): HasMany
+    {
+        return $this->hasMany(CardSet::class);
+    }
+
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);

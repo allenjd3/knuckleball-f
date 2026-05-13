@@ -189,6 +189,14 @@
                     class="py-3 text-sm transition-colors -mb-px">
                     Packs
                 </button>
+                <button
+                    @click="tab = 'sets'"
+                    :class="tab === 'sets'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Sets
+                </button>
             </div>
         </div>
 
@@ -231,6 +239,47 @@
                 </div>
             @else
                 <p class="text-gray-400 text-sm text-center py-8">No packs yet.</p>
+            @endif
+        </div>
+
+        {{-- Sets tab --}}
+        <div x-show="tab === 'sets'" x-cloak class="px-4 pt-6 pb-16">
+            @if ($this->sets->isNotEmpty())
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">{{ $this->sets->count() }} {{ Str::plural('Set', $this->sets->count()) }}</p>
+                    @if ($this->isOwner)
+                        <a href="{{ route('sets.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+                    @endif
+                </div>
+                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    @foreach ($this->sets as $set)
+                        @php $pct = $set->completionPercentage(); @endphp
+                        <a href="{{ $set->path() }}" class="group block">
+                            <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-100 group-hover:opacity-90 transition-opacity relative">
+                                @if ($set->cover_image)
+                                    <img src="{{ Storage::url($set->cover_image) }}" alt="{{ $set->name }}" class="w-full h-full object-cover" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center h-full text-gray-400 p-2 text-center gap-1">
+                                        <x-heroicon-o-squares-2x2 class="size-6" />
+                                        <span class="text-xs leading-tight">{{ $set->name }}</span>
+                                    </div>
+                                @endif
+                                @if ($pct > 0)
+                                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+                                        <div class="h-full {{ $pct === 100 ? 'bg-amber-400' : 'bg-[#D93C3F]' }}" style="width: {{ $pct }}%"></div>
+                                    </div>
+                                @endif
+                            </div>
+                            <p class="text-xs font-medium truncate mt-1.5">{{ $set->name }}</p>
+                            <p class="text-xs text-gray-400">
+                                {{ $set->entries_count }} {{ Str::plural('card', $set->entries_count) }}
+                                @if ($pct > 0) · {{ $pct }}% @endif
+                            </p>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-400 text-sm text-center py-8">No sets yet.</p>
             @endif
         </div>
 

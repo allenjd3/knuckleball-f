@@ -1,6 +1,7 @@
 <?php
 namespace App\Livewire;
 
+use App\Models\CardSet;
 use App\Models\Feed;
 use App\Models\Pack;
 use App\Models\User;
@@ -66,6 +67,19 @@ class UserProfile extends Component implements HasActions, HasForms
         return Pack::where('user_id', $this->user->id)
             ->when(! $ownProfile && ! $isAdmin, fn ($q) => $q->where('is_public', true))
             ->withCount('players')
+            ->latest()
+            ->get();
+    }
+
+    #[Computed]
+    public function sets()
+    {
+        $ownProfile = auth()->id() === $this->user->id;
+        $isAdmin    = auth()->user()?->isSuperAdmin();
+
+        return CardSet::where('user_id', $this->user->id)
+            ->when(! $ownProfile && ! $isAdmin, fn ($q) => $q->where('is_public', true))
+            ->withCount('entries')
             ->latest()
             ->get();
     }
