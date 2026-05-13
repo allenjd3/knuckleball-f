@@ -197,6 +197,16 @@
                     class="py-3 text-sm transition-colors -mb-px">
                     Sets
                 </button>
+                @if ($this->isOwner)
+                <button
+                    @click="tab = 'watchlist'"
+                    :class="tab === 'watchlist'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Watchlist
+                </button>
+                @endif
             </div>
         </div>
 
@@ -299,6 +309,70 @@
                 @endif
             @endif
         </div>
+
+        {{-- Watchlist tab (owner only) --}}
+        @if ($this->isOwner)
+        <div x-show="tab === 'watchlist'" x-cloak class="px-4 pt-6 pb-16">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">
+                    {{ $this->watchlist->count() }} {{ Str::plural('Player', $this->watchlist->count()) }}
+                </p>
+                <a href="{{ route('watchlist.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+            </div>
+
+            @if ($this->watchlist->isEmpty())
+                <div class="text-center py-12">
+                    <x-heroicon-o-eye class="size-10 mx-auto mb-3 text-gray-200" />
+                    <p class="text-gray-500 text-sm mb-1">No players on your watchlist yet.</p>
+                    <p class="text-xs text-gray-400">Add players from their profile page to get signing alerts.</p>
+                </div>
+            @else
+                <div class="space-y-2">
+                    @foreach ($this->watchlist as $player)
+                        <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-xl p-3">
+                            <div class="size-9 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                                @if ($player->media?->url)
+                                    <img src="{{ Storage::url($player->media->url) }}" class="w-full h-full object-cover" />
+                                @else
+                                    <x-heroicon-o-user class="size-4 text-gray-300 m-2.5" />
+                                @endif
+                            </div>
+                            <a href="{{ $player->path() }}" class="flex-1 font-medium text-sm text-gray-900 hover:underline">
+                                {{ $player->name }}
+                            </a>
+                            <button wire:click="removeFromWatchlist({{ $player->id }})"
+                                    class="text-xs text-gray-400 hover:text-red-500 transition-colors shrink-0">
+                                Remove
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Location alert settings callout --}}
+            <div class="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-4">
+                <div class="flex items-start gap-3">
+                    <x-heroicon-o-map-pin class="size-5 text-blue-500 shrink-0 mt-0.5" />
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-blue-800">Get alerts for events near you</p>
+                        @if ($this->user->zip_code)
+                            <p class="text-xs text-blue-600 mt-0.5">
+                                Alerts set for within <strong>{{ $this->user->radius ?? 50 }} miles</strong> of
+                                <strong>{{ $this->user->zip_code }}</strong>.
+                                @if ($this->user->card_show_alerts) Card show alerts on. @endif
+                            </p>
+                        @else
+                            <p class="text-xs text-blue-600 mt-0.5">Add your zip code in Edit Profile to get notified about signings and shows near you.</p>
+                        @endif
+                        <button wire:click="mountAction('editProfile')"
+                                class="mt-2 text-xs font-semibold text-blue-700 hover:underline">
+                            {{ $this->user->zip_code ? 'Update location →' : 'Set location →' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
 
     </div>
 

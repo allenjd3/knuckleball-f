@@ -13,8 +13,11 @@ use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Livewire\Attributes\Computed;
@@ -184,15 +187,33 @@ class UserProfile extends Component implements HasActions, HasForms
             });
     }
 
+    #[Computed]
+    public function watchlist()
+    {
+        if (! $this->isOwner) {
+            return collect();
+        }
+        return $this->user->watchlist()->with(['media'])->get();
+    }
+
+    public function removeFromWatchlist(int $playerId): void
+    {
+        $this->user->watchlist()->detach($playerId);
+        unset($this->watchlist);
+    }
+
     public function editProfileAction(): Action
     {
         return Action::make('editProfile')
             ->label('Edit Profile')
             ->visible(fn () => $this->isOwner)
             ->fillForm(fn () => [
-                'name'        => $this->user->name,
-                'bio'         => $this->user->bio,
-                'cover_photo' => $this->user->cover_photo,
+                'name'             => $this->user->name,
+                'bio'              => $this->user->bio,
+                'cover_photo'      => $this->user->cover_photo,
+                'zip_code'         => $this->user->zip_code,
+                'radius'           => $this->user->radius ?? 50,
+                'card_show_alerts' => (bool) $this->user->card_show_alerts,
             ])
             ->schema([
                 TextInput::make('name')->required()->maxLength(255),
@@ -205,12 +226,30 @@ class UserProfile extends Component implements HasActions, HasForms
                     ->maxSize(10240)
                     ->helperText('Max 10MB. JPG or PNG recommended.')
                     ->nullable(),
+                Section::make('Location & Alerts')
+                    ->description('Used to notify you about signings and shows near you.')
+                    ->schema([
+                        TextInput::make('zip_code')
+                            ->label('Zip / Postal Code')
+                            ->nullable()
+                            ->maxLength(10),
+                        Select::make('radius')
+                            ->label('Alert radius')
+                            ->options([25 => '25 miles', 50 => '50 miles', 100 => '100 miles', 200 => '200 miles'])
+                            ->default(50),
+                        Toggle::make('card_show_alerts')
+                            ->label('Card show alerts')
+                            ->helperText('Get notified when a card show is posted near you.'),
+                    ]),
             ])
             ->action(function (array $data) {
                 $this->user->update([
-                    'name'        => $data['name'],
-                    'bio'         => $data['bio'],
-                    'cover_photo' => $data['cover_photo'] ?? $this->user->cover_photo,
+                    'name'             => $data['name'],
+                    'bio'              => $data['bio'],
+                    'cover_photo'      => $data['cover_photo'] ?? $this->user->cover_photo,
+                    'zip_code'         => $data['zip_code'] ?: null,
+                    'radius'           => $data['radius'] ?? 50,
+                    'card_show_alerts' => $data['card_show_alerts'] ?? false,
                 ]);
                 unset($this->user);
             });

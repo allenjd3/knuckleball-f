@@ -66,6 +66,19 @@
                                     <a href="{{ route('packs.show', data_get($data, 'pack_slug')) }}"
                                        class="font-semibold hover:underline">{{ data_get($data, 'pack_name') }}</a>.
                                 </p>
+                            @elseif (isset($data['event_id']) && isset($data['player_name']))
+                                <p class="text-sm text-gray-800 leading-snug">
+                                    <span class="font-semibold">Signing alert:</span>
+                                    <a href="{{ data_get($data, 'event_path', '#') }}" class="hover:underline">{{ data_get($data, 'player_name') }}</a>
+                                    — {{ data_get($data, 'event_name') }}
+                                    @if(data_get($data, 'city')) · {{ data_get($data, 'city') }}@if(data_get($data, 'state')), {{ data_get($data, 'state') }}@endif @endif
+                                </p>
+                            @elseif (isset($data['event_id']) && !isset($data['player_name']))
+                                <p class="text-sm text-gray-800 leading-snug">
+                                    <span class="font-semibold">Card show near you:</span>
+                                    <a href="{{ data_get($data, 'event_path', '#') }}" class="hover:underline">{{ data_get($data, 'event_name') }}</a>
+                                    @if(data_get($data, 'city')) · {{ data_get($data, 'city') }}@if(data_get($data, 'state')), {{ data_get($data, 'state') }}@endif @endif
+                                </p>
                             @else
                                 <p class="text-sm text-gray-800">New notification</p>
                             @endif
