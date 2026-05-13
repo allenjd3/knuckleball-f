@@ -40,6 +40,11 @@
                                 Add to Pack
                             </button>
                         @endif
+                        <button wire:click="toggleWatchlist"
+                                class="flex items-center gap-3 px-4 py-3 text-sm font-medium hover:bg-gray-50 w-full text-left">
+                            <x-heroicon-o-eye class="size-4 text-gray-500 shrink-0" />
+                            {{ $this->isWatching ? 'Remove from Watchlist' : 'Add to Watchlist' }}
+                        </button>
                     </div>
                 @endif
             @endauth

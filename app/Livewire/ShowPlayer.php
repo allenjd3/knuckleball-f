@@ -59,6 +59,25 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     }
 
     #[Computed]
+    public function isWatching(): bool
+    {
+        if (! auth()->check()) return false;
+        return auth()->user()->watchlist()->where('player_id', $this->player->id)->exists();
+    }
+
+    public function toggleWatchlist(): void
+    {
+        if (! auth()->check()) return;
+
+        if ($this->isWatching) {
+            auth()->user()->watchlist()->detach($this->player->id);
+        } else {
+            auth()->user()->watchlist()->syncWithoutDetaching([$this->player->id]);
+        }
+        unset($this->isWatching);
+    }
+
+    #[Computed]
     public function address()
     {
         return $this->player->address();

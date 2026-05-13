@@ -36,6 +36,8 @@ class Feed extends Model
             $this->feedable_type === PostalMail::class => $this->postalMailComponentName(),
             $this->feedable_type === Pack::class       => 'feeds.pack-card',
             $this->feedable_type === Comment::class    => 'feeds.comment',
+            $this->feedable_type === Event::class      => 'feeds.event-card',
+            $this->feedable_type === CardShop::class   => 'feeds.shop-spotlight',
             default                                    => 'feeds.send-card',
         };
     }

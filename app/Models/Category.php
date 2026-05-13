@@ -18,4 +18,9 @@ class Category extends Model
     {
         return $this->hasMany(Team::class);
     }
+
+    public function cardShops(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(CardShop::class, 'card_shop_category');
+    }
 }

@@ -25,6 +25,12 @@
                         <x-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
                             {{ __('Categories') }}
                         </x-nav-link>
+                        <x-nav-link href="{{ route('events.index') }}" :active="request()->routeIs('events.*')">
+                            {{ __('Events') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('shops.index') }}" :active="request()->routeIs('shops.*')">
+                            {{ __('Shops') }}
+                        </x-nav-link>
                         @if (auth()->user()?->isSuperAdmin() || auth()->user()?->isEditor())
                             <x-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
                                 {{ __('Admin Panel') }}
@@ -121,6 +127,10 @@
                                     {{ __('Settings') }}
                                 </x-dropdown-link>
 
+                                <x-dropdown-link href="{{ route('billing.index') }}">
+                                    {{ __('Billing & Listings') }}
+                                </x-dropdown-link>
+
                                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                     <x-dropdown-link href="{{ route('api-tokens.index') }}">
                                         {{ __('API Tokens') }}
@@ -173,8 +183,14 @@
             <x-responsive-nav-link href="{{ route('teams.index') }}" :active="request()->routeIs('teams.index')">
                 {{ __('Teams') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('teams.index')">
+            <x-responsive-nav-link href="{{ route('categories.index') }}" :active="request()->routeIs('categories.index')">
                 {{ __('Categories') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('events.index') }}" :active="request()->routeIs('events.*')">
+                {{ __('Events') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('shops.index') }}" :active="request()->routeIs('shops.*')">
+                {{ __('Shops') }}
             </x-responsive-nav-link>
             @if (auth()->user()?->isSuperAdmin())
                 <x-responsive-nav-link href="{{ route('filament.cp.pages.dashboard') }}" :active="request()->routeIs('filament.cp.pages.dashboard')">
@@ -209,6 +225,10 @@
 
                     <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                         {{ __('Settings') }}
+                    </x-responsive-nav-link>
+
+                    <x-responsive-nav-link href="{{ route('billing.index') }}" :active="request()->routeIs('billing.index')">
+                        {{ __('Billing & Listings') }}
                     </x-responsive-nav-link>
 
                     @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
