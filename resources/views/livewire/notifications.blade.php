@@ -1,4 +1,3 @@
-@auth
 <div class="relative" x-data="{ open: false }" x-on:click.outside="open = false">
     {{-- Bell button --}}
     <button @click="open = !open"
@@ -106,4 +105,3 @@
         </div>
     </div>
 </div>
-@endauth
