@@ -42,7 +42,7 @@
                         @auth
                         <a href="{{ route('users.profile', auth()->user()) }}"
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-800">
-                            <x-heroicon-o-camera class="size-5 shrink-0" /> My Profile
+                            <x-heroicon-o-user-circle class="size-5 shrink-0" /> My Profile
                         </a>
                         @endauth
                     </nav>

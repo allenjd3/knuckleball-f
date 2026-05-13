@@ -248,7 +248,13 @@
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">{{ $this->sets->count() }} {{ Str::plural('Set', $this->sets->count()) }}</p>
                     @if ($this->isOwner)
-                        <a href="{{ route('sets.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('sets.index') }}"
+                               class="flex items-center gap-1.5 text-sm font-medium bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors">
+                                <x-heroicon-o-plus class="size-3.5" /> New Set
+                            </a>
+                            <a href="{{ route('sets.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+                        </div>
                     @endif
                 </div>
                 <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -279,7 +285,18 @@
                     @endforeach
                 </div>
             @else
-                <p class="text-gray-400 text-sm text-center py-8">No sets yet.</p>
+                @if ($this->isOwner)
+                    <div class="text-center py-12">
+                        <x-heroicon-o-squares-2x2 class="size-10 mx-auto mb-3 text-gray-300" />
+                        <p class="text-gray-500 text-sm mb-4">Track your signed set completion progress.</p>
+                        <a href="{{ route('sets.index') }}"
+                           class="inline-flex items-center gap-2 bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            <x-heroicon-o-plus class="size-4" /> Create your first set
+                        </a>
+                    </div>
+                @else
+                    <p class="text-gray-400 text-sm text-center py-8">No sets yet.</p>
+                @endif
             @endif
         </div>
 

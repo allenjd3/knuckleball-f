@@ -43,7 +43,7 @@ class CardSet extends Model
 
     public function followers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'set_followers')->withTimestamps();
+        return $this->belongsToMany(User::class, 'set_followers', 'set_id', 'user_id')->withTimestamps();
     }
 
     public function feeds(): MorphMany
