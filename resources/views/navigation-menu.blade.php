@@ -94,7 +94,7 @@
                     <!-- Notification Bell -->
                     @auth
                     <div class="ms-3 relative">
-                        @livewire('notifications')
+                        @livewire('notification-bell')
                     </div>
                     @endauth
 

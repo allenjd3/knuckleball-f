@@ -5,7 +5,7 @@ namespace App\Livewire;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
-class Notifications extends Component
+class NotificationBell extends Component
 {
     public bool $open = false;
 
@@ -49,6 +49,6 @@ class Notifications extends Component
 
     public function render()
     {
-        return view('livewire.notifications');
+        return view('livewire.notification-bell');
     }
 }
