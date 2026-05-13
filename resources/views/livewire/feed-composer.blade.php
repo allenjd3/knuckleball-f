@@ -103,4 +103,42 @@
             </div>
         </div>
     @endif
+
+    {{-- Set connection prompt --}}
+    @if ($setPromptOpen && count($setPromptEntries) > 0)
+        <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="size-10 bg-amber-50 rounded-full flex items-center justify-center shrink-0">
+                        <x-heroicon-o-squares-2x2 class="size-5 text-amber-600" />
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900 text-sm">Got it in a set!</p>
+                        <p class="text-xs text-gray-500">This player is in {{ count($setPromptEntries) }} of your Need It {{ Str::plural('list', count($setPromptEntries)) }}.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 mb-5">
+                    @foreach ($setPromptEntries as $entry)
+                        <div class="flex items-center gap-2 text-sm text-gray-700">
+                            <x-heroicon-o-check-circle class="size-4 text-amber-500 shrink-0" />
+                            <a href="{{ $entry['set_path'] }}" class="hover:underline font-medium">{{ $entry['set_name'] }}</a>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="flex gap-2">
+                    <button wire:click="markSetEntriesSigned"
+                            class="flex-1 py-2.5 text-sm font-semibold text-white rounded-xl transition-colors"
+                            style="background-color:#D93C3F;">
+                        Mark Signed ✓
+                    </button>
+                    <button wire:click="dismissSetPrompt"
+                            class="px-4 py-2.5 text-sm font-medium text-gray-500 hover:text-gray-700 border border-gray-200 rounded-xl transition-colors">
+                        Skip
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>

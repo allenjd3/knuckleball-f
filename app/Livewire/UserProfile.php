@@ -3,6 +3,7 @@ namespace App\Livewire;
 
 use App\Models\CardSet;
 use App\Models\Feed;
+use App\Notifications\NewFollower;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UserSnapshot;
@@ -113,6 +114,7 @@ class UserProfile extends Component implements HasActions, HasForms
     public function follow(): void
     {
         auth()->user()->follow($this->user);
+        $this->user->notify(new NewFollower(auth()->user()));
         unset($this->user, $this->isFollowing);
     }
 

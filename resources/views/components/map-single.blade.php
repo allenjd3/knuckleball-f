@@ -36,10 +36,12 @@
         new google.maps.Marker({ position: position, map: map, title: @json($name) });
     }
 
-    if (typeof google !== 'undefined' && google.maps) {
-        initMap();
-    } else {
-        window.addEventListener('load', initMap);
-    }
+    (function poll() {
+        if (typeof google !== 'undefined' && google.maps) {
+            initMap();
+        } else {
+            setTimeout(poll, 150);
+        }
+    })();
 })();
 </script>

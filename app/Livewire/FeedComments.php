@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Models\Comment;
 use App\Models\Feed;
+use App\Models\User;
+use App\Notifications\NewComment;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
@@ -52,11 +54,18 @@ class FeedComments extends Component
 
         $this->validate();
 
+        $feed = Feed::find($this->feedId);
+
         Comment::create([
             'feed_id' => $this->feedId,
             'user_id' => auth()->id(),
-            'body' => $this->body,
+            'body'    => $this->body,
         ]);
+
+        $owner = $feed ? User::find($feed->followable_id) : null;
+        if ($owner && $owner->id !== auth()->id()) {
+            $owner->notify(new NewComment(auth()->user(), $feed, $this->body));
+        }
 
         $this->body = '';
         unset($this->comments, $this->commentCount);

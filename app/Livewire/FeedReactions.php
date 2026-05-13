@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Feed;
 use App\Models\Reaction;
+use App\Notifications\NewReaction;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -68,8 +69,14 @@ class FeedReactions extends Component
             Reaction::create([
                 'feed_id' => $this->feedId,
                 'user_id' => auth()->id(),
-                'type' => $type,
+                'type'    => $type,
             ]);
+
+            $feed  = Feed::find($this->feedId);
+            $owner = $feed ? \App\Models\User::find($feed->followable_id) : null;
+            if ($owner && $owner->id !== auth()->id()) {
+                $owner->notify(new NewReaction(auth()->user(), $feed, self::EMOJIS[$type] ?? $type));
+            }
         }
 
         unset($this->reactions);

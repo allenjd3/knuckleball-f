@@ -3,10 +3,12 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Enums\SetEntryStatus;
 use App\Http\Controllers\ReturnCardController;
 use App\Models\Comment;
 use App\Models\FeeMaterial;
 use App\Models\Player;
+use App\Models\SetEntry;
 use App\Services\ReturnCardService;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -31,6 +33,10 @@ class FeedComposer extends Component implements HasActions, HasForms
     public ?int  $shareMailId    = null;
     public bool  $shareOpen      = false;
     public bool  $shareGenerating = false;
+
+    // Set connection prompt (shown after logging a return if player is in Need It sets)
+    public bool  $setPromptOpen   = false;
+    public array $setPromptEntries = [];
 
     public function submit(): void
     {
@@ -154,6 +160,26 @@ class FeedComposer extends Component implements HasActions, HasForms
                 $this->shareMailId = $postalMail->id;
                 $this->shareOpen   = true;
                 app(ReturnCardService::class)->generate($postalMail);
+
+                // Check if this player is in any Need It set entries
+                $postalMail->load('signer.signable');
+                $player = $postalMail->signer?->signable;
+                if ($player instanceof Player) {
+                    $entries = SetEntry::where('status', SetEntryStatus::NeedIt->value)
+                        ->where('player_id', $player->id)
+                        ->whereHas('cardSet', fn ($q) => $q->where('user_id', auth()->id()))
+                        ->with('cardSet')
+                        ->get();
+
+                    if ($entries->isNotEmpty()) {
+                        $this->setPromptEntries = $entries->map(fn ($e) => [
+                            'id'       => $e->id,
+                            'set_name' => $e->cardSet->name,
+                            'set_path' => $e->cardSet->path(),
+                        ])->toArray();
+                        $this->setPromptOpen = true;
+                    }
+                }
             });
     }
 
@@ -161,6 +187,25 @@ class FeedComposer extends Component implements HasActions, HasForms
     {
         $this->shareOpen   = false;
         $this->shareMailId = null;
+    }
+
+    public function markSetEntriesSigned(): void
+    {
+        $ids = collect($this->setPromptEntries)->pluck('id');
+        SetEntry::whereIn('id', $ids)
+            ->whereHas('cardSet', fn ($q) => $q->where('user_id', auth()->id()))
+            ->update([
+                'status'      => SetEntryStatus::HaveItSigned->value,
+                'date_signed' => now()->toDateString(),
+            ]);
+        $this->setPromptOpen   = false;
+        $this->setPromptEntries = [];
+    }
+
+    public function dismissSetPrompt(): void
+    {
+        $this->setPromptOpen   = false;
+        $this->setPromptEntries = [];
     }
 
     public function shareSquareUrl(): string
