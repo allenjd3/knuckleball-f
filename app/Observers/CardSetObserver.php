@@ -53,6 +53,7 @@ class CardSetObserver
                 'followable_id' => $set->user_id,
                 'feedable_type' => CardSet::class,
                 'feedable_id'   => $set->id,
+                'comment'       => '',
                 'meta'          => [
                     'photo'     => $set->user->profile_photo_url,
                     'user'      => $set->user->name,
