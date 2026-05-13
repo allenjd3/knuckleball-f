@@ -91,6 +91,13 @@
                         </div>
                     @endif
 
+                    <!-- Notification Bell -->
+                    @auth
+                    <div class="ms-3 relative">
+                        @livewire('notifications')
+                    </div>
+                    @endauth
+
                     <!-- Settings Dropdown -->
                     @if (auth()->check())
                     <div class="ms-3 relative">
