@@ -9,8 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('reactions', function (Blueprint $table) {
-            $table->dropUnique(['feed_id', 'user_id', 'type']);
             $table->unique(['feed_id', 'user_id']);
+        });
+        Schema::table('reactions', function (Blueprint $table) {
+            $table->dropUnique(['feed_id', 'user_id', 'type']);
         });
     }
 
