@@ -7,7 +7,6 @@ use App\Filament\Resources\CardShopResource\Pages;
 use App\Helpers\Countries;
 use App\Services\GeocodingService;
 use App\Models\CardShop;
-use App\Models\ShopClaim;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -145,8 +144,9 @@ class CardShopResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCardShops::route('/'),
-            'edit'  => Pages\EditCardShop::route('/{record}/edit'),
+            'index'  => Pages\ListCardShops::route('/'),
+            'edit'   => Pages\EditCardShop::route('/{record}/edit'),
+            'claims' => Pages\ManageShopClaims::route('/{record}/claims'),
         ];
     }
 }
