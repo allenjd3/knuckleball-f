@@ -3,9 +3,11 @@
 namespace App\Livewire;
 
 use App\Helpers\Countries;
+use App\Helpers\States;
 use App\Models\CardShop;
 use App\Models\Category;
 use App\Services\GeocodingService;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -52,17 +54,30 @@ class SubmitCardShop extends Component
         return Countries::list();
     }
 
+    #[Computed]
+    public function states(): ?array
+    {
+        return States::forCountry($this->country);
+    }
+
+    public function updatedCountry(): void
+    {
+        $this->state = '';
+    }
+
     public function submit(): void
     {
         $this->validate([
-            'name'    => 'required|string|max:255',
-            'city'    => 'required|string|max:100',
-            'state'   => 'nullable|string|max:100',
-            'country' => 'required|string|size:2',
-            'address' => 'nullable|string|max:255',
-            'zipCode' => 'nullable|string|max:10',
-            'phone'   => 'nullable|string|max:20',
-            'website' => 'nullable|url|max:255',
+            'name'        => 'required|string|max:255',
+            'ownerName'   => 'nullable|string|max:255',
+            'city'        => 'required|string|max:255',
+            'state'       => ['required', 'string', 'size:2', Rule::in(array_keys(States::forCountry($this->country) ?? []))],
+            'country'     => 'required|string|size:2',
+            'address'     => 'nullable|string|max:255',
+            'zipCode'     => 'nullable|string|max:10',
+            'phone'       => 'nullable|string|max:20',
+            'website'     => 'nullable|url|max:255',
+            'description' => 'nullable|string',
         ]);
 
         $coords = null;

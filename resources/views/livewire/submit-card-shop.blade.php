@@ -118,9 +118,20 @@
                     @error('city') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">State / Province</label>
-                    <input type="text" wire:model="state" placeholder="e.g. CA or Ontario"
-                           class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#D93C3F]/30" />
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        State / Province <span class="text-[#D93C3F]">*</span>
+                    </label>
+                    @if ($this->states)
+                        <select wire:model="state"
+                                class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#D93C3F]/30">
+                            <option value="">Select…</option>
+                            @foreach ($this->states as $abbr => $label)
+                                <option value="{{ $abbr }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    @else
+                        <p class="text-xs text-gray-400 py-2">State/province selection is only supported for US and Canadian shops.</p>
+                    @endif
                     @error('state') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                 </div>
             </div>
