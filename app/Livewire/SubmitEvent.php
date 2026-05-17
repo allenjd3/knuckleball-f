@@ -49,8 +49,7 @@ class SubmitEvent extends Component
     public ?string $playerName      = null;   // display label (db or custom)
     public string $customPlayerName = '';     // free-text when not in db
 
-    #[Validate('array')]
-    #[Validate('exists:players,id', attribute: 'expected_signer_ids.*')]
+    #[Validate(['expected_signer_ids' => 'array', 'expected_signer_ids.*' => 'exists:players,id'])]
     public array $expected_signer_ids = [];
 
     // Date & time
