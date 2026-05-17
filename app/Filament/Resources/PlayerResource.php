@@ -18,12 +18,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ImportAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -66,6 +68,10 @@ class PlayerResource extends Resource
                 FileUpload::make('url')
                     ->directory('avatars')
                     ->avatar(),
+                Checkbox::make('dmca_certification')
+                    ->label('I certify that I own this image or have a legitimate license/permission to share it. I understand that Knuckleball follows a strict DMCA policy and will remove infringing content and terminate repeat infringer accounts.')
+                    ->rules(fn (Get $get): array => filled($get('url')) ? ['accepted'] : [])
+                    ->dehydrated(false),
             ]);
     }
 

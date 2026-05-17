@@ -1,76 +1,53 @@
 <?php
 
-use App\Models\InviteCode;
 use App\Models\User;
+use RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile;
 
-test('valid invite codes are necessary to register a new user', function () {
-    $userData = User::factory()->make()->only(['name', 'email', 'password']);
-    $userData = [
+test('a user can register with a valid turnstile response', function () {
+    $fake = Turnstile::fake();
+
+    $this->post(route('register'), [
         'name' => 'Joe Schmo',
         'email' => 'joe@jamesdallen.me',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'code' => 'INVITE',
-    ];
-
-    $this->post(route('register'), $userData)->assertInvalid('code');
+        'cf-turnstile-response' => $fake->dummy(),
+    ])->assertValid();
 });
 
-test('a user can be registers with a valid code', function () {
-    $inviteCode = InviteCode::factory()->create();
-    $userData = User::factory()->make()->only(['name', 'email', 'password']);
-    $userData = [
+test('a user cannot register without a turnstile response', function () {
+    Turnstile::fake();
+
+    $this->post(route('register'), [
         'name' => 'Joe Schmo',
         'email' => 'joe@jamesdallen.me',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'code' => $inviteCode->code,
-    ];
-
-    $this->post(route('register'), $userData)->assertValid();
+    ])->assertInvalid('cf-turnstile-response');
 });
 
-test('a user cannot register with a code that has no remaining uses', function () {
-    $inviteCode = InviteCode::factory()->state(['remaining' => 0])->create();
-    $userData = User::factory()->make()->only(['name', 'email', 'password']);
-    $userData = [
+test('a user cannot register with a failed turnstile response', function () {
+    Turnstile::fake()->fail();
+
+    $this->post(route('register'), [
         'name' => 'Joe Schmo',
         'email' => 'joe@jamesdallen.me',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'code' => $inviteCode->code,
-    ];
-
-    $this->post(route('register'), $userData)->assertInvalid('code');
-});
-
-test('invite codes decrement after use', function () {
-    $inviteCode = InviteCode::factory()->state(['remaining' => 2])->create();
-    $userData = User::factory()->make()->only(['name', 'email', 'password']);
-    $userData = [
-        'name' => 'Joe Schmo',
-        'email' => 'joe@jamesdallen.me',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-        'code' => $inviteCode->code,
-    ];
-
-    $this->post(route('register'), $userData)->assertValid();
-    $this->assertEquals(1, $inviteCode->fresh()->remaining);
+        'cf-turnstile-response' => 'invalid-token',
+    ])->assertInvalid('cf-turnstile-response');
 });
 
 test('a new user is published as soon as they register', function () {
-    $inviteCode = InviteCode::factory()->state(['remaining' => 2])->create();
-    $userData = User::factory()->make()->only(['name', 'email', 'password']);
-    $userData = [
+    $fake = Turnstile::fake();
+
+    $this->post(route('register'), [
         'name' => 'Joe Schmo',
         'email' => 'joe@jamesdallen.me',
         'password' => 'password123',
         'password_confirmation' => 'password123',
-        'code' => $inviteCode->code,
-    ];
+        'cf-turnstile-response' => $fake->dummy(),
+    ])->assertValid();
 
-    $this->post(route('register'), $userData)->assertValid();
-
-    $this->assertTrue(User::firstWhere('name', 'Joe Schmo')->isPublished());
+    expect(User::firstWhere('name', 'Joe Schmo')->isPublished())->toBeTrue();
 });

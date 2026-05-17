@@ -35,6 +35,7 @@ use App\Livewire\ViewWantLists;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::view('dmca', 'dmca')->name('dmca');
 Route::get('feed', UserFeed::class)->name('users.feed');
 Route::get('trending', TrendingFeed::class)->name('users.trending');
 Route::get('teams', ViewTeams::class)->name('teams.index');

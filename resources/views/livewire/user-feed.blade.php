@@ -39,13 +39,18 @@
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('sets.*') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
                             <x-heroicon-o-squares-2x2 class="size-5 shrink-0" /> Sets
                         </a>
-                        @auth
                         <a href="{{ route('users.profile', auth()->user()) }}"
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-800">
                             <x-heroicon-o-user-circle class="size-5 shrink-0" /> My Profile
                         </a>
-                        @endauth
                     </nav>
+                @else
+                    <div class="text-center">
+                        <p class="text-sm font-medium text-gray-700">Sign in to personalize your feed</p>
+                        <a href="{{ route('login') }}" class="mt-3 inline-block text-sm font-semibold text-gray-900 underline underline-offset-2">
+                            Log in
+                        </a>
+                    </div>
                 @endauth
             </aside>
 

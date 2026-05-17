@@ -1,4 +1,8 @@
 <x-guest-layout>
+    @pushOnce('header-scripts')
+        <x-turnstile.scripts />
+    @endPushOnce
+
     <x-authentication-card>
         <x-slot name="logo">
             <h3 style="--color-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
@@ -13,13 +17,6 @@
             x-init="getParam()"
         >
             @csrf
-            <div>
-                <x-label for="code" value="{{ __('Invite Code') }}" class="mb-1" />
-                <x-filament::input.wrapper>
-                    <x-filament::input x-ref="code" id="code" type="text" x-model="code" name="code" required />
-                </x-filament::input.wrapper>
-            </div>
-
             <div>
                 <x-label for="name" value="{{ __('Name') }}" class="mb-1" />
                 <x-filament::input.wrapper>
@@ -64,8 +61,14 @@
                     </x-label>
                 </div>
             @endif
+            <div class="mt-4">
+                <x-turnstile />
+            </div>
 
             <div class="flex items-center justify-end mt-4 gap-4">
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('dmca') }}" target="_blank">
+                    {{ __('DMCA Policy') }}
+                </a>
                 <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                     {{ __('Already registered?') }}
                 </a>

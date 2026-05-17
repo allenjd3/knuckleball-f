@@ -350,7 +350,7 @@
 
             <div class="flex flex-col md:flex-row items-center gap-4 md:gap-8 border-t border-gray-800 pt-8 w-full justify-center">
                 <p>Copyright &copy; 2026 Knuckleball | All rights reserved | Made in the USA</p>
-                <a href="#" class="hover:text-white transition-colors">DMCA Policy</a>
+                <a href="{{ route('dmca') }}" class="hover:text-white transition-colors">DMCA Policy</a>
             </div>
         </div>
     </footer>

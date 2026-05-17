@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\InviteCode;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
 use Laravel\Jetstream\Jetstream;
+use RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -49,14 +49,14 @@ class RegistrationTest extends TestCase
             $this->markTestSkipped('Registration support is not enabled.');
         }
 
-        $inviteCode = InviteCode::factory()->create();
+        $fake = Turnstile::fake();
 
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
-            'code' => $inviteCode->code,
             'password_confirmation' => 'password',
+            'cf-turnstile-response' => $fake->dummy(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
 
@@ -67,13 +67,13 @@ class RegistrationTest extends TestCase
     /**
      * @test
      */
-    public function new_users_without_code_cannot_register(): void
+    public function new_users_without_turnstile_cannot_register(): void
     {
         if (! Features::enabled(Features::registration())) {
             $this->markTestSkipped('Registration support is not enabled.');
         }
 
-        $inviteCode = InviteCode::factory()->create();
+        Turnstile::fake();
 
         $response = $this->post('/register', [
             'name' => 'Test User',
@@ -83,6 +83,6 @@ class RegistrationTest extends TestCase
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature(),
         ]);
 
-        $response->assertSessionHasErrors('code');
+        $response->assertSessionHasErrors('cf-turnstile-response');
     }
 }
