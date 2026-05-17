@@ -34,7 +34,13 @@ class CardShop extends Model
     {
         static::creating(function (self $shop) {
             if (empty($shop->slug)) {
-                $shop->slug = Str::slug($shop->name);
+                $base = Str::slug($shop->name);
+                $slug = $base;
+                $i    = 2;
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $base . '-' . $i++;
+                }
+                $shop->slug = $slug;
             }
         });
     }

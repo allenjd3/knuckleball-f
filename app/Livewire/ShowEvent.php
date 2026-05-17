@@ -20,7 +20,7 @@ class ShowEvent extends Component
     {
         if ($event->status !== 'approved') {
             abort_unless(
-                auth()->check() && (auth()->id() === $event->user_id || auth()->user()->isSuperAdmin()),
+                auth()->check() && (auth()->id() === $event->user_id || auth()->user()?->isSuperAdmin()),
                 404
             );
         }
@@ -94,6 +94,11 @@ class ShowEvent extends Component
 
             if ($pi->status !== 'succeeded') {
                 $this->paymentError = 'Payment not confirmed. Please try again.';
+                return;
+            }
+
+            if ($pi->customer !== auth()->user()->stripe_id) {
+                $this->paymentError = 'Payment verification failed.';
                 return;
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Feed;
@@ -6,10 +7,16 @@ use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class UserStatsService
 {
     public function compute(User $user): array
+    {
+        return Cache::remember("user_stats_{$user->id}", 300, fn () => $this->run($user));
+    }
+
+    private function run(User $user): array
     {
         $isSqlite = config('database.default') === 'sqlite';
         $diffExpr = $isSqlite
@@ -119,3 +126,4 @@ class UserStatsService
         ];
     }
 }
+

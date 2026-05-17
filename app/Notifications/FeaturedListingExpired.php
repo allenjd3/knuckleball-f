@@ -28,7 +28,7 @@ class FeaturedListingExpired extends Notification
             ->line('Thanks for using Knuckleball!');
     }
 
-    public function toArray(object $notifiable): array
+    public function toDatabase(object $notifiable): array
     {
         return [
             'event_id'   => $this->event->id,

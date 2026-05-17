@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Event;
 use App\Models\FeaturedListing;
 use App\Notifications\FeaturedListingExpired;
 use Illuminate\Console\Command;
@@ -20,9 +19,11 @@ class ExpireFeaturedListings extends Command
             ->whereHas('event', fn ($q) => $q->where('is_featured', true))
             ->get();
 
+        $notified = [];
+
         foreach ($expired as $listing) {
             $event = $listing->event;
-            if (! $event) continue;
+            if (! $event || in_array($event->id, $notified)) continue;
 
             // Only un-feature if there's no other active listing for this event
             $hasActiveOther = FeaturedListing::where('event_id', $event->id)
@@ -33,6 +34,7 @@ class ExpireFeaturedListings extends Command
             if (! $hasActiveOther) {
                 $event->update(['is_featured' => false]);
                 $event->user?->notify(new FeaturedListingExpired($event));
+                $notified[] = $event->id;
                 $this->line("Expired: {$event->name}");
             }
         }

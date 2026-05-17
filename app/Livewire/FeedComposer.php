@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Actions\CreateFeedItem;
 use App\Enums\SetEntryStatus;
 use App\Http\Controllers\ReturnCardController;
+use App\Jobs\GenerateReturnCard;
 use App\Models\Comment;
 use App\Models\FeeMaterial;
 use App\Models\Player;
@@ -159,7 +160,7 @@ class FeedComposer extends Component implements HasActions, HasForms
                 // Trigger the share prompt
                 $this->shareMailId = $postalMail->id;
                 $this->shareOpen   = true;
-                app(ReturnCardService::class)->generate($postalMail);
+                GenerateReturnCard::dispatch($postalMail->id);
 
                 // Check if this player is in any Need It set entries
                 $postalMail->load('signer.signable');

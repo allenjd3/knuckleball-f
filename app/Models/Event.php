@@ -62,7 +62,9 @@ class Event extends Model
 
     public function featuredListing(): HasOne
     {
-        return $this->hasOne(FeaturedListing::class)->where('expires_at', '>', now())->latestOfMany();
+        return $this->hasOne(FeaturedListing::class)
+            ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
+            ->latestOfMany();
     }
 
     public function feed(): HasOne

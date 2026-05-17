@@ -67,7 +67,7 @@ class EventsLanding extends Component
                 'name'      => $e->name,
                 'latitude'  => (float) $e->latitude,
                 'longitude' => (float) $e->longitude,
-                'popup'     => "<strong>{$e->name}</strong><br>{$e->formattedDate()}<br><a href='{$e->path()}'>View →</a>",
+                'popup'     => '<strong>' . e($e->name) . '</strong><br>' . e($e->formattedDate()) . '<br><a href=\'' . e($e->path()) . '\'>View →</a>',
             ])
             ->toArray();
     }

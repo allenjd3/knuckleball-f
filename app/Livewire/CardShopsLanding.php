@@ -69,7 +69,7 @@ class CardShopsLanding extends Component
                 'name'      => $s->name,
                 'latitude'  => (float) $s->latitude,
                 'longitude' => (float) $s->longitude,
-                'popup'     => "<strong>{$s->name}</strong><br>{$s->city}, {$s->state}<br><a href='{$s->path()}'>View →</a>",
+                'popup'     => '<strong>' . e($s->name) . '</strong><br>' . e($s->city) . ', ' . e($s->state) . '<br><a href=\'' . e($s->path()) . '\'>View →</a>',
             ])
             ->toArray();
     }

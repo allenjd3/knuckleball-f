@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Console\Commands;
 
 use App\Models\User;
@@ -13,17 +14,26 @@ class TakeUserSnapshots extends Command
 
     public function handle(UserStatsService $statsService): void
     {
-        $year = (int) ($this->option('year') ?? now()->year);
-        $users = User::all();
+        $year  = (int) ($this->option('year') ?? now()->year);
+        $total = User::count();
+        $count = 0;
 
-        $this->withProgressBar($users, function (User $user) use ($year, $statsService) {
-            UserSnapshot::updateOrCreate(
-                ['user_id' => $user->id, 'year' => $year],
-                ['data' => $statsService->compute($user)]
-            );
+        $bar = $this->output->createProgressBar($total);
+        $bar->start();
+
+        User::chunk(200, function ($users) use ($year, $statsService, $bar, &$count) {
+            foreach ($users as $user) {
+                UserSnapshot::updateOrCreate(
+                    ['user_id' => $user->id, 'year' => $year],
+                    ['data' => $statsService->compute($user)]
+                );
+                $count++;
+                $bar->advance();
+            }
         });
 
+        $bar->finish();
         $this->newLine();
-        $this->info("Snapshots taken for {$users->count()} users ({$year}).");
+        $this->info("Snapshots taken for {$count} users ({$year}).");
     }
 }

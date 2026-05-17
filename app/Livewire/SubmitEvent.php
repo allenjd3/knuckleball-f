@@ -49,6 +49,8 @@ class SubmitEvent extends Component
     public ?string $playerName      = null;   // display label (db or custom)
     public string $customPlayerName = '';     // free-text when not in db
 
+    #[Validate('array')]
+    #[Validate('exists:players,id', attribute: 'expected_signer_ids.*')]
     public array $expected_signer_ids = [];
 
     // Date & time
@@ -134,6 +136,7 @@ class SubmitEvent extends Component
     #[Validate('nullable|string|max:255')]
     public ?string $promoter_name = null;
 
+    #[Validate('nullable|image|mimes:jpg,jpeg,png,webp|max:5120')]
     public $heroImage = null;
     public array $photos = [];
 
@@ -335,6 +338,10 @@ class SubmitEvent extends Component
             $pi = Cashier::stripe()->paymentIntents->retrieve($paymentIntentId);
             if ($pi->status !== 'succeeded') {
                 $this->featureError = 'Payment not confirmed. Please try again.';
+                return;
+            }
+            if ($pi->customer !== auth()->user()->stripe_id) {
+                $this->featureError = 'Payment verification failed.';
                 return;
             }
             $amount = match ($this->type) {

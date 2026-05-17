@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -41,6 +42,6 @@ class GeocodingService
 
     public function geocodeZip(string $zip, string $country = 'US'): ?array
     {
-        return $this->geocode("{$zip}, {$country}");
+        return Cache::remember("geo_{$zip}_{$country}", 86400, fn () => $this->geocode("{$zip}, {$country}"));
     }
 }
