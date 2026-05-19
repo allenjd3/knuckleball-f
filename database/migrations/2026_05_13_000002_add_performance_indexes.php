@@ -24,25 +24,11 @@ return new class extends Migration
         Schema::table('set_entries', function (Blueprint $table) {
             $table->index(['set_id', 'status']);
         });
-    }
 
-    public function down(): void
-    {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropIndex(['status']);
-            $table->dropIndex(['start_date']);
-            $table->dropIndex(['is_featured']);
-            $table->dropIndex(['latitude', 'longitude']);
-        });
-
-        Schema::table('card_shops', function (Blueprint $table) {
-            $table->dropIndex(['status']);
-            $table->dropIndex(['is_featured']);
-            $table->dropIndex(['latitude', 'longitude']);
-        });
-
-        Schema::table('set_entries', function (Blueprint $table) {
-            $table->dropIndex(['set_id', 'status']);
+        Schema::table('feeds', function (Blueprint $table) {
+            $table->index('followable_id');
         });
     }
+
+    public function down(): void {}
 };

@@ -1,16 +1,17 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE events MODIFY COLUMN type ENUM('player_signing', 'card_show', 'comic_con', 'memorabilia_show') NOT NULL");
+        Schema::table('events', function (Blueprint $table) {
+            $table->enum('type', ['player_signing', 'card_show', 'comic_con', 'memorabilia_show'])->change();
+        });
     }
 
-    public function down(): void
-    {
-        DB::statement("ALTER TABLE events MODIFY COLUMN type ENUM('player_signing', 'card_show') NOT NULL");
-    }
+    public function down(): void {}
 };

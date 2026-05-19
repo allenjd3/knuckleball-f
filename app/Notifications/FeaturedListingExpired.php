@@ -4,10 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Event;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class FeaturedListingExpired extends Notification
+class FeaturedListingExpired extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -31,10 +32,10 @@ class FeaturedListingExpired extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'event_id'   => $this->event->id,
+            'event_id' => $this->event->id,
             'event_name' => $this->event->name,
-            'event_url'  => $this->event->path(),
-            'message'    => "Your featured listing for \u{201C}{$this->event->name}\u{201D} has expired.",
+            'event_url' => $this->event->path(),
+            'message' => "Your featured listing for \u{201C}{$this->event->name}\u{201D} has expired.",
         ];
     }
 }

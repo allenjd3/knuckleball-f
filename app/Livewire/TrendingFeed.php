@@ -10,9 +10,9 @@ use Livewire\Component;
 
 class TrendingFeed extends Component
 {
-    public int    $perPage = 20;
-    public bool   $hasMore = true;
-    public string $sort    = 'reactions'; // 'reactions' | 'fastest' | 'comments'
+    public int $perPage = 20;
+    public bool $hasMore = true;
+    public string $sort = 'reactions'; // 'reactions' | 'fastest' | 'comments'
 
     public function render()
     {
@@ -38,24 +38,28 @@ class TrendingFeed extends Component
             $query->orderByDesc('feed_comments_count');
         }
 
-        // For 'fastest' we sort in PHP to avoid cross-DB JSON extraction differences
+        // For 'fastest' we sort in PHP to avoid cross-DB JSON extraction differences; cap at 500 for safety
         if ($this->sort !== 'fastest') {
             $query->limit($this->perPage + 1);
+        } else {
+            $query->limit(500);
         }
 
         $results = $query->get();
 
         if ($this->sort === 'fastest') {
             $results = $results
-                ->filter(fn ($f) => !is_null(data_get($f->meta, 'turnaround_days')))
+                ->filter(fn ($f) => ! is_null(data_get($f->meta, 'turnaround_days')))
                 ->sortBy(fn ($f) => (int) data_get($f->meta, 'turnaround_days'))
                 ->values();
 
             $this->hasMore = false;
+
             return $results->take($this->perPage);
         }
 
         $this->hasMore = $results->count() > $this->perPage;
+
         return $results->take($this->perPage);
     }
 
@@ -95,7 +99,7 @@ class TrendingFeed extends Component
 
     public function setSort(string $sort): void
     {
-        $this->sort    = $sort;
+        $this->sort = $sort;
         $this->perPage = 20;
         unset($this->trendingReturns);
     }

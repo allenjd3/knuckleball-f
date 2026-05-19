@@ -5,9 +5,11 @@ namespace App\Notifications;
 use App\Models\Feed;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Str;
 
-class NewComment extends Notification
+class NewComment extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -25,12 +27,12 @@ class NewComment extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'type'            => 'new_comment',
-            'commenter_name'  => $this->commenter->name,
-            'commenter_slug'  => $this->commenter->slug,
+            'type' => 'new_comment',
+            'commenter_name' => $this->commenter->name,
+            'commenter_slug' => $this->commenter->slug,
             'commenter_photo' => $this->commenter->profile_photo_url,
-            'body'            => \Str::limit($this->body, 80),
-            'feed_id'         => $this->feed->id,
+            'body' => Str::limit($this->body, 80),
+            'feed_id' => $this->feed->id,
         ];
     }
 }

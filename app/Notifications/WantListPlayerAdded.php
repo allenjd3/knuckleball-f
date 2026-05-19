@@ -5,9 +5,10 @@ namespace App\Notifications;
 use App\Models\Player;
 use App\Models\WantList;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class WantListPlayerAdded extends Notification
+class WantListPlayerAdded extends Notification implements ShouldQueue
 {
     use Queueable;
 

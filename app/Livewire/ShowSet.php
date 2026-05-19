@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\SetEntryStatus;
 use App\Models\CardSet;
+use App\Models\Feed;
 use App\Models\Player;
 use App\Models\SetEntry;
 use Filament\Actions\Action;
@@ -95,7 +96,7 @@ class ShowSet extends Component implements HasActions, HasForms
                 FormSelect::make('status')
                     ->label('Status')
                     ->options([
-                        SetEntryStatus::NeedIt->value       => SetEntryStatus::NeedIt->label(),
+                        SetEntryStatus::NeedIt->value => SetEntryStatus::NeedIt->label(),
                         SetEntryStatus::HaveItSigned->value => SetEntryStatus::HaveItSigned->label(),
                     ])
                     ->default(SetEntryStatus::NeedIt->value)
@@ -109,6 +110,8 @@ class ShowSet extends Component implements HasActions, HasForms
                     ->maxLength(500),
             ])
             ->action(function (array $data) {
+                abort_unless($this->isOwner, 403);
+
                 $this->set->entries()->create($data);
                 unset($this->needItEntries, $this->haveItEntries, $this->completionPct);
             });
@@ -132,12 +135,14 @@ class ShowSet extends Component implements HasActions, HasForms
                     ->maxLength(500),
             ])
             ->action(function (array $data, array $arguments) {
+                abort_unless($this->isOwner, 403);
+
                 $entry = SetEntry::find($arguments['entry'] ?? null);
                 if ($entry && $entry->set_id === $this->set->id) {
                     $entry->update([
-                        'status'      => SetEntryStatus::HaveItSigned->value,
+                        'status' => SetEntryStatus::HaveItSigned->value,
                         'date_signed' => $data['date_signed'],
-                        'notes'       => $data['notes'],
+                        'notes' => $data['notes'],
                     ]);
                     $this->maybePushMilestoneFeed();
                 }
@@ -154,6 +159,8 @@ class ShowSet extends Component implements HasActions, HasForms
             ->requiresConfirmation()
             ->visible(fn () => $this->isOwner)
             ->action(function (array $arguments) {
+                abort_unless($this->isOwner, 403);
+
                 $entry = SetEntry::find($arguments['entry'] ?? null);
                 if ($entry && $entry->set_id === $this->set->id) {
                     $entry->delete();
@@ -179,12 +186,19 @@ class ShowSet extends Component implements HasActions, HasForms
             });
     }
 
+    public function render()
+    {
+        return view('livewire.show-set')
+            ->layout('layouts.app');
+    }
+
     private function maybePushMilestoneFeed(): void
     {
         $pct = $this->set->completionPercentage();
 
         if ($pct === 100) {
             $this->pushCompletionFeed();
+
             return;
         }
 
@@ -196,19 +210,19 @@ class ShowSet extends Component implements HasActions, HasForms
     private function pushCompletionFeed(): void
     {
         $this->set->loadMissing('user');
-        \App\Models\Feed::create([
+        Feed::create([
             'followable_id' => $this->set->user_id,
             'feedable_type' => CardSet::class,
-            'feedable_id'   => $this->set->id,
-            'meta'          => [
-                'photo'       => $this->set->user->profile_photo_url,
-                'user'        => $this->set->user->name,
-                'user_path'   => $this->set->user->path(),
-                'set_name'    => $this->set->name,
-                'set_path'    => $this->set->path(),
-                'set_year'    => $this->set->year,
+            'feedable_id' => $this->set->id,
+            'meta' => [
+                'photo' => $this->set->user->profile_photo_url,
+                'user' => $this->set->user->name,
+                'user_path' => $this->set->user->path(),
+                'set_name' => $this->set->name,
+                'set_path' => $this->set->path(),
+                'set_year' => $this->set->year,
                 'cover_image' => $this->set->cover_image,
-                'card_type'   => 'completion',
+                'card_type' => 'completion',
             ],
         ]);
     }
@@ -216,27 +230,21 @@ class ShowSet extends Component implements HasActions, HasForms
     private function pushMilestoneFeed(int $pct): void
     {
         $this->set->loadMissing('user');
-        \App\Models\Feed::create([
+        Feed::create([
             'followable_id' => $this->set->user_id,
             'feedable_type' => CardSet::class,
-            'feedable_id'   => $this->set->id,
-            'meta'          => [
-                'photo'       => $this->set->user->profile_photo_url,
-                'user'        => $this->set->user->name,
-                'user_path'   => $this->set->user->path(),
-                'set_name'    => $this->set->name,
-                'set_path'    => $this->set->path(),
-                'set_year'    => $this->set->year,
+            'feedable_id' => $this->set->id,
+            'meta' => [
+                'photo' => $this->set->user->profile_photo_url,
+                'user' => $this->set->user->name,
+                'user_path' => $this->set->user->path(),
+                'set_name' => $this->set->name,
+                'set_path' => $this->set->path(),
+                'set_year' => $this->set->year,
                 'cover_image' => $this->set->cover_image,
-                'percentage'  => $pct,
-                'card_type'   => 'milestone',
+                'percentage' => $pct,
+                'card_type' => 'milestone',
             ],
         ]);
-    }
-
-    public function render()
-    {
-        return view('livewire.show-set')
-            ->layout('layouts.app');
     }
 }

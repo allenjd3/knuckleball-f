@@ -22,10 +22,6 @@ class Pack extends Model
 
     protected $guarded = [];
 
-    protected $casts = [
-        'is_public' => 'boolean',
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -84,5 +80,12 @@ class Pack extends Model
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+        ];
     }
 }

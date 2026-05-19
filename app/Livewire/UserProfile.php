@@ -1,12 +1,13 @@
 <?php
+
 namespace App\Livewire;
 
 use App\Models\CardSet;
 use App\Models\Feed;
-use App\Notifications\NewFollower;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\UserSnapshot;
+use App\Notifications\NewFollower;
 use App\Services\UserStatsService;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -14,12 +15,12 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Section;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -66,7 +67,7 @@ class UserProfile extends Component implements HasActions, HasForms
     public function packs()
     {
         $ownProfile = auth()->id() === $this->user->id;
-        $isAdmin    = auth()->user()?->isSuperAdmin();
+        $isAdmin = auth()->user()?->isSuperAdmin();
 
         return Pack::where('user_id', $this->user->id)
             ->when(! $ownProfile && ! $isAdmin, fn ($q) => $q->where('is_public', true))
@@ -79,7 +80,7 @@ class UserProfile extends Component implements HasActions, HasForms
     public function sets()
     {
         $ownProfile = auth()->id() === $this->user->id;
-        $isAdmin    = auth()->user()?->isSuperAdmin();
+        $isAdmin = auth()->user()?->isSuperAdmin();
 
         return CardSet::where('user_id', $this->user->id)
             ->when(! $ownProfile && ! $isAdmin, fn ($q) => $q->where('is_public', true))
@@ -116,6 +117,8 @@ class UserProfile extends Component implements HasActions, HasForms
 
     public function follow(): void
     {
+        abort_unless(auth()->check(), 403);
+
         auth()->user()->follow($this->user);
         $this->user->notify(new NewFollower(auth()->user()));
         unset($this->user, $this->isFollowing);
@@ -123,6 +126,8 @@ class UserProfile extends Component implements HasActions, HasForms
 
     public function unfollow(): void
     {
+        abort_unless(auth()->check(), 403);
+
         auth()->user()->unfollow($this->user);
         unset($this->user, $this->isFollowing);
     }
@@ -137,8 +142,10 @@ class UserProfile extends Component implements HasActions, HasForms
                 $changedAt = $this->user->handle_changed_at;
                 if ($changedAt && $changedAt->gt(now()->subDays(30))) {
                     $available = $changedAt->addDays(30)->diffForHumans();
+
                     return "You can change your handle again {$available}.";
                 }
+
                 return 'Your handle is used in your profile URL and @mentions. You can change it once every 30 days.';
             })
             ->fillForm(fn () => ['handle' => $this->user->handle])
@@ -161,22 +168,23 @@ class UserProfile extends Component implements HasActions, HasForms
 
                 if ($changedAt && $changedAt->gt(now()->subDays(30))) {
                     $this->notify('danger', 'You can\'t change your handle yet.');
+
                     return;
                 }
 
                 $newHandle = $data['handle'];
-                $newSlug   = str($newHandle)->slug('-');
+                $newSlug = str($newHandle)->slug('-');
 
                 // Ensure slug is unique (append suffix if taken by another user)
                 $slug = $newSlug;
                 $i = 2;
-                while (\App\Models\User::where('slug', $slug)->where('id', '!=', $this->user->id)->exists()) {
+                while (User::where('slug', $slug)->where('id', '!=', $this->user->id)->exists()) {
                     $slug = $newSlug . '-' . $i++;
                 }
 
                 $this->user->update([
-                    'handle'           => $newHandle,
-                    'slug'             => $slug,
+                    'handle' => $newHandle,
+                    'slug' => $slug,
                     'handle_changed_at' => now(),
                 ]);
 
@@ -193,12 +201,15 @@ class UserProfile extends Component implements HasActions, HasForms
         if (! $this->isOwner) {
             return collect();
         }
+
         return $this->user->watchlist()->with(['media'])->get();
     }
 
     public function removeFromWatchlist(int $playerId): void
     {
-        $this->user->watchlist()->detach($playerId);
+        abort_unless($this->isOwner, 403);
+
+        auth()->user()->watchlist()->detach($playerId);
         unset($this->watchlist);
     }
 
@@ -208,11 +219,11 @@ class UserProfile extends Component implements HasActions, HasForms
             ->label('Edit Profile')
             ->visible(fn () => $this->isOwner)
             ->fillForm(fn () => [
-                'name'             => $this->user->name,
-                'bio'              => $this->user->bio,
-                'cover_photo'      => $this->user->cover_photo,
-                'zip_code'         => $this->user->zip_code,
-                'radius'           => $this->user->radius ?? 50,
+                'name' => $this->user->name,
+                'bio' => $this->user->bio,
+                'cover_photo' => $this->user->cover_photo,
+                'zip_code' => $this->user->zip_code,
+                'radius' => $this->user->radius ?? 50,
                 'card_show_alerts' => (bool) $this->user->card_show_alerts,
             ])
             ->schema([
@@ -244,11 +255,11 @@ class UserProfile extends Component implements HasActions, HasForms
             ])
             ->action(function (array $data) {
                 $this->user->update([
-                    'name'             => $data['name'],
-                    'bio'              => $data['bio'],
-                    'cover_photo'      => $data['cover_photo'] ?? $this->user->cover_photo,
-                    'zip_code'         => $data['zip_code'] ?: null,
-                    'radius'           => $data['radius'] ?? 50,
+                    'name' => $data['name'],
+                    'bio' => $data['bio'],
+                    'cover_photo' => $data['cover_photo'] ?? $this->user->cover_photo,
+                    'zip_code' => $data['zip_code'] ?: null,
+                    'radius' => $data['radius'] ?? 50,
                     'card_show_alerts' => $data['card_show_alerts'] ?? false,
                 ]);
                 unset($this->user);

@@ -26,11 +26,6 @@ class CardSet extends Model
 
     protected $guarded = [];
 
-    protected $casts = [
-        'is_public' => 'boolean',
-        'year'      => 'integer',
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -87,5 +82,13 @@ class CardSet extends Model
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+            'year' => 'integer',
+        ];
     }
 }

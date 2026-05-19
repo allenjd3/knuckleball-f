@@ -36,8 +36,8 @@ class CardShopsLanding extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('city', 'like', '%' . $this->search . '%')
-                  ->orWhere('state', 'like', '%' . $this->search . '%');
+                    ->orWhere('city', 'like', '%' . $this->search . '%')
+                    ->orWhere('state', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -64,37 +64,56 @@ class CardShopsLanding extends Component
         return CardShop::approved()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->limit(500)
             ->get()
             ->map(fn (CardShop $s) => [
-                'name'      => $s->name,
-                'latitude'  => (float) $s->latitude,
+                'name' => $s->name,
+                'latitude' => (float) $s->latitude,
                 'longitude' => (float) $s->longitude,
-                'popup'     => '<strong>' . e($s->name) . '</strong><br>' . e($s->city) . ', ' . e($s->state) . '<br><a href=\'' . e($s->path()) . '\'>View →</a>',
+                'popup' => '<strong>' . e($s->name) . '</strong><br>' . e($s->city) . ', ' . e($s->state) . '<br><a href=\'' . e($s->path()) . '\'>View →</a>',
             ])
             ->toArray();
     }
 
-    private function applyNearMe($query): void
+    public function updatedFilter(): void
     {
-        $user = auth()->user();
-        $zip  = $user?->zip_code;
-
-        if (! $zip) return;
-
-        $coords = app(GeocodingService::class)->geocodeZip($zip, $user->country ?? 'US');
-        if (! $coords) return;
-
-        $radius = $user->radius ?? 50;
-        $query->withinRadius($coords['latitude'], $coords['longitude'], $radius);
+        $this->resetPage();
+        unset($this->shops);
     }
 
-    public function updatedFilter(): void { $this->resetPage(); unset($this->shops); }
-    public function updatedSearch(): void { $this->resetPage(); unset($this->shops); }
-    public function updatedCategoryId(): void { $this->resetPage(); unset($this->shops); }
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+        unset($this->shops);
+    }
+
+    public function updatedCategoryId(): void
+    {
+        $this->resetPage();
+        unset($this->shops);
+    }
 
     public function render()
     {
         return view('livewire.card-shops-landing')
             ->layout('layouts.app');
+    }
+
+    private function applyNearMe($query): void
+    {
+        $user = auth()->user();
+        $zip = $user?->zip_code;
+
+        if (! $zip) {
+            return;
+        }
+
+        $coords = app(GeocodingService::class)->geocodeZip($zip, $user->country ?? 'US');
+        if (! $coords) {
+            return;
+        }
+
+        $radius = $user->radius ?? 50;
+        $query->withinRadius($coords['latitude'], $coords['longitude'], $radius);
     }
 }
