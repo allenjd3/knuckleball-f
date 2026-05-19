@@ -34,6 +34,17 @@ function fakeStripePaymentIntentForSubmit(string $status, string $customer, stri
     \Stripe\ApiRequestor::setHttpClient($mock);
 }
 
+// ── authorization ────────────────────────────────────────────────────────
+
+test('guests cannot submit an event', function () {
+    Livewire::test(SubmitEvent::class)
+        ->set('type', 'player_signing')
+        ->set('name', 'Guest Event')
+        ->set('start_date', now()->addWeek()->toDateString())
+        ->call('submit')
+        ->assertStatus(401);
+});
+
 // ── confirmFeaturePayment ─────────────────────────────────────────────────
 
 test('confirmFeaturePayment creates a FeaturedListing when customer matches', function () {

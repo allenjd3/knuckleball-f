@@ -254,6 +254,8 @@ class UserProfile extends Component implements HasActions, HasForms
                     ]),
             ])
             ->action(function (array $data) {
+                abort_unless($this->isOwner, 403);
+
                 $this->user->update([
                     'name' => $data['name'],
                     'bio' => $data['bio'],

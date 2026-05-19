@@ -7,10 +7,11 @@ use App\Models\FeaturedShop;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Http\Controllers\WebhookController as CashierWebhookController;
+use Symfony\Component\HttpFoundation\Response;
 
 class StripeWebhookController extends CashierWebhookController
 {
-    public function handlePaymentIntentSucceeded(array $payload): \Symfony\Component\HttpFoundation\Response
+    public function handlePaymentIntentSucceeded(array $payload): Response
     {
         $intentId = $payload['data']['object']['id'] ?? null;
 
@@ -22,7 +23,7 @@ class StripeWebhookController extends CashierWebhookController
         return $this->successMethod();
     }
 
-    public function handlePaymentIntentPaymentFailed(array $payload): \Symfony\Component\HttpFoundation\Response
+    public function handlePaymentIntentPaymentFailed(array $payload): Response
     {
         Log::warning('Stripe PaymentIntent failed', [
             'intent_id' => $payload['data']['object']['id'] ?? null,
@@ -31,13 +32,13 @@ class StripeWebhookController extends CashierWebhookController
         return $this->successMethod();
     }
 
-    public function handleCustomerSubscriptionUpdated(array $payload): \Symfony\Component\HttpFoundation\Response
+    public function handleCustomerSubscriptionUpdated(array $payload): Response
     {
         // Cashier handles subscription state. We sync our featured flags.
         parent::handleCustomerSubscriptionUpdated($payload);
 
         $stripeSubId = $payload['data']['object']['id'] ?? null;
-        $status      = $payload['data']['object']['status'] ?? null;
+        $status = $payload['data']['object']['status'] ?? null;
 
         if ($stripeSubId && in_array($status, ['canceled', 'past_due', 'unpaid', 'incomplete_expired'])) {
             // Featured event via subscription
@@ -55,15 +56,17 @@ class StripeWebhookController extends CashierWebhookController
         return $this->successMethod();
     }
 
-    public function handleCustomerSubscriptionDeleted(array $payload): \Symfony\Component\HttpFoundation\Response
+    public function handleCustomerSubscriptionDeleted(array $payload): Response
     {
         // Cashier handles subscription state. We sync our featured flags.
         parent::handleCustomerSubscriptionDeleted($payload);
 
-        $stripeSubId  = $payload['data']['object']['id'] ?? null;
+        $stripeSubId = $payload['data']['object']['id'] ?? null;
         $stripeUserId = $payload['data']['object']['customer'] ?? null;
 
-        if (! $stripeSubId) return $this->successMethod();
+        if (! $stripeSubId) {
+            return $this->successMethod();
+        }
 
         // Un-feature any events tied to this subscription
         $listing = FeaturedListing::where('stripe_subscription_id', $stripeSubId)->first();
@@ -80,7 +83,7 @@ class StripeWebhookController extends CashierWebhookController
         if ($stripeUserId) {
             $user = User::where('stripe_id', $stripeUserId)->first();
             if ($user && ! $user->subscribed('promoter')) {
-                $user->events()->where('status', 'approved')->where('is_featured', true)->each(function ($event) use ($user) {
+                $user->events()->where('status', 'approved')->where('is_featured', true)->each(function ($event) {
                     // Only un-feature if there's no other active listing
                     $hasActiveListing = FeaturedListing::where('event_id', $event->id)
                         ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()))
