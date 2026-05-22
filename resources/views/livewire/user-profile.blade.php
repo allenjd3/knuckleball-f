@@ -20,7 +20,7 @@
     <div class="pt-16 pb-4 px-6 flex items-start justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold">{{ $this->user->name }}</h1>
-            <p class="text-gray-500 text-sm">@{{ $this->user->handle }} · Joined {{ $this->user->created_at?->format('M Y') }}</p>
+            <p class="text-gray-500 text-sm">{{ '@' . $this->user->handle }} · Joined {{ $this->user->created_at?->format('M Y') }}</p>
             @if ($this->user->bio)
                 <p class="mt-2 text-gray-700 text-sm max-w-md">{{ $this->user->bio }}</p>
             @endif
