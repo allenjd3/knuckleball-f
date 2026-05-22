@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\FeaturedListing;
 use App\Models\FeaturedShop;
 use Exception;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -94,6 +95,8 @@ class BillingSettings extends Component
             $this->promoterCheckoutSuccess = true;
             $this->promoterCheckoutOpen = false;
             unset($this->promoterSubscription);
+        } catch (IncompletePayment $e) {
+            $this->dispatch('stripe-promoter-payment-action-required', clientSecret: $e->payment->clientSecret());
         } catch (Exception $e) {
             $this->promoterError = $e->getMessage();
         }
@@ -144,11 +147,20 @@ class BillingSettings extends Component
         return view('livewire.billing-settings')->layout('layouts.app');
     }
 
+    public function finalizePromoterSubscription(): void
+    {
+        $user = auth()->user();
+        $user->events()->where('status', 'approved')->update(['is_featured' => true]);
+        $this->promoterCheckoutSuccess = true;
+        $this->promoterCheckoutOpen = false;
+        unset($this->promoterSubscription);
+    }
+
     private function createPromoterIntent(): void
     {
         $user = auth()->user();
         $user->createOrGetStripeCustomer();
-        $intent = $user->createSetupIntent();
+        $intent = $user->createSetupIntent(['usage' => 'off_session']);
         $this->dispatch('stripe-promoter-intent-ready', clientSecret: $intent->client_secret);
     }
 
@@ -156,7 +168,7 @@ class BillingSettings extends Component
     {
         $user = auth()->user();
         $user->createOrGetStripeCustomer();
-        $intent = $user->createSetupIntent();
+        $intent = $user->createSetupIntent(['usage' => 'off_session']);
         $this->dispatch('stripe-shop-billing-intent-ready', clientSecret: $intent->client_secret);
     }
 }

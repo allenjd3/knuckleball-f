@@ -6,6 +6,7 @@ use App\Models\CardShop;
 use App\Models\Event;
 use App\Models\FeaturedShop;
 use Exception;
+use Laravel\Cashier\Exceptions\IncompletePayment;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -153,9 +154,41 @@ class ShowCardShop extends Component
             $this->shop->update(['is_featured' => true]);
             $this->shopCheckoutSuccess = true;
             $this->shopCheckoutOpen = false;
+        } catch (IncompletePayment $e) {
+            // Bank requires 3DS on the first charge — record is created, awaiting auth
+            $amount = $this->shopSelectedPlan === 'yearly' ? 99.00 : 9.99;
+            $subscription = $user->subscription('shop_featured');
+
+            FeaturedShop::create([
+                'card_shop_id' => $this->shop->id,
+                'user_id' => $user->id,
+                'plan_type' => $this->shopSelectedPlan,
+                'stripe_subscription_id' => $subscription?->stripe_id,
+                'amount_paid' => $amount,
+                'starts_at' => now(),
+                'status' => 'processing',
+            ]);
+
+            $this->dispatch('stripe-shop-payment-action-required', clientSecret: $e->payment->clientSecret());
         } catch (Exception $e) {
             $this->shopPaymentError = $e->getMessage();
         }
+    }
+
+    public function activateShopFeatured(): void
+    {
+        abort_unless($this->canFeatureShop(), 403);
+
+        FeaturedShop::where('user_id', auth()->id())
+            ->where('card_shop_id', $this->shop->id)
+            ->where('status', 'processing')
+            ->latest()
+            ->first()
+            ?->update(['status' => 'active']);
+
+        $this->shop->update(['is_featured' => true]);
+        $this->shopCheckoutSuccess = true;
+        $this->shopCheckoutOpen = false;
     }
 
     public function render()
@@ -168,7 +201,7 @@ class ShowCardShop extends Component
     {
         $user = auth()->user();
         $user->createOrGetStripeCustomer();
-        $intent = $user->createSetupIntent();
+        $intent = $user->createSetupIntent(['usage' => 'off_session']);
         $this->dispatch('stripe-shop-intent-ready', clientSecret: $intent->client_secret);
     }
 }

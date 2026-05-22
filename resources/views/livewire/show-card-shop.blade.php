@@ -216,6 +216,7 @@
         <div x-data="knuckleballShopCheckout('{{ config('cashier.key') }}')"
              x-init="init()"
              @stripe-shop-intent-ready.window="onIntent($event.detail.clientSecret)"
+             @stripe-shop-payment-action-required.window="onPaymentActionRequired($event.detail.clientSecret)"
              class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6" @click.stop>
 
@@ -329,7 +330,6 @@ function knuckleballShopCheckout(stripeKey) {
                     style: {
                         base: { fontSize: '15px', color: '#111827', '::placeholder': { color: '#9ca3af' } },
                     },
-                    hidePostalCode: true,
                 });
                 this.card.mount(this.$refs.shopCardElement);
                 this.card.on('change', (e) => { this.cardError = e.error ? e.error.message : ''; });
@@ -355,8 +355,17 @@ function knuckleballShopCheckout(stripeKey) {
                 return;
             }
 
-            await $wire.confirmShopSubscription(setupIntent.payment_method);
+            await this.$wire.confirmShopSubscription(setupIntent.payment_method);
             this.loading = false;
+        },
+
+        async onPaymentActionRequired(clientSecret) {
+            const { error } = await this.stripe.confirmCardPayment(clientSecret);
+            if (error) {
+                this.cardError = error.message;
+                return;
+            }
+            await this.$wire.activateShopFeatured();
         },
     };
 }

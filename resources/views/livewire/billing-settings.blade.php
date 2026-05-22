@@ -9,12 +9,12 @@
     <div class="bg-white border border-gray-100 rounded-2xl p-6 mb-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-bold uppercase tracking-widest text-gray-500">Promoter Pass</h2>
-            @if ($promoterCheckoutSuccess || (auth()->user()->isPromoter() && ! $this->promoterSubscription?->cancelled()))
+            @if ($promoterCheckoutSuccess || (auth()->user()->isPromoter() && ! $this->promoterSubscription?->canceled()))
                 <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full">Active</span>
             @endif
         </div>
 
-        @if ($this->promoterSubscription && ! $this->promoterSubscription->cancelled())
+        @if ($this->promoterSubscription && ! $this->promoterSubscription->canceled())
             <div class="space-y-2 mb-4">
                 <p class="text-sm text-gray-700">All your events are featured while your subscription is active.</p>
                 @if ($this->promoterSubscription->asStripeSubscription()->current_period_end ?? null)
@@ -34,7 +34,7 @@
             @else
                 <button wire:click="$set('confirmCancel', 'promoter')" class="text-xs text-gray-400 hover:text-red-500 transition-colors">Cancel subscription</button>
             @endif
-        @elseif ($this->promoterSubscription?->cancelled())
+        @elseif ($this->promoterSubscription?->canceled())
             <p class="text-sm text-gray-500 mb-3">
                 Your Promoter Pass is cancelled but active until
                 {{ \Carbon\Carbon::createFromTimestamp($this->promoterSubscription->asStripeSubscription()->current_period_end)->format('M j, Y') }}.
@@ -129,7 +129,7 @@
                     <div class="shrink-0 text-right">
                         @if ($fs->status === 'active')
                             <span class="text-xs font-semibold text-green-600">Active</span>
-                            @if ($this->shopSubscription && ! $this->shopSubscription->cancelled())
+                            @if ($this->shopSubscription && ! $this->shopSubscription->canceled())
                                 @if ($confirmCancel === 'shop')
                                     <div class="mt-1">
                                         <button wire:click="cancelShopSubscription" class="text-xs font-semibold text-red-600 hover:underline">Confirm cancel</button>
@@ -154,6 +154,7 @@
         <div x-data="knuckleballBillingPromoter('{{ config('cashier.key') }}')"
              x-init="init()"
              @stripe-promoter-intent-ready.window="onIntent($event.detail.clientSecret)"
+             @stripe-promoter-payment-action-required.window="onPaymentActionRequired($event.detail.clientSecret)"
              class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6" @click.stop>
                 <div class="flex items-center justify-between mb-5">
@@ -199,7 +200,6 @@ function knuckleballBillingPromoter(stripeKey) {
             this.$nextTick(() => {
                 this.card = els.create('card', {
                     style: { base: { fontSize: '15px', color: '#111827', '::placeholder': { color: '#9ca3af' } } },
-                    hidePostalCode: true,
                 });
                 this.card.mount(this.$refs.cardElement);
                 this.card.on('change', (e) => { this.cardError = e.error ? e.error.message : ''; });
@@ -213,8 +213,13 @@ function knuckleballBillingPromoter(stripeKey) {
                 payment_method: { card: this.card },
             });
             if (error) { this.cardError = error.message; this.loading = false; return; }
-            await $wire.confirmPromoterSubscription(setupIntent.payment_method);
+            await this.$wire.confirmPromoterSubscription(setupIntent.payment_method);
             this.loading = false;
+        },
+        async onPaymentActionRequired(clientSecret) {
+            const { error } = await this.stripe.confirmCardPayment(clientSecret);
+            if (error) { this.cardError = error.message; return; }
+            await this.$wire.finalizePromoterSubscription();
         },
     };
 }
