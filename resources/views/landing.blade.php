@@ -60,11 +60,17 @@
                 <a href="{{ route('players.index') }}" class="hover:text-red-200 transition-colors">TTM DATABASE</a>
                 <a href="#contact" class="hover:text-red-200 transition-colors">CONTACT</a>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="{{ route('login') }}" class="text-sm font-semibold hover:text-red-200 transition-colors hidden sm:block">Log In</a>
-                <a href="{{ route('register') }}" class="bg-white text-[#CB504B] hover:bg-gray-50 text-sm font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm">
-                    Join Free
-                </a>
+            <div class="flex items-center gap-3">
+                @auth
+                    <a href="{{ route('players.index') }}" class="bg-white text-[#CB504B] hover:bg-gray-50 text-sm font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm">
+                        TTM Database
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="text-sm font-semibold hover:text-red-200 transition-colors border border-white/40 px-4 py-2 rounded-full sm:border-0 sm:px-0 sm:py-0">Log In</a>
+                    <a href="{{ route('register') }}" class="bg-white text-[#CB504B] hover:bg-gray-50 text-sm font-bold px-5 py-2.5 rounded-full transition-colors shadow-sm">
+                        Join Free
+                    </a>
+                @endauth
             </div>
         </div>
     </nav>
@@ -152,13 +158,13 @@
                 @if ($item['isReturn'])
                     <span>
                         <span class="text-orange-400">🔥</span>
-                        <span class="font-bold">Mail day for @{{ $item['slug'] }}:</span>
+                        <span class="font-bold">Mail day for {{ '@' . $item['slug'] }}:</span>
                         {{ $item['player'] }}{{ $item['days'] ? ' (' . $item['days'] . ' Days)' : '' }}
                     </span>
                 @else
                     <span>
                         <span class="text-green-400">📬</span>
-                        <span class="font-bold">@{{ $item['slug'] }} sent:</span>
+                        <span class="font-bold">{{ '@' . $item['slug'] }} sent:</span>
                         {{ $item['player'] }}
                     </span>
                 @endif
@@ -174,13 +180,13 @@
                 @if ($item['isReturn'])
                     <span>
                         <span class="text-orange-400">🔥</span>
-                        <span class="font-bold">Mail day for @{{ $item['slug'] }}:</span>
+                        <span class="font-bold">Mail day for {{ '@' . $item['slug'] }}:</span>
                         {{ $item['player'] }}{{ $item['days'] ? ' (' . $item['days'] . ' Days)' : '' }}
                     </span>
                 @else
                     <span>
                         <span class="text-green-400">📬</span>
-                        <span class="font-bold">@{{ $item['slug'] }} sent:</span>
+                        <span class="font-bold">{{ '@' . $item['slug'] }} sent:</span>
                         {{ $item['player'] }}
                     </span>
                 @endif
