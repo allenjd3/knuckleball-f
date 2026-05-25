@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\InviteCode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\InviteCode>
+ * @extends Factory<InviteCode>
  */
 class InviteCodeFactory extends Factory
 {

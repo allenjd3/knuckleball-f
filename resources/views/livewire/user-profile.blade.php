@@ -1,81 +1,380 @@
-<div class="max-w-5xl mx-auto flex flex-col sm:flex-row gap-6 mt-8 px-4">
-    <aside class="w-full sm:w-56 shrink-0 space-y-6">
-        <div class="text-center">
-            <img
-                src="{{ $this->user->profile_photo_url }}"
-                alt="{{ $this->user->name }}"
-                class="size-20 rounded-full object-cover ring-2 ring-gray-100 mx-auto"
-            />
-            <p class="font-bold text-gray-900 mt-3">{{ $this->user->name }}</p>
-            <p class="text-xs text-gray-500 mt-1">Joined {{ $this->user->created_at?->format('M d, Y') }}</p>
-            <div class="flex justify-center gap-4 mt-3 text-sm">
+<div class="max-w-5xl mx-auto pb-16">
+
+    {{-- Cover + Avatar --}}
+    <div class="relative">
+        <div class="h-48 md:h-56 bg-gray-200 overflow-hidden">
+            @if ($this->user->cover_photo)
+                <img src="{{ Storage::url($this->user->cover_photo) }}" class="w-full h-full object-cover" alt="Cover" />
+            @else
+                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
+            @endif
+        </div>
+        <div class="absolute bottom-0 left-6 translate-y-1/2">
+            <div class="size-24 rounded-full ring-4 ring-white overflow-hidden bg-gray-100">
+                <img src="{{ $this->user->profile_photo_url }}" alt="{{ $this->user->name }}" class="w-full h-full object-cover" />
+            </div>
+        </div>
+    </div>
+
+    {{-- Profile info --}}
+    <div class="pt-16 pb-4 px-6 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold">{{ $this->user->name }}</h1>
+            <p class="text-gray-500 text-sm">{{ '@' . $this->user->handle }} · Joined {{ $this->user->created_at?->format('M Y') }}</p>
+            @if ($this->user->bio)
+                <p class="mt-2 text-gray-700 text-sm max-w-md">{{ $this->user->bio }}</p>
+            @endif
+        </div>
+        <div class="flex items-center gap-2 shrink-0 mt-1">
+            @if ($this->isOwner)
+                {{ $this->editProfile }}
+                {{ $this->changeHandle }}
+            @elseif (auth()->check())
+                @if ($this->isFollowing)
+                    <button wire:click="unfollow" class="px-4 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Unfollow</button>
+                @else
+                    <button wire:click="follow" class="px-4 py-1.5 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-700">Follow</button>
+                @endif
+            @endif
+        </div>
+    </div>
+
+    <div class="px-4 space-y-8 mt-4">
+
+        {{-- Stats card --}}
+        <div class="rounded-2xl p-8 md:p-10 text-white" style="background-color:#D93C3F; font-family:'Inter',sans-serif;">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between mb-10">
+                <p class="text-xs font-bold uppercase tracking-widest">All-Time Stats</p>
+                <a href="{{ route('users.snapshot', [$this->user, now()->year]) }}"
+                   class="bg-white rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors"
+                   style="color:#D93C3F;">
+                    Share Snapshot ↗
+                </a>
+            </div>
+
+            {{-- 4 headline numbers --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
                 <div>
-                    <p class="font-bold text-gray-900">{{ $this->user->following_count }}</p>
-                    <p class="text-xs text-gray-500">Following</p>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_sends'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Sends</p>
                 </div>
-                <div class="w-px bg-gray-200"></div>
                 <div>
-                    <p class="font-bold text-gray-900">{{ $this->user->followers_count }}</p>
-                    <p class="text-xs text-gray-500">Followers</p>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_returns'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Returns</p>
+                </div>
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['success_rate'] }}<span class="text-4xl font-black">%</span></p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Success</p>
+                </div>
+                <div>
+                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['unique_players'] }}</p>
+                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Players</p>
                 </div>
             </div>
-            @if (auth()->check() && $this->user->id !== auth()->user()?->id)
-                <div class="mt-4">
-                    @if (! $this->isFollowing)
-                        <button wire:click="follow" class="text-sm font-semibold text-gray-900 underline underline-offset-2 hover:text-gray-600">
-                            Follow
-                        </button>
-                    @else
-                        <button wire:click="unfollow" class="text-sm font-semibold text-gray-500 underline underline-offset-2 hover:text-gray-700">
-                            Unfollow
-                        </button>
+
+            {{-- Divider --}}
+            <div class="border-t border-white/20 mb-6"></div>
+
+            {{-- Detail rows --}}
+            <div class="space-y-4">
+                @if ($this->stats['fastest_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-bolt class="size-5 text-white/70 shrink-0" />
+                            Fastest Return
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['fastest_return']['player_name'] }} · {{ $this->stats['fastest_return']['days'] }} days</span>
+                    </div>
+                @endif
+                @if ($this->stats['longest_wait'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-clock class="size-5 text-white/70 shrink-0" />
+                            Longest Wait
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['longest_wait']['player_name'] }} · {{ $this->stats['longest_wait']['days'] }} days</span>
+                    </div>
+                @endif
+                @if ($this->stats['favorite_team'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-trophy class="size-5 text-white/70 shrink-0" />
+                            Favorite Team
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['favorite_team'] }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['favorite_category'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-tag class="size-5 text-white/70 shrink-0" />
+                            Top Category
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['favorite_category'] }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['most_reacted_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-s-heart class="size-5 text-white/70 shrink-0" />
+                            Most Reacted
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['most_reacted_return']['player_name'] }} · {{ $this->stats['most_reacted_return']['reaction_count'] }} reactions</span>
+                    </div>
+                @endif
+                @if ($this->stats['first_send'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-paper-airplane class="size-5 text-white/70 shrink-0" />
+                            First Send
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['first_send']->format('M j, Y') }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['most_recent_return'])
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-sm font-medium">
+                            <x-heroicon-o-inbox-arrow-down class="size-5 text-white/70 shrink-0" />
+                            Latest Return
+                        </div>
+                        <span class="text-sm font-semibold">{{ $this->stats['most_recent_return']->format('M j, Y') }}</span>
+                    </div>
+                @endif
+                @if ($this->stats['total_sends'] === 0)
+                    <p class="text-white/50 text-sm text-center py-2">No activity yet — send some mail to see stats here.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- Past Snapshots --}}
+        @if ($this->snapshots->isNotEmpty())
+            <div>
+                <h2 class="text-sm uppercase tracking-widest text-gray-500 font-medium mb-3">Snapshots</h2>
+                <div class="flex gap-3 overflow-x-auto pb-2">
+                    @foreach ($this->snapshots as $snapshot)
+                        <a href="{{ route('users.snapshot', [$this->user, $snapshot->year]) }}"
+                           class="shrink-0 bg-gray-950 text-white rounded-xl p-4 w-36 hover:opacity-80 transition-opacity">
+                            <p class="text-3xl font-black">{{ $snapshot->year }}</p>
+                            <p class="text-xs text-gray-400 mt-1">{{ data_get($snapshot->data, 'total_sends', 0) }} sends</p>
+                            <p class="text-xs text-gray-400">{{ data_get($snapshot->data, 'success_rate', 0) }}% success</p>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+    </div>
+
+    {{-- Tabs --}}
+    <div x-data="{ tab: 'activity' }" class="mt-6">
+
+        {{-- Tab nav --}}
+        <div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-4">
+            <div class="flex gap-6">
+                <button
+                    @click="tab = 'activity'"
+                    :class="tab === 'activity'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Activity
+                </button>
+                <button
+                    @click="tab = 'packs'"
+                    :class="tab === 'packs'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Packs
+                </button>
+                <button
+                    @click="tab = 'sets'"
+                    :class="tab === 'sets'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Sets
+                </button>
+                @if ($this->isOwner)
+                <button
+                    @click="tab = 'watchlist'"
+                    :class="tab === 'watchlist'
+                        ? 'border-b-2 border-[#CB504B] text-[#CB504B] font-semibold'
+                        : 'border-b-2 border-transparent text-gray-400 hover:text-gray-600'"
+                    class="py-3 text-sm transition-colors -mb-px">
+                    Watchlist
+                </button>
+                @endif
+            </div>
+        </div>
+
+        {{-- Activity tab --}}
+        <div x-show="tab === 'activity'" x-cloak class="px-4 pt-6 pb-16 flex flex-col gap-3">
+            @forelse ($this->feeds as $feed)
+                <x-dynamic-component :component="$feed->componentName()" :$feed />
+            @empty
+                <p class="text-gray-400 text-sm text-center py-8">No activity yet.</p>
+            @endforelse
+            {{ $this->feeds->links() }}
+        </div>
+
+        {{-- Packs tab --}}
+        <div x-show="tab === 'packs'" x-cloak class="px-4 pt-6 pb-16">
+            @if ($this->packs->isNotEmpty())
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">{{ $this->packs->count() }} {{ Str::plural('Pack', $this->packs->count()) }}</p>
+                    @if ($this->isOwner)
+                        <a href="{{ route('packs.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
                     @endif
                 </div>
+                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    @foreach ($this->packs as $pack)
+                        <a href="{{ $pack->path() }}" class="group block">
+                            <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-100 group-hover:opacity-90 transition-opacity">
+                                @if ($pack->cover_image)
+                                    <img src="{{ Storage::url($pack->cover_image) }}" alt="{{ $pack->name }}" class="w-full h-full object-cover" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center h-full text-gray-400 p-2 text-center gap-1">
+                                        <x-heroicon-o-rectangle-stack class="size-6" />
+                                        <span class="text-xs leading-tight">{{ $pack->name }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                            <p class="text-xs font-medium truncate mt-1.5">{{ $pack->name }}</p>
+                            <p class="text-xs text-gray-400">{{ $pack->players_count }} {{ Str::plural('player', $pack->players_count) }}</p>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-gray-400 text-sm text-center py-8">No packs yet.</p>
             @endif
         </div>
 
-        <div class="border-t border-gray-200"></div>
+        {{-- Sets tab --}}
+        <div x-show="tab === 'sets'" x-cloak class="px-4 pt-6 pb-16">
+            @if ($this->sets->isNotEmpty())
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">{{ $this->sets->count() }} {{ Str::plural('Set', $this->sets->count()) }}</p>
+                    @if ($this->isOwner)
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('sets.index') }}"
+                               class="flex items-center gap-1.5 text-sm font-medium bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors">
+                                <x-heroicon-o-plus class="size-3.5" /> New Set
+                            </a>
+                            <a href="{{ route('sets.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
+                        </div>
+                    @endif
+                </div>
+                <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                    @foreach ($this->sets as $set)
+                        @php $pct = $set->completionPercentage(); @endphp
+                        <a href="{{ $set->path() }}" class="group block">
+                            <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-100 group-hover:opacity-90 transition-opacity relative">
+                                @if ($set->cover_image)
+                                    <img src="{{ Storage::url($set->cover_image) }}" alt="{{ $set->name }}" class="w-full h-full object-cover" />
+                                @else
+                                    <div class="flex flex-col items-center justify-center h-full text-gray-400 p-2 text-center gap-1">
+                                        <x-heroicon-o-squares-2x2 class="size-6" />
+                                        <span class="text-xs leading-tight">{{ $set->name }}</span>
+                                    </div>
+                                @endif
+                                @if ($pct > 0)
+                                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/20">
+                                        <div class="h-full {{ $pct === 100 ? 'bg-amber-400' : 'bg-[#D93C3F]' }}" style="width: {{ $pct }}%"></div>
+                                    </div>
+                                @endif
+                            </div>
+                            <p class="text-xs font-medium truncate mt-1.5">{{ $set->name }}</p>
+                            <p class="text-xs text-gray-400">
+                                {{ $set->entries_count }} {{ Str::plural('card', $set->entries_count) }}
+                                @if ($pct > 0) · {{ $pct }}% @endif
+                            </p>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                @if ($this->isOwner)
+                    <div class="text-center py-12">
+                        <x-heroicon-o-squares-2x2 class="size-10 mx-auto mb-3 text-gray-300" />
+                        <p class="text-gray-500 text-sm mb-4">Track your signed set completion progress.</p>
+                        <a href="{{ route('sets.index') }}"
+                           class="inline-flex items-center gap-2 bg-gray-900 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            <x-heroicon-o-plus class="size-4" /> Create your first set
+                        </a>
+                    </div>
+                @else
+                    <p class="text-gray-400 text-sm text-center py-8">No sets yet.</p>
+                @endif
+            @endif
+        </div>
 
-        <nav class="space-y-1">
-            <a href="{{ route('users.feed') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-                </svg>
-                Feed
-            </a>
-            <a href="{{ route('players.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </svg>
-                Players
-            </a>
-            <a href="{{ route('teams.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-                </svg>
-                Teams
-            </a>
-            <a href="{{ route('categories.index') }}" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-                </svg>
-                Categories
-            </a>
-        </nav>
-    </aside>
-
-    <div class="flex-1 min-w-0">
-        @forelse ($this->feeds as $feed)
-            <x-dynamic-component :component="$feed->componentName()" :$feed />
-        @empty
-            <div class="text-center py-16 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="size-12 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                </svg>
-                <p class="font-medium text-gray-500">No activity yet</p>
+        {{-- Watchlist tab (owner only) --}}
+        @if ($this->isOwner)
+        <div x-show="tab === 'watchlist'" x-cloak class="px-4 pt-6 pb-16">
+            <div class="flex items-center justify-between mb-4">
+                <p class="text-sm uppercase tracking-widest text-gray-500 font-medium">
+                    {{ $this->watchlist->count() }} {{ Str::plural('Player', $this->watchlist->count()) }}
+                </p>
+                <a href="{{ route('watchlist.index') }}" class="text-sm underline text-gray-500 hover:text-gray-700">Manage</a>
             </div>
-        @endforelse
-        {{ $this->feeds->links() }}
+
+            @if ($this->watchlist->isEmpty())
+                <div class="text-center py-12">
+                    <x-heroicon-o-eye class="size-10 mx-auto mb-3 text-gray-200" />
+                    <p class="text-gray-500 text-sm mb-1">No players on your watchlist yet.</p>
+                    <p class="text-xs text-gray-400">Add players from their profile page to get signing alerts.</p>
+                </div>
+            @else
+                <div class="space-y-2">
+                    @foreach ($this->watchlist as $player)
+                        <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-xl p-3">
+                            <div class="size-9 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                                @if ($player->media?->url)
+                                    <img src="{{ Storage::url($player->media->url) }}" class="w-full h-full object-cover" />
+                                @else
+                                    <x-heroicon-o-user class="size-4 text-gray-300 m-2.5" />
+                                @endif
+                            </div>
+                            <a href="{{ $player->path() }}" class="flex-1 font-medium text-sm text-gray-900 hover:underline">
+                                {{ $player->name }}
+                            </a>
+                            <button wire:click="removeFromWatchlist({{ $player->id }})"
+                                    class="text-xs text-gray-400 hover:text-red-500 transition-colors shrink-0">
+                                Remove
+                            </button>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
+            {{-- Location alert settings callout --}}
+            <div class="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-4">
+                <div class="flex items-start gap-3">
+                    <x-heroicon-o-map-pin class="size-5 text-blue-500 shrink-0 mt-0.5" />
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-blue-800">Get alerts for events near you</p>
+                        @if ($this->user->zip_code)
+                            <p class="text-xs text-blue-600 mt-0.5">
+                                Alerts set for within <strong>{{ $this->user->radius ?? 50 }} miles</strong> of
+                                <strong>{{ $this->user->zip_code }}</strong>.
+                                @if ($this->user->card_show_alerts) Card show alerts on. @endif
+                            </p>
+                        @else
+                            <p class="text-xs text-blue-600 mt-0.5">Add your zip code in Edit Profile to get notified about signings and shows near you.</p>
+                        @endif
+                        <button wire:click="mountAction('editProfile')"
+                                class="mt-2 text-xs font-semibold text-blue-700 hover:underline">
+                            {{ $this->user->zip_code ? 'Update location →' : 'Set location →' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
     </div>
+
+    <x-filament-actions::modals />
 </div>

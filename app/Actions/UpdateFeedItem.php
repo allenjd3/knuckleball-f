@@ -14,6 +14,9 @@ class UpdateFeedItem
     public static function execute(PostalMail|Comment $feedItem, ?string $comment)
     {
         $feed = Feed::firstWhere('feedable_id', $feedItem->id);
+        if (! $feed) {
+            return;
+        }
         $feed->update([
             'comment' => $comment ?? '',
             'followable_id' => $feedItem->getFollowableId(),

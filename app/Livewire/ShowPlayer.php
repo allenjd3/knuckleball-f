@@ -6,6 +6,7 @@ use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
 use App\Models\Fee;
+use App\Models\Pack;
 use App\Models\Player;
 use App\Models\Tag;
 use Filament\Actions\Action;
@@ -55,6 +56,30 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 ? ['unpublishedAddress' => $address]
                 : [],
         );
+    }
+
+    #[Computed]
+    public function isWatching(): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        return auth()->user()->watchlist()->where('player_id', $this->player->id)->exists();
+    }
+
+    public function toggleWatchlist(): void
+    {
+        if (! auth()->check()) {
+            return;
+        }
+
+        if ($this->isWatching) {
+            auth()->user()->watchlist()->detach($this->player->id);
+        } else {
+            auth()->user()->watchlist()->syncWithoutDetaching([$this->player->id]);
+        }
+        unset($this->isWatching);
     }
 
     #[Computed]
@@ -110,6 +135,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
         return CreateAction::make('createFee')
             ->model(Fee::class)
             ->authorize(fn () => request()->user()?->can('create', Fee::class))
+            ->icon('heroicon-o-currency-dollar')
             ->schema(FeeForm::schema())
             ->mutateDataUsing(function (array $data) {
                 data_set($data, 'user_id', request()->user()?->id);
@@ -148,6 +174,33 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ])
             ->action(function (array $data) {
                 $this->player->addTag(data_get($data, 'tag_id'));
+            });
+    }
+
+    public function addToPackAction(): Action
+    {
+        return Action::make('addToPack')
+            ->label('Add to Pack')
+            ->icon('heroicon-o-bookmark')
+            ->authorize(fn () => request()->user()?->isPublished())
+            ->schema([
+                Select::make('pack_id')
+                    ->label('Pack')
+                    ->required()
+                    ->options(fn () => auth()->user()->packs()->pluck('name', 'id'))
+                    ->createOptionForm([
+                        TextInput::make('name')->required()->maxLength(255),
+                    ])
+                    ->createOptionUsing(fn (array $data) => auth()->user()->packs()->create($data)->id),
+                Textarea::make('note')
+                    ->label('Note')
+                    ->placeholder('e.g. Send 3 cards, include SASE')
+                    ->nullable()
+                    ->maxLength(500),
+            ])
+            ->action(function (array $data) {
+                $pack = Pack::findOrFail($data['pack_id']);
+                $pack->addPlayer($this->player, $data['note'] ?? null);
             });
     }
 
@@ -200,7 +253,6 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->icon('heroicon-o-rectangle-stack')
                     ->visible(fn (Model $record) => $record->card->exists)
                     ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
-                    ->slideOver()
                     ->modalSubmitActionLabel('Ok'),
                 CreateAction::make('createCard')
                     ->modalHeading('Create Card')

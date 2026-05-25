@@ -11,11 +11,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Cashier\Billable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
 {
+    use Billable;
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
@@ -51,6 +53,21 @@ class User extends Authenticatable implements FilamentUser
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class);
+    }
+
+    public function wantLists(): HasMany
+    {
+        return $this->hasMany(WantList::class);
+    }
+
+    public function packs(): HasMany
+    {
+        return $this->hasMany(Pack::class);
+    }
+
+    public function cardSets(): HasMany
+    {
+        return $this->hasMany(CardSet::class);
     }
 
     public function postalMails(): HasMany
@@ -142,13 +159,55 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Comment::class);
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function featuredListings(): HasMany
+    {
+        return $this->hasMany(FeaturedListing::class);
+    }
+
+    public function watchlist(): BelongsToMany
+    {
+        return $this->belongsToMany(Player::class, 'watchlist_players')->withTimestamps();
+    }
+
+    public function isWatching(Player $player): bool
+    {
+        return $this->watchlist()->where('player_id', $player->id)->exists();
+    }
+
+    public function isPromoter(): bool
+    {
+        return $this->subscribed('promoter');
+    }
+
+    public function cardShops(): HasMany
+    {
+        return $this->hasMany(CardShop::class);
+    }
+
+    public function savedShops(): BelongsToMany
+    {
+        return $this->belongsToMany(CardShop::class, 'saved_shops')->withTimestamps();
+    }
+
+    public function isSavedShop(CardShop $shop): bool
+    {
+        return $this->savedShops()->where('card_shop_id', $shop->id)->exists();
+    }
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'published_at' => 'datetime',
+            'handle_changed_at' => 'datetime',
             'role' => Role::class,
+            'card_show_alerts' => 'boolean',
         ];
     }
 }

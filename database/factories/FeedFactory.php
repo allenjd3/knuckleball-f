@@ -3,13 +3,14 @@
 namespace Database\Factories;
 
 use App\Models\Comment;
+use App\Models\Feed;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Feed>
+ * @extends Factory<Feed>
  */
 class FeedFactory extends Factory
 {
