@@ -66,8 +66,8 @@ class TrendingFeed extends Component
     #[Computed]
     public function trendingPlayers()
     {
-        return Player::query()
-            ->select('players.*')
+        $subquery = Player::query()
+            ->selectRaw('players.id, COUNT(postal_mails.id) as send_count')
             ->join('signers', fn ($j) => $j
                 ->on('signers.signable_id', '=', 'players.id')
                 ->where('signers.signable_type', Player::class)
@@ -77,11 +77,15 @@ class TrendingFeed extends Component
                 ->whereNotNull('postal_mails.date_sent')
                 ->where('postal_mails.created_at', '>=', now()->subDays(30))
             )
-            ->selectRaw('COUNT(postal_mails.id) as send_count')
-            ->with('media', 'team.category')
             ->groupBy('players.id')
             ->orderByDesc('send_count')
-            ->limit(10)
+            ->limit(10);
+
+        return Player::query()
+            ->joinSub($subquery, 'counts', fn ($j) => $j->on('players.id', '=', 'counts.id'))
+            ->select('players.*', 'counts.send_count')
+            ->with('media', 'team.category')
+            ->orderByDesc('counts.send_count')
             ->get();
     }
 
