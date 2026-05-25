@@ -16,16 +16,17 @@ class HomeController extends Controller
             ->get()
             ->map(function (Feed $feed) {
                 $meta = $feed->meta;
-                $slug = basename(data_get($meta, 'user_path', ''));
-                $player = data_get($meta, 'player', '');
-                $days = data_get($meta, 'turnaround_days');
-                $isReturn = ! empty(data_get($meta, 'date_returned'));
 
-                return compact('slug', 'player', 'days', 'isReturn');
+                return [
+                    'slug' => basename(data_get($meta, 'user_path', '')),
+                    'player' => data_get($meta, 'player', ''),
+                    'days' => data_get($meta, 'turnaround_days'),
+                    'isReturn' => ! empty(data_get($meta, 'date_returned')),
+                ];
             })
             ->filter(fn ($item) => $item['slug'] && $item['player'])
             ->values();
 
-        return view('landing', compact('tickerItems'));
+        return view('landing', ['tickerItems' => $tickerItems]);
     }
 }

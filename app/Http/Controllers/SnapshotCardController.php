@@ -18,6 +18,10 @@ class SnapshotCardController extends Controller
 
         $stats = $snapshot ? $snapshot->data : $statsService->compute($user);
 
-        return view('snapshot-card', compact('user', 'year', 'stats'));
+        return view('snapshot-card', [
+            'user' => $user,
+            'year' => $year,
+            'stats' => $stats,
+        ]);
     }
 }
