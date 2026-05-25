@@ -10,9 +10,9 @@ use Livewire\Component;
 
 class UserFeed extends Component
 {
-    public int    $perPage = 15;
-    public bool   $hasMore = true;
-    public string $filter  = 'global'; // 'following' | 'global'
+    public int $perPage = 15;
+    public bool $hasMore = true;
+    public string $filter = 'global'; // 'following' | 'global'
 
     public function render()
     {
@@ -31,10 +31,12 @@ class UserFeed extends Component
                     auth()->user()->following()->pluck('users.id')->push(auth()->id())
                 )
             )
+            ->withCount('feedComments')
+            ->with(['reactions', 'feedable'])
             ->orderByDesc('created_at')
             ->limit($this->perPage + 1);
 
-        $results      = $query->get();
+        $results = $query->get();
         $this->hasMore = $results->count() > $this->perPage;
 
         return $results->take($this->perPage);
@@ -70,7 +72,7 @@ class UserFeed extends Component
 
     public function setFilter(string $filter): void
     {
-        $this->filter  = $filter;
+        $this->filter = $filter;
         $this->perPage = 15;
         unset($this->feeds);
     }

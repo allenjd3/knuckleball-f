@@ -6,6 +6,7 @@ use App\Models\Feed;
 use App\Models\Reaction;
 use App\Models\User;
 use App\Notifications\NewReaction;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -18,15 +19,21 @@ class FeedReactions extends Component
     #[Locked]
     public int $feedId;
 
+    private ?Collection $preloadedReactions = null;
+
     public function mount(Feed $feed): void
     {
         $this->feedId = $feed->id;
+
+        if ($feed->relationLoaded('reactions')) {
+            $this->preloadedReactions = $feed->reactions;
+        }
     }
 
     #[Computed]
     public function reactions()
     {
-        return Reaction::where('feed_id', $this->feedId)->get();
+        return $this->preloadedReactions ?? Reaction::where('feed_id', $this->feedId)->get();
     }
 
     public function counts(): array

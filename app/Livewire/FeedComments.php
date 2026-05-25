@@ -18,12 +18,15 @@ class FeedComments extends Component
 
     public bool $expanded = false;
 
+    public int $commentCount = 0;
+
     #[Validate('required|max:500')]
     public string $body = '';
 
     public function mount(Feed $feed): void
     {
         $this->feedId = $feed->id;
+        $this->commentCount = (int) ($feed->feed_comments_count ?? 0);
     }
 
     #[Computed]
@@ -33,12 +36,6 @@ class FeedComments extends Component
             ->with('user')
             ->oldest()
             ->get();
-    }
-
-    #[Computed]
-    public function commentCount(): int
-    {
-        return Comment::where('feed_id', $this->feedId)->count();
     }
 
     public function toggle(): void
@@ -59,7 +56,7 @@ class FeedComments extends Component
         Comment::create([
             'feed_id' => $this->feedId,
             'user_id' => auth()->id(),
-            'body'    => $this->body,
+            'body' => $this->body,
         ]);
 
         $owner = $feed ? User::find($feed->followable_id) : null;
@@ -68,7 +65,8 @@ class FeedComments extends Component
         }
 
         $this->body = '';
-        unset($this->comments, $this->commentCount);
+        $this->commentCount++;
+        unset($this->comments);
     }
 
     public function render()
