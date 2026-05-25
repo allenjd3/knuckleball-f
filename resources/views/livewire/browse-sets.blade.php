@@ -24,7 +24,7 @@
         </button>
     </div>
 
-    @if ($this->sets->isEmpty())
+    @if ($this->sets->total() === 0)
         <div class="text-center py-20 text-gray-400">
             <x-heroicon-o-squares-2x2 class="size-12 mx-auto mb-3 text-gray-300" />
             <p>No public sets yet.</p>
@@ -65,5 +65,6 @@
                 </div>
             @endforeach
         </div>
+        <div class="mt-8">{{ $this->sets->links() }}</div>
     @endif
 </div>

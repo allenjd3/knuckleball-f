@@ -24,7 +24,7 @@
         </div>
     @endif
 
-    @if ($this->packs->isEmpty())
+    @if ($this->packs->total() === 0)
         <div class="text-center py-20 text-gray-400">
             <x-heroicon-o-rectangle-stack class="size-12 mx-auto mb-3 text-gray-300" />
             <p>No public packs yet.</p>
@@ -57,5 +57,6 @@
                 </div>
             @endforeach
         </div>
+        <div class="mt-8">{{ $this->packs->links() }}</div>
     @endif
 </div>

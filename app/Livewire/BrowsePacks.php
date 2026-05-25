@@ -7,11 +7,19 @@ use App\Models\Pack;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class BrowsePacks extends Component
 {
+    use WithPagination;
+
     #[Url]
     public ?int $category = null;
+
+    public function updatedCategory(): void
+    {
+        $this->resetPage();
+    }
 
     #[Computed]
     public function packs()
@@ -21,7 +29,7 @@ class BrowsePacks extends Component
             ->withCount('players', 'followers')
             ->with('user', 'category')
             ->latest()
-            ->get();
+            ->paginate(24);
     }
 
     #[Computed]
