@@ -17,20 +17,20 @@ class MediaCard extends Component
     public string $playerPath;
     public string $dateSent;
     public string $createdAt;
-    public array  $cardPhotos;
-    public int    $photoCount;
+    public array $cardPhotos;
+    public int $photoCount;
 
     public function __construct(public Feed $feed)
     {
-        $this->photo      = data_get($feed->meta, 'photo', '');
-        $this->user       = data_get($feed->meta, 'user', '');
-        $this->userPath   = data_get($feed->meta, 'user_path', '');
-        $this->player     = data_get($feed->meta, 'player', '');
+        $this->photo = data_get($feed->meta, 'photo', '');
+        $this->user = data_get($feed->meta, 'user', '');
+        $this->userPath = data_get($feed->meta, 'user_path', '');
+        $this->player = data_get($feed->meta, 'player', '');
         $this->playerPath = data_get($feed->meta, 'player_path', '');
-        $this->dateSent   = Carbon::parse(data_get($feed->meta, 'date_sent'))->format('M j, Y');
+        $this->dateSent = Carbon::parse(data_get($feed->meta, 'date_sent'))->format('M j, Y');
         $this->cardPhotos = data_get($feed->meta, 'card_photos', []);
         $this->photoCount = count($this->cardPhotos);
-        $this->createdAt  = $feed->created_at->diffForHumans();
+        $this->createdAt = $feed->created_at->diffForHumans();
     }
 
     public function render(): View|Closure|string

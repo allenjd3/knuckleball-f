@@ -11,7 +11,7 @@ class ShowReturn extends Component
 {
     public PostalMail $mail;
 
-    public bool   $shareOpen   = false;
+    public bool $shareOpen = false;
     public string $copySuccess = '';
 
     public function mount(PostalMail $mail): void
@@ -51,6 +51,7 @@ class ShowReturn extends Component
     public function ogImageUrl(): ?string
     {
         $relative = app(ReturnCardService::class)->previewUrl($this->mail, 'square');
+
         return $relative ? url($relative) : null;
     }
 
@@ -66,12 +67,12 @@ class ShowReturn extends Component
         ]);
 
         $player = $this->mail->player;
-        $meta   = $this->mail->generateMeta();
+        $meta = $this->mail->generateMeta();
 
         return view('livewire.show-return', [
-            'player'        => $player,
-            'meta'          => $meta,
-            'publicUrl'     => route('returns.show', $this->mail),
+            'player' => $player,
+            'meta' => $meta,
+            'publicUrl' => route('returns.show', $this->mail),
         ])->layout('layouts.app');
     }
 }

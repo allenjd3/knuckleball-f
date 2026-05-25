@@ -16,7 +16,7 @@ test('it creates a feed item for the event', function () {
 
     $this->assertDatabaseHas('feeds', [
         'feedable_type' => Event::class,
-        'feedable_id'   => $event->id,
+        'feedable_id' => $event->id,
         'followable_id' => $event->user_id,
     ]);
 });
@@ -42,15 +42,15 @@ test('it dispatches DispatchWatchlistAlerts job', function () {
 });
 
 test('it attaches to a recent digest from the same user', function () {
-    $user  = User::factory()->create();
+    $user = User::factory()->create();
     $event = Event::factory()->approved()->for($user)->create();
 
     $digest = Feed::create([
         'followable_id' => $user->id,
         'feedable_type' => Event::class,
-        'feedable_id'   => $event->id,
-        'comment'       => '',
-        'meta'          => ['event_ids' => [$event->id]],
+        'feedable_id' => $event->id,
+        'comment' => '',
+        'meta' => ['event_ids' => [$event->id]],
     ]);
 
     $event2 = Event::factory()->approved()->for($user)->create();
@@ -70,9 +70,9 @@ test('it does not attach to a digest belonging to a different user', function ()
     Feed::create([
         'followable_id' => $user1->id,
         'feedable_type' => Event::class,
-        'feedable_id'   => $event1->id,
-        'comment'       => '',
-        'meta'          => ['event_ids' => [$event1->id]],
+        'feedable_id' => $event1->id,
+        'comment' => '',
+        'meta' => ['event_ids' => [$event1->id]],
     ]);
 
     $event2 = Event::factory()->approved()->for($user2)->create();
@@ -84,16 +84,16 @@ test('it does not attach to a digest belonging to a different user', function ()
 });
 
 test('it creates a new feed if the digest is older than 60 minutes', function () {
-    $user   = User::factory()->create();
+    $user = User::factory()->create();
     $event1 = Event::factory()->approved()->for($user)->create();
 
     Feed::create([
         'followable_id' => $user->id,
         'feedable_type' => Event::class,
-        'feedable_id'   => $event1->id,
-        'comment'       => '',
-        'meta'          => ['event_ids' => [$event1->id]],
-        'created_at'    => now()->subMinutes(61),
+        'feedable_id' => $event1->id,
+        'comment' => '',
+        'meta' => ['event_ids' => [$event1->id]],
+        'created_at' => now()->subMinutes(61),
     ]);
 
     $event2 = Event::factory()->approved()->for($user)->create();

@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Card;
 use App\Models\PostalMail;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Card>
+ * @extends Factory<Card>
  */
 class CardFactory extends Factory
 {

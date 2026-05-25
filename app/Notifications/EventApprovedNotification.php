@@ -22,12 +22,12 @@ class EventApprovedNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
-            'event_id'    => $this->event->id,
-            'event_name'  => $this->event->name,
-            'event_type'  => $this->event->type,
-            'event_path'  => $this->event->path(),
+            'event_id' => $this->event->id,
+            'event_name' => $this->event->name,
+            'event_type' => $this->event->type,
+            'event_path' => $this->event->path(),
             'player_name' => $this->event->player?->name,
-            'date'        => $this->event->formattedDate(),
+            'date' => $this->event->formattedDate(),
         ];
     }
 
@@ -37,7 +37,7 @@ class EventApprovedNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
             ->subject("Your {$label} listing is live — {$this->event->name}")
-            ->greeting("Good news!")
+            ->greeting('Good news!')
             ->line("Your {$label} listing **{$this->event->name}** has been approved and is now live.")
             ->action('View Listing', $this->event->path())
             ->line('Thank you for contributing to the Knuckleball community.');

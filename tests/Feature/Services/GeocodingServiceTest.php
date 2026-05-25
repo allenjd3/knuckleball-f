@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 test('it returns coordinates for a valid address', function () {
     Http::fake([
         'maps.googleapis.com/*' => Http::response([
-            'status'  => 'OK',
+            'status' => 'OK',
             'results' => [
                 ['geometry' => ['location' => ['lat' => 40.7128, 'lng' => -74.0060]]],
             ],
@@ -43,7 +43,7 @@ test('it returns null when the Google API returns a non-OK status', function () 
 test('geocodeZip caches results and calls the API only once for the same zip', function () {
     Http::fake([
         'maps.googleapis.com/*' => Http::response([
-            'status'  => 'OK',
+            'status' => 'OK',
             'results' => [
                 ['geometry' => ['location' => ['lat' => 40.7128, 'lng' => -74.0060]]],
             ],
@@ -63,7 +63,7 @@ test('geocodeZip caches results and calls the API only once for the same zip', f
 test('geocodeZip makes separate API calls for different zips', function () {
     Http::fake([
         'maps.googleapis.com/*' => Http::response([
-            'status'  => 'OK',
+            'status' => 'OK',
             'results' => [
                 ['geometry' => ['location' => ['lat' => 40.7128, 'lng' => -74.0060]]],
             ],

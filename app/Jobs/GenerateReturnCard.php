@@ -17,7 +17,9 @@ class GenerateReturnCard implements ShouldQueue
     {
         $mail = PostalMail::find($this->postalMailId);
 
-        if (! $mail) return;
+        if (! $mail) {
+            return;
+        }
 
         $service->generate($mail);
     }

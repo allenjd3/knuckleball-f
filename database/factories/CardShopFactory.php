@@ -10,11 +10,11 @@ class CardShopFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'    => fake()->company(),
-            'city'    => fake()->city(),
-            'state'   => fake()->stateAbbr(),
+            'name' => fake()->company(),
+            'city' => fake()->city(),
+            'state' => fake()->stateAbbr(),
             'user_id' => User::factory(),
-            'status'  => 'pending',
+            'status' => 'pending',
         ];
     }
 
@@ -31,7 +31,7 @@ class CardShopFactory extends Factory
     public function withLocation(float $lat = 40.7128, float $lng = -74.0060): static
     {
         return $this->state([
-            'latitude'  => $lat,
+            'latitude' => $lat,
             'longitude' => $lng,
         ]);
     }

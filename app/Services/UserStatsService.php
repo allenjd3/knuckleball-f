@@ -31,9 +31,9 @@ class UserStatsService
         $withReturns = (clone $base)->whereNotNull('postal_mails.returned_date');
 
         // ── headline numbers ──────────────────────────────────────────────────
-        $totalSends   = (clone $base)->count();
+        $totalSends = (clone $base)->count();
         $totalReturns = (clone $withReturns)->count();
-        $successRate  = $totalSends > 0 ? round(($totalReturns / $totalSends) * 100) : 0;
+        $successRate = $totalSends > 0 ? round(($totalReturns / $totalSends) * 100) : 0;
 
         $uniquePlayers = (clone $base)
             ->whereNotNull('postal_mails.signer_id')
@@ -41,13 +41,13 @@ class UserStatsService
             ->count('postal_mails.signer_id');
 
         // ── first / latest ────────────────────────────────────────────────────
-        $firstSend        = (clone $base)->min('postal_mails.date_sent');
+        $firstSend = (clone $base)->min('postal_mails.date_sent');
         $mostRecentReturn = (clone $withReturns)->max('postal_mails.returned_date');
 
         // ── fastest / longest (needs player name) ─────────────────────────────
         $playerJoin = function ($join) {
             $join->on('signers.signable_id', '=', 'players.id')
-                 ->where('signers.signable_type', '=', Player::class);
+                ->where('signers.signable_type', '=', Player::class);
         };
 
         $withPlayerQuery = (clone $withReturns)
@@ -101,29 +101,28 @@ class UserStatsService
         }
 
         return [
-            'total_sends'        => $totalSends,
-            'total_returns'      => $totalReturns,
-            'success_rate'       => $successRate,
-            'unique_players'     => $uniquePlayers,
-            'first_send'         => $firstSend ? Carbon::parse($firstSend) : null,
+            'total_sends' => $totalSends,
+            'total_returns' => $totalReturns,
+            'success_rate' => $successRate,
+            'unique_players' => $uniquePlayers,
+            'first_send' => $firstSend ? Carbon::parse($firstSend) : null,
             'most_recent_return' => $mostRecentReturn ? Carbon::parse($mostRecentReturn) : null,
-            'fastest_return'     => $fastest ? [
+            'fastest_return' => $fastest ? [
                 'player_name' => $fastest->player_name,
                 'player_slug' => $fastest->player_slug,
-                'days'        => (int) $fastest->turnaround_days,
+                'days' => (int) $fastest->turnaround_days,
             ] : null,
-            'longest_wait'       => $longest ? [
+            'longest_wait' => $longest ? [
                 'player_name' => $longest->player_name,
                 'player_slug' => $longest->player_slug,
-                'days'        => (int) $longest->turnaround_days,
+                'days' => (int) $longest->turnaround_days,
             ] : null,
-            'favorite_team'      => $favoriteTeam?->name,
-            'favorite_category'  => $favoriteCategory?->name,
+            'favorite_team' => $favoriteTeam?->name,
+            'favorite_category' => $favoriteCategory?->name,
             'most_reacted_return' => $mostReacted ? [
-                'player_name'    => data_get($mostReacted->meta, 'player'),
+                'player_name' => data_get($mostReacted->meta, 'player'),
                 'reaction_count' => $mostReacted->reactions_count,
             ] : null,
         ];
     }
 }
-

@@ -9,13 +9,6 @@ class ShopClaim extends Model
 {
     protected $guarded = [];
 
-    protected function casts(): array
-    {
-        return [
-            'reviewed_at' => 'datetime',
-        ];
-    }
-
     public function cardShop(): BelongsTo
     {
         return $this->belongsTo(CardShop::class);
@@ -24,5 +17,12 @@ class ShopClaim extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'reviewed_at' => 'datetime',
+        ];
     }
 }

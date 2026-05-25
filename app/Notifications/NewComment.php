@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
-use Str;
+use Illuminate\Support\Str;
 
 class NewComment extends Notification implements ShouldQueue
 {

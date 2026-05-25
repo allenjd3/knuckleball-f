@@ -75,6 +75,12 @@ class ViewPacks extends Component implements HasActions, HasForms
             });
     }
 
+    public function render()
+    {
+        return view('livewire.view-packs')
+            ->layout('layouts.app');
+    }
+
     private function formSchema(): array
     {
         return [
@@ -96,11 +102,5 @@ class ViewPacks extends Component implements HasActions, HasForms
                 ->directory('packs')
                 ->nullable(),
         ];
-    }
-
-    public function render()
-    {
-        return view('livewire.view-packs')
-            ->layout('layouts.app');
     }
 }

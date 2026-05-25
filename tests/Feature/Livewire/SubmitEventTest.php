@@ -5,6 +5,8 @@ use App\Models\Event;
 use App\Models\Player;
 use App\Models\User;
 use Livewire\Livewire;
+use Stripe\ApiRequestor;
+use Stripe\HttpClient\ClientInterface;
 
 // Re-uses the helper defined in ShowEventTest
 function fakeStripePaymentIntentForSubmit(string $status, string $customer, string $intentId = 'pi_test_123'): void
@@ -12,17 +14,18 @@ function fakeStripePaymentIntentForSubmit(string $status, string $customer, stri
     config(['cashier.secret' => 'sk_test_fake_key_for_testing']);
 
     $body = json_encode([
-        'id'       => $intentId,
-        'object'   => 'payment_intent',
-        'status'   => $status,
+        'id' => $intentId,
+        'object' => 'payment_intent',
+        'status' => $status,
         'customer' => $customer,
-        'amount'   => 999,
+        'amount' => 999,
         'currency' => 'usd',
         'livemode' => false,
-        'created'  => time(),
+        'created' => time(),
     ]);
 
-    $mock = new class ($body) implements \Stripe\HttpClient\ClientInterface {
+    $mock = new class($body) implements ClientInterface
+    {
         public function __construct(private string $body) {}
 
         public function request($method, $absUrl, $headers, $params, $hasFile, $apiMode = 'v1', $maxNetworkRetries = null): array
@@ -31,7 +34,7 @@ function fakeStripePaymentIntentForSubmit(string $status, string $customer, stri
         }
     };
 
-    \Stripe\ApiRequestor::setHttpClient($mock);
+    ApiRequestor::setHttpClient($mock);
 }
 
 // ── authorization ────────────────────────────────────────────────────────
@@ -48,7 +51,7 @@ test('guests cannot submit an event', function () {
 // ── confirmFeaturePayment ─────────────────────────────────────────────────
 
 test('confirmFeaturePayment creates a FeaturedListing when customer matches', function () {
-    $user  = User::factory()->create(['stripe_id' => 'cus_correct_456']);
+    $user = User::factory()->create(['stripe_id' => 'cus_correct_456']);
     $event = Event::factory()->approved()->for($user)->create();
 
     fakeStripePaymentIntentForSubmit('succeeded', 'cus_correct_456');
@@ -60,13 +63,13 @@ test('confirmFeaturePayment creates a FeaturedListing when customer matches', fu
         ->call('confirmFeaturePayment', 'pi_test_123');
 
     $this->assertDatabaseHas('featured_listings', [
-        'event_id'                 => $event->id,
+        'event_id' => $event->id,
         'stripe_payment_intent_id' => 'pi_test_123',
     ]);
 });
 
 test('confirmFeaturePayment rejects a PaymentIntent from a different customer', function () {
-    $user  = User::factory()->create(['stripe_id' => 'cus_user_a']);
+    $user = User::factory()->create(['stripe_id' => 'cus_user_a']);
     $event = Event::factory()->approved()->for($user)->create();
 
     fakeStripePaymentIntentForSubmit('succeeded', 'cus_user_b');
@@ -96,7 +99,7 @@ test('submit validation rejects non-existent player IDs in expected_signer_ids',
 });
 
 test('submit validation accepts valid player IDs in expected_signer_ids', function () {
-    $user   = User::factory()->create();
+    $user = User::factory()->create();
     $player = Player::factory()->create();
 
     Livewire::actingAs($user)

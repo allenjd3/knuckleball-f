@@ -4,16 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Actions\CreateEventFeedItem;
 use App\Filament\Resources\EventResource\Pages;
-use App\Models\Event;
 use App\Helpers\Countries;
+use App\Models\Event;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\Collection;
 class EventResource extends Resource
 {
     protected static ?string $model = Event::class;
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar';
     protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
@@ -30,9 +31,9 @@ class EventResource extends Resource
         return $schema->components([
             Select::make('type')
                 ->options([
-                    'player_signing'   => 'Player Signing',
-                    'card_show'        => 'Card Show',
-                    'comic_con'        => 'Comic Con',
+                    'player_signing' => 'Player Signing',
+                    'card_show' => 'Card Show',
+                    'comic_con' => 'Comic Con',
                     'memorabilia_show' => 'Memorabilia Show',
                 ])
                 ->required(),
@@ -58,25 +59,25 @@ class EventResource extends Resource
                 TextColumn::make('type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'player_signing'   => 'Player Signing',
-                        'card_show'        => 'Card Show',
-                        'comic_con'        => 'Comic Con',
+                        'player_signing' => 'Player Signing',
+                        'card_show' => 'Card Show',
+                        'comic_con' => 'Comic Con',
                         'memorabilia_show' => 'Memorabilia Show',
-                        default            => ucfirst($state),
+                        default => ucfirst($state),
                     })
                     ->color(fn ($state) => match ($state) {
-                        'player_signing'   => 'info',
-                        'card_show'        => 'primary',
-                        'comic_con'        => 'warning',
+                        'player_signing' => 'info',
+                        'card_show' => 'primary',
+                        'comic_con' => 'warning',
                         'memorabilia_show' => 'success',
-                        default            => 'gray',
+                        default => 'gray',
                     }),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
                         'approved' => 'success',
                         'rejected' => 'danger',
-                        default    => 'warning',
+                        default => 'warning',
                     }),
                 TextColumn::make('player.name')->label('Player')->default('—'),
                 TextColumn::make('user.name')->label('Submitted By'),
@@ -91,9 +92,9 @@ class EventResource extends Resource
                     ->options(['pending' => 'Pending', 'approved' => 'Approved', 'rejected' => 'Rejected']),
                 SelectFilter::make('type')
                     ->options([
-                        'player_signing'   => 'Player Signing',
-                        'card_show'        => 'Card Show',
-                        'comic_con'        => 'Comic Con',
+                        'player_signing' => 'Player Signing',
+                        'card_show' => 'Card Show',
+                        'comic_con' => 'Comic Con',
                         'memorabilia_show' => 'Memorabilia Show',
                     ]),
             ])
@@ -119,7 +120,7 @@ class EventResource extends Resource
                     ])
                     ->action(function (Event $record, array $data) {
                         $record->update([
-                            'status'           => 'rejected',
+                            'status' => 'rejected',
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
                     }),
@@ -154,7 +155,7 @@ class EventResource extends Resource
     {
         return [
             'index' => Pages\ListEvents::route('/'),
-            'edit'  => Pages\EditEvent::route('/{record}/edit'),
+            'edit' => Pages\EditEvent::route('/{record}/edit'),
         ];
     }
 }

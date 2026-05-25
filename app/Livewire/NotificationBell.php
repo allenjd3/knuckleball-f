@@ -15,6 +15,7 @@ class NotificationBell extends Component
         if (! auth()->check()) {
             return collect();
         }
+
         return auth()->user()->notifications()->latest()->limit(20)->get();
     }
 
@@ -24,6 +25,7 @@ class NotificationBell extends Component
         if (! auth()->check()) {
             return 0;
         }
+
         return auth()->user()->unreadNotifications()->count();
     }
 

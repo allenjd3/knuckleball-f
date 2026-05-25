@@ -9,13 +9,11 @@ class FeaturedShop extends Model
 {
     protected $guarded = [];
 
-    protected function casts(): array
+    public static function prices(): array
     {
         return [
-            'starts_at'         => 'datetime',
-            'next_billing_date' => 'datetime',
-            'cancelled_at'      => 'datetime',
-            'amount_paid'       => 'decimal:2',
+            'monthly' => ['label' => 'Monthly', 'amount' => 999,  'display' => '$9.99/mo'],
+            'yearly' => ['label' => 'Yearly',  'amount' => 9900, 'display' => '$99/yr'],
         ];
     }
 
@@ -29,11 +27,13 @@ class FeaturedShop extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function prices(): array
+    protected function casts(): array
     {
         return [
-            'monthly' => ['label' => 'Monthly', 'amount' => 999,  'display' => '$9.99/mo'],
-            'yearly'  => ['label' => 'Yearly',  'amount' => 9900, 'display' => '$99/yr'],
+            'starts_at' => 'datetime',
+            'next_billing_date' => 'datetime',
+            'cancelled_at' => 'datetime',
+            'amount_paid' => 'decimal:2',
         ];
     }
 }

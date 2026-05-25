@@ -18,25 +18,13 @@ class CardShop extends Model
 
     protected $guarded = [];
 
-    protected function casts(): array
-    {
-        return [
-            'hours'       => 'array',
-            'photos'      => 'array',
-            'is_featured' => 'boolean',
-            'latitude'    => 'decimal:7',
-            'longitude'   => 'decimal:7',
-            'approved_at' => 'datetime',
-        ];
-    }
-
     protected static function booted(): void
     {
         static::creating(function (self $shop) {
             if (empty($shop->slug)) {
                 $base = Str::slug($shop->name);
                 $slug = $base;
-                $i    = 2;
+                $i = 2;
                 while (static::where('slug', $slug)->exists()) {
                     $slug = $base . '-' . $i++;
                 }
@@ -102,7 +90,7 @@ class CardShop extends Model
     public function scopeWithinRadius(Builder $query, float $lat, float $lng, int $miles): void
     {
         $query->whereNotNull('latitude')->whereNotNull('longitude')
-            ->selectRaw("*, (3959 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$lat, $lng, $lat])
+            ->selectRaw('*, (3959 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [$lat, $lng, $lat])
             ->having('distance', '<=', $miles);
     }
 
@@ -114,6 +102,7 @@ class CardShop extends Model
         if (! empty($photos)) {
             return Storage::url($photos[0]);
         }
+
         return $this->logo ? Storage::url($this->logo) : null;
     }
 
@@ -149,7 +138,7 @@ class CardShop extends Model
             return false;
         }
 
-        $open  = now()->setTimeFromTimeString($dayHours['open']);
+        $open = now()->setTimeFromTimeString($dayHours['open']);
         $close = now()->setTimeFromTimeString($dayHours['close']);
 
         return now()->between($open, $close);
@@ -176,14 +165,26 @@ class CardShop extends Model
     public function generateMeta(): array
     {
         return [
-            'shop_name'  => $this->name,
-            'city'       => $this->city,
-            'state'      => $this->state,
-            'country'    => $this->country,
+            'shop_name' => $this->name,
+            'city' => $this->city,
+            'state' => $this->state,
+            'country' => $this->country,
             'hero_photo' => $this->heroPhoto(),
-            'shop_path'  => $this->path(),
-            'latitude'   => $this->latitude,
-            'longitude'  => $this->longitude,
+            'shop_path' => $this->path(),
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'hours' => 'array',
+            'photos' => 'array',
+            'is_featured' => 'boolean',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
+            'approved_at' => 'datetime',
         ];
     }
 }

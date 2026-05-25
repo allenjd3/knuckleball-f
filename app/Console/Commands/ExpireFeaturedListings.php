@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class ExpireFeaturedListings extends Command
 {
-    protected $signature   = 'featured:expire';
+    protected $signature = 'featured:expire';
     protected $description = 'Mark expired featured listings and notify owners';
 
     public function handle(): void
@@ -23,7 +23,9 @@ class ExpireFeaturedListings extends Command
 
         foreach ($expired as $listing) {
             $event = $listing->event;
-            if (! $event || in_array($event->id, $notified)) continue;
+            if (! $event || in_array($event->id, $notified)) {
+                continue;
+            }
 
             // Only un-feature if there's no other active listing for this event
             $hasActiveOther = FeaturedListing::where('event_id', $event->id)

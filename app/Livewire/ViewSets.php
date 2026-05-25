@@ -72,6 +72,12 @@ class ViewSets extends Component implements HasActions, HasForms
             });
     }
 
+    public function render()
+    {
+        return view('livewire.view-sets')
+            ->layout('layouts.app');
+    }
+
     private function formSchema(): array
     {
         return [
@@ -104,11 +110,5 @@ class ViewSets extends Component implements HasActions, HasForms
                 ->directory('sets')
                 ->nullable(),
         ];
-    }
-
-    public function render()
-    {
-        return view('livewire.view-sets')
-            ->layout('layouts.app');
     }
 }

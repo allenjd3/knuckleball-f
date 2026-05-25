@@ -20,8 +20,8 @@ $scrollIntoViewJsSnippet = ($scrollTo !== false)
                         {!! __('pagination.previous') !!}
                     </x-filament::button>
                 @else
-                    @if(method_exists($paginator,'getCursorName'))
-                        <x-filament::button dusk="previousPage" wire:key="cursor-{{ $paginator->getCursorName() }}-{{ $paginator->previousCursor()->encode() }}" wire:click="setPage('{{$paginator->previousCursor()->encode()}}','{{ $paginator->getCursorName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled">
+                    @if (method_exists($paginator,'getCursorName'))
+                        <x-filament::button dusk="previousPage" wire:key="cursor-{{ $paginator->getCursorName() }}-{{ $paginator->previousCursor()->encode() }}" wire:click="setPage('{{ $paginator->previousCursor()->encode() }}','{{ $paginator->getCursorName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled">
                                 {!! __('pagination.previous') !!}
                         </x-filament::button>
                     @else
@@ -35,8 +35,8 @@ $scrollIntoViewJsSnippet = ($scrollTo !== false)
             <span>
                 {{-- Next Page Link --}}
                 @if ($paginator->hasMorePages())
-                    @if(method_exists($paginator,'getCursorName'))
-                        <x-filament::button dusk="nextPage" wire:key="cursor-{{ $paginator->getCursorName() }}-{{ $paginator->nextCursor()->encode() }}" wire:click="setPage('{{$paginator->nextCursor()->encode()}}','{{ $paginator->getCursorName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled">
+                    @if (method_exists($paginator,'getCursorName'))
+                        <x-filament::button dusk="nextPage" wire:key="cursor-{{ $paginator->getCursorName() }}-{{ $paginator->nextCursor()->encode() }}" wire:click="setPage('{{ $paginator->nextCursor()->encode() }}','{{ $paginator->getCursorName() }}')" x-on:click="{{ $scrollIntoViewJsSnippet }}" wire:loading.attr="disabled">
                                 {!! __('pagination.next') !!}
                         </x-filament::button>
                     @else

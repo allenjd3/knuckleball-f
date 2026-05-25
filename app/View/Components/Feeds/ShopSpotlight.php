@@ -17,11 +17,11 @@ class ShopSpotlight extends Component
     {
         $meta = $feed->meta;
 
-        $this->shopName  = $meta['shop_name'] ?? '';
-        $this->shopPath  = $meta['shop_path'] ?? '#';
+        $this->shopName = $meta['shop_name'] ?? '';
+        $this->shopPath = $meta['shop_path'] ?? '#';
         $this->cityState = collect([$meta['city'] ?? null, $meta['state'] ?? null])->filter()->implode(', ');
         $this->heroPhoto = $meta['hero_photo'] ?? null;
-        $this->shopIds   = $meta['shop_ids'] ?? [];
+        $this->shopIds = $meta['shop_ids'] ?? [];
     }
 
     public function render()

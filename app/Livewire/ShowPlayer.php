@@ -6,9 +6,9 @@ use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
 use App\Models\Fee;
+use App\Models\Pack;
 use App\Models\Player;
 use App\Models\Tag;
-use App\Models\Pack;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -61,13 +61,18 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     #[Computed]
     public function isWatching(): bool
     {
-        if (! auth()->check()) return false;
+        if (! auth()->check()) {
+            return false;
+        }
+
         return auth()->user()->watchlist()->where('player_id', $this->player->id)->exists();
     }
 
     public function toggleWatchlist(): void
     {
-        if (! auth()->check()) return;
+        if (! auth()->check()) {
+            return;
+        }
 
         if ($this->isWatching) {
             auth()->user()->watchlist()->detach($this->player->id);

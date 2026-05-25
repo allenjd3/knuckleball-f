@@ -11,11 +11,11 @@ class EventFactory extends Factory
     public function definition(): array
     {
         return [
-            'type'       => 'player_signing',
-            'name'       => fake()->words(3, true),
+            'type' => 'player_signing',
+            'name' => fake()->words(3, true),
             'start_date' => fake()->dateTimeBetween('+1 week', '+3 months')->format('Y-m-d'),
-            'user_id'    => User::factory(),
-            'status'     => 'pending',
+            'user_id' => User::factory(),
+            'status' => 'pending',
         ];
     }
 
@@ -27,18 +27,18 @@ class EventFactory extends Factory
     public function playerSigning(?Player $player = null): static
     {
         return $this->state([
-            'type'          => 'player_signing',
+            'type' => 'player_signing',
             'event_subtype' => 'in_person',
-            'player_id'     => $player?->id ?? Player::factory(),
+            'player_id' => $player?->id ?? Player::factory(),
         ]);
     }
 
     public function mailIn(?Player $player = null): static
     {
         return $this->state([
-            'type'          => 'player_signing',
+            'type' => 'player_signing',
             'event_subtype' => 'mail_in',
-            'player_id'     => $player?->id ?? Player::factory(),
+            'player_id' => $player?->id ?? Player::factory(),
         ]);
     }
 
@@ -52,10 +52,10 @@ class EventFactory extends Factory
     public function withLocation(float $lat = 40.7128, float $lng = -74.0060): static
     {
         return $this->state([
-            'latitude'  => $lat,
+            'latitude' => $lat,
             'longitude' => $lng,
-            'city'      => 'New York',
-            'state'     => 'NY',
+            'city' => 'New York',
+            'state' => 'NY',
         ]);
     }
 

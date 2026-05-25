@@ -22,12 +22,12 @@ class CardShowAlert extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
-            'event_id'   => $this->event->id,
+            'event_id' => $this->event->id,
             'event_name' => $this->event->name,
             'event_path' => $this->event->path(),
-            'date'       => $this->event->formattedDate(),
-            'city'       => $this->event->city,
-            'state'      => $this->event->state,
+            'date' => $this->event->formattedDate(),
+            'city' => $this->event->city,
+            'state' => $this->event->state,
         ];
     }
 
@@ -35,7 +35,7 @@ class CardShowAlert extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject("Card Show near you — {$this->event->name}")
-            ->greeting("Card show alert!")
+            ->greeting('Card show alert!')
             ->line("A card show near you is coming up: **{$this->event->name}**")
             ->line("{$this->event->formattedDate()} · {$this->event->city}, {$this->event->state}")
             ->action('View Event', $this->event->path());

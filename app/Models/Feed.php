@@ -7,9 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use App\Models\CardSet;
-use App\Models\Pack;
-use App\Models\Reaction;
 
 class Feed extends Model
 {
@@ -35,33 +32,13 @@ class Feed extends Model
     {
         return match (true) {
             $this->feedable_type === PostalMail::class => $this->postalMailComponentName(),
-            $this->feedable_type === Pack::class       => 'feeds.pack-card',
-            $this->feedable_type === CardSet::class    => $this->setCardComponentName(),
-            $this->feedable_type === Comment::class    => 'feeds.comment',
-            $this->feedable_type === Event::class      => 'feeds.event-card',
-            $this->feedable_type === CardShop::class   => 'feeds.shop-spotlight',
-            default                                    => 'feeds.send-card',
+            $this->feedable_type === Pack::class => 'feeds.pack-card',
+            $this->feedable_type === CardSet::class => $this->setCardComponentName(),
+            $this->feedable_type === Comment::class => 'feeds.comment',
+            $this->feedable_type === Event::class => 'feeds.event-card',
+            $this->feedable_type === CardShop::class => 'feeds.shop-spotlight',
+            default => 'feeds.send-card',
         };
-    }
-
-    private function setCardComponentName(): string
-    {
-        return match (data_get($this->meta, 'card_type')) {
-            'completion' => 'feeds.set-completion-card',
-            'milestone'  => 'feeds.set-milestone-card',
-            default      => 'feeds.set-card',
-        };
-    }
-
-    private function postalMailComponentName(): string
-    {
-        if (data_get($this->meta, 'date_returned')) {
-            return 'feeds.celebration-card';
-        }
-        if (!empty(data_get($this->meta, 'card_photos', []))) {
-            return 'feeds.media-card';
-        }
-        return 'feeds.send-card';
     }
 
     public function reactions(): HasMany
@@ -90,5 +67,26 @@ class Feed extends Model
             'mentioned_by_id' => $this->followable_id,
             'feed_type' => $this->feedable_type,
         ]);
+    }
+
+    private function setCardComponentName(): string
+    {
+        return match (data_get($this->meta, 'card_type')) {
+            'completion' => 'feeds.set-completion-card',
+            'milestone' => 'feeds.set-milestone-card',
+            default => 'feeds.set-card',
+        };
+    }
+
+    private function postalMailComponentName(): string
+    {
+        if (data_get($this->meta, 'date_returned')) {
+            return 'feeds.celebration-card';
+        }
+        if (! empty(data_get($this->meta, 'card_photos', []))) {
+            return 'feeds.media-card';
+        }
+
+        return 'feeds.send-card';
     }
 }

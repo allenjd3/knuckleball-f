@@ -11,7 +11,7 @@ test('it creates a snapshot for every user', function () {
     foreach ($users as $user) {
         $this->assertDatabaseHas('user_snapshots', [
             'user_id' => $user->id,
-            'year'    => now()->year,
+            'year' => now()->year,
         ]);
     }
 });
@@ -32,6 +32,6 @@ test('it accepts a custom year option', function () {
 
     $this->assertDatabaseHas('user_snapshots', [
         'user_id' => $user->id,
-        'year'    => 2025,
+        'year' => 2025,
     ]);
 });

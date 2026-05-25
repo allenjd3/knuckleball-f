@@ -39,12 +39,11 @@ test('it notifies all watchers of a mail-in signing regardless of location', fun
 });
 
 test('it notifies watchers within radius for in-person signing', function () {
-    $this->mock(GeocodingService::class, fn ($mock) =>
-        $mock->shouldReceive('geocodeZip')
-             ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
+    $this->mock(GeocodingService::class, fn ($mock) => $mock->shouldReceive('geocodeZip')
+        ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
     );
 
-    $player  = Player::factory()->create();
+    $player = Player::factory()->create();
     $watcher = User::factory()->create(['zip_code' => '10001', 'radius' => 50]);
     $watcher->watchlist()->attach($player);
 
@@ -60,12 +59,11 @@ test('it notifies watchers within radius for in-person signing', function () {
 });
 
 test('it does not notify watchers outside radius for in-person signing', function () {
-    $this->mock(GeocodingService::class, fn ($mock) =>
-        $mock->shouldReceive('geocodeZip')
-             ->andReturn(['latitude' => FAR_LAT, 'longitude' => FAR_LNG])
+    $this->mock(GeocodingService::class, fn ($mock) => $mock->shouldReceive('geocodeZip')
+        ->andReturn(['latitude' => FAR_LAT, 'longitude' => FAR_LNG])
     );
 
-    $player  = Player::factory()->create();
+    $player = Player::factory()->create();
     $watcher = User::factory()->create(['zip_code' => '90001', 'radius' => 50]);
     $watcher->watchlist()->attach($player);
 
@@ -81,15 +79,14 @@ test('it does not notify watchers outside radius for in-person signing', functio
 });
 
 test('it notifies card-show-alert users within radius for a card show', function () {
-    $this->mock(GeocodingService::class, fn ($mock) =>
-        $mock->shouldReceive('geocodeZip')
-             ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
+    $this->mock(GeocodingService::class, fn ($mock) => $mock->shouldReceive('geocodeZip')
+        ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
     );
 
     $user = User::factory()->create([
         'card_show_alerts' => true,
-        'zip_code'         => '10001',
-        'radius'           => 50,
+        'zip_code' => '10001',
+        'radius' => 50,
     ]);
 
     $event = Event::factory()
@@ -104,15 +101,14 @@ test('it notifies card-show-alert users within radius for a card show', function
 });
 
 test('it does not notify card-show-alert users outside radius', function () {
-    $this->mock(GeocodingService::class, fn ($mock) =>
-        $mock->shouldReceive('geocodeZip')
-             ->andReturn(['latitude' => FAR_LAT, 'longitude' => FAR_LNG])
+    $this->mock(GeocodingService::class, fn ($mock) => $mock->shouldReceive('geocodeZip')
+        ->andReturn(['latitude' => FAR_LAT, 'longitude' => FAR_LNG])
     );
 
     $user = User::factory()->create([
         'card_show_alerts' => true,
-        'zip_code'         => '90001',
-        'radius'           => 50,
+        'zip_code' => '90001',
+        'radius' => 50,
     ]);
 
     $event = Event::factory()
@@ -127,15 +123,14 @@ test('it does not notify card-show-alert users outside radius', function () {
 });
 
 test('it does not notify users who have card_show_alerts disabled', function () {
-    $this->mock(GeocodingService::class, fn ($mock) =>
-        $mock->shouldReceive('geocodeZip')
-             ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
+    $this->mock(GeocodingService::class, fn ($mock) => $mock->shouldReceive('geocodeZip')
+        ->andReturn(['latitude' => NEAR_LAT, 'longitude' => NEAR_LNG])
     );
 
     $user = User::factory()->create([
         'card_show_alerts' => false,
-        'zip_code'         => '10001',
-        'radius'           => 50,
+        'zip_code' => '10001',
+        'radius' => 50,
     ]);
 
     $event = Event::factory()

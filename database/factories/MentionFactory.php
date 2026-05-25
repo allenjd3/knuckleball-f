@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Feed;
+use App\Models\Mention;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Mention>
+ * @extends Factory<Mention>
  */
 class MentionFactory extends Factory
 {

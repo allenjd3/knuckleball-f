@@ -24,6 +24,7 @@ class WatchlistManager extends Component
                     ->first();
 
                 $player->latest_signing = $latestSigning;
+
                 return $player;
             });
     }

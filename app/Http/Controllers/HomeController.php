@@ -15,10 +15,10 @@ class HomeController extends Controller
             ->limit(20)
             ->get()
             ->map(function (Feed $feed) {
-                $meta    = $feed->meta;
-                $slug    = basename(data_get($meta, 'user_path', ''));
-                $player  = data_get($meta, 'player', '');
-                $days    = data_get($meta, 'turnaround_days');
+                $meta = $feed->meta;
+                $slug = basename(data_get($meta, 'user_path', ''));
+                $player = data_get($meta, 'player', '');
+                $days = data_get($meta, 'turnaround_days');
                 $isReturn = ! empty(data_get($meta, 'date_returned'));
 
                 return compact('slug', 'player', 'days', 'isReturn');

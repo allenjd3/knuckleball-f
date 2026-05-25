@@ -14,7 +14,7 @@ class TakeUserSnapshots extends Command
 
     public function handle(UserStatsService $statsService): void
     {
-        $year  = (int) ($this->option('year') ?? now()->year);
+        $year = (int) ($this->option('year') ?? now()->year);
         $total = User::count();
         $count = 0;
 

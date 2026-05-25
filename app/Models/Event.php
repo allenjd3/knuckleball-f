@@ -16,33 +16,6 @@ class Event extends Model
 
     protected $guarded = [];
 
-    protected function casts(): array
-    {
-        return [
-            'start_date'            => 'date',
-            'end_date'              => 'date',
-            'submission_deadline'   => 'date',
-            'expected_return_by'    => 'date',
-            'approved_at'           => 'datetime',
-            'is_multi_day'          => 'boolean',
-            'personalization_allowed' => 'boolean',
-            'photo_op_available'    => 'boolean',
-            'vip_available'         => 'boolean',
-            'registration_required' => 'boolean',
-            'return_envelope_required' => 'boolean',
-            'is_featured'           => 'boolean',
-            'card_show_alerts'      => 'boolean',
-            'photos'                => 'array',
-            'payment_methods'       => 'array',
-            'pricing_items'         => 'array',
-            'fees_per_item'         => 'decimal:2',
-            'photo_op_price'        => 'decimal:2',
-            'vip_price'             => 'decimal:2',
-            'latitude'              => 'decimal:7',
-            'longitude'             => 'decimal:7',
-        ];
-    }
-
     // ── Relationships ──────────────────────────────────────────────
 
     public function player(): BelongsTo
@@ -108,7 +81,7 @@ class Event extends Model
     {
         $query->where(function ($q) {
             $q->whereIn('type', ['card_show', 'comic_con', 'memorabilia_show'])
-              ->orWhere(fn ($q) => $q->where('type', 'player_signing')->where('event_subtype', 'in_person'));
+                ->orWhere(fn ($q) => $q->where('type', 'player_signing')->where('event_subtype', 'in_person'));
         });
     }
 
@@ -130,7 +103,7 @@ class Event extends Model
     public function scopeWithinRadius(Builder $query, float $lat, float $lng, int $miles): void
     {
         $query->whereNotNull('latitude')->whereNotNull('longitude')
-            ->selectRaw("*, (3959 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$lat, $lng, $lat])
+            ->selectRaw('*, (3959 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [$lat, $lng, $lat])
             ->having('distance', '<=', $miles);
     }
 
@@ -139,11 +112,11 @@ class Event extends Model
     public function getTypeLabel(): string
     {
         return match ($this->type) {
-            'player_signing'   => 'Player Signing',
-            'card_show'        => 'Card Show',
-            'comic_con'        => 'Comic Con',
+            'player_signing' => 'Player Signing',
+            'card_show' => 'Card Show',
+            'comic_con' => 'Comic Con',
             'memorabilia_show' => 'Memorabilia Show',
-            default            => ucfirst($this->type),
+            default => ucfirst($this->type),
         };
     }
 
@@ -151,8 +124,8 @@ class Event extends Model
     {
         return match ($this->event_subtype) {
             'in_person' => 'In Person',
-            'mail_in'   => 'Mail In',
-            default     => '',
+            'mail_in' => 'Mail In',
+            default => '',
         };
     }
 
@@ -182,8 +155,10 @@ class Event extends Model
             if ($this->start_date->month === $this->end_date->month) {
                 return $this->start_date->format('M j') . '–' . $this->end_date->format('j, Y');
             }
+
             return $this->start_date->format('M j') . ' – ' . $this->end_date->format('M j, Y');
         }
+
         return $this->start_date->format('M j, Y');
     }
 
@@ -196,6 +171,7 @@ class Event extends Model
                 : null;
         }
         $photos = $this->photos ?? [];
+
         return ! empty($photos) ? Storage::url($photos[0]) : null;
     }
 
@@ -219,24 +195,51 @@ class Event extends Model
     public function generateMeta(): array
     {
         return [
-            'event_type'   => $this->type,
+            'event_type' => $this->type,
             'event_subtype' => $this->event_subtype,
-            'name'         => $this->name,
-            'date'         => $this->formattedDate(),
-            'venue'        => $this->venue_name,
-            'city'         => $this->city,
-            'state'        => $this->state,
-            'country'      => $this->country,
-            'fees'         => $this->fees_per_item,
-            'player'       => $this->player?->name,
-            'player_path'  => $this->player?->path(),
+            'name' => $this->name,
+            'date' => $this->formattedDate(),
+            'venue' => $this->venue_name,
+            'city' => $this->city,
+            'state' => $this->state,
+            'country' => $this->country,
+            'fees' => $this->fees_per_item,
+            'player' => $this->player?->name,
+            'player_path' => $this->player?->path(),
             'player_photo' => $this->player?->media?->url
                 ? Storage::url($this->player->media->url)
                 : null,
-            'hero_photo'   => $this->heroPhoto(),
-            'event_path'   => $this->path(),
-            'latitude'     => $this->latitude,
-            'longitude'    => $this->longitude,
+            'hero_photo' => $this->heroPhoto(),
+            'event_path' => $this->path(),
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
+        ];
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'submission_deadline' => 'date',
+            'expected_return_by' => 'date',
+            'approved_at' => 'datetime',
+            'is_multi_day' => 'boolean',
+            'personalization_allowed' => 'boolean',
+            'photo_op_available' => 'boolean',
+            'vip_available' => 'boolean',
+            'registration_required' => 'boolean',
+            'return_envelope_required' => 'boolean',
+            'is_featured' => 'boolean',
+            'card_show_alerts' => 'boolean',
+            'photos' => 'array',
+            'payment_methods' => 'array',
+            'pricing_items' => 'array',
+            'fees_per_item' => 'decimal:2',
+            'photo_op_price' => 'decimal:2',
+            'vip_price' => 'decimal:2',
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 }

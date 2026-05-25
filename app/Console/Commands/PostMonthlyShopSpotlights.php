@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 
 class PostMonthlyShopSpotlights extends Command
 {
-    protected $signature   = 'shops:post-spotlights';
+    protected $signature = 'shops:post-spotlights';
     protected $description = 'Post monthly feed spotlights for featured card shops';
 
     public function handle(): void
@@ -17,6 +17,7 @@ class PostMonthlyShopSpotlights extends Command
 
         if ($shops->isEmpty()) {
             $this->info('No featured shops to spotlight.');
+
             return;
         }
 

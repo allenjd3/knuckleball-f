@@ -27,15 +27,15 @@ class CardSetObserver
         $set->loadMissing('user');
 
         $setData = [
-            'id'               => $set->id,
-            'name'             => $set->name,
-            'year'             => $set->year,
-            'manufacturer'     => $set->manufacturer,
-            'description'      => $set->description,
-            'slug'             => $set->slug,
-            'cover_image'      => $set->cover_image,
-            'path'             => $set->path(),
-            'entries_count'    => 0,
+            'id' => $set->id,
+            'name' => $set->name,
+            'year' => $set->year,
+            'manufacturer' => $set->manufacturer,
+            'description' => $set->description,
+            'slug' => $set->slug,
+            'cover_image' => $set->cover_image,
+            'path' => $set->path(),
+            'entries_count' => 0,
         ];
 
         $existing = Feed::where('feedable_type', CardSet::class)
@@ -45,20 +45,20 @@ class CardSetObserver
             ->first();
 
         if ($existing) {
-            $sets   = data_get($existing->meta, 'sets', []);
+            $sets = data_get($existing->meta, 'sets', []);
             $sets[] = $setData;
             $existing->update(['meta' => array_merge($existing->meta ?? [], ['sets' => $sets])]);
         } else {
             Feed::create([
                 'followable_id' => $set->user_id,
                 'feedable_type' => CardSet::class,
-                'feedable_id'   => $set->id,
-                'comment'       => '',
-                'meta'          => [
-                    'photo'     => $set->user->profile_photo_url,
-                    'user'      => $set->user->name,
+                'feedable_id' => $set->id,
+                'comment' => '',
+                'meta' => [
+                    'photo' => $set->user->profile_photo_url,
+                    'user' => $set->user->name,
                     'user_path' => $set->user->path(),
-                    'sets'      => [$setData],
+                    'sets' => [$setData],
                 ],
             ]);
         }

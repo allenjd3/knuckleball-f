@@ -71,35 +71,35 @@ class PostalMail extends Model
 
     public function generateMeta(array $overrides = [])
     {
-        $user   = $this->user;
+        $user = $this->user;
         $player = $this->player;
-        $cards  = $this->cards()->with('media')->get();
+        $cards = $this->cards()->with('media')->get();
 
         $cardPhotos = $cards->flatMap(fn ($card) => $card->media)->pluck('url')->toArray();
 
         $playerPhoto = null;
-        $category    = null;
+        $category = null;
         if ($player instanceof Player) {
             $player->loadMissing('media', 'team.category');
             $playerPhoto = $player->media?->url;
-            $category    = $player->team?->category?->name;
+            $category = $player->team?->category?->name;
         }
 
         return [
-            'photo'           => $user->profile_photo_url,
-            'user'            => $user->name,
-            'user_path'       => $user->path(),
-            'player'          => $player->name,
-            'player_path'     => $player->path(),
-            'player_photo'    => $playerPhoto,
-            'category'        => $category,
-            'date_sent'       => $this->date_sent,
-            'date_returned'   => $this->returned_date,
+            'photo' => $user->profile_photo_url,
+            'user' => $user->name,
+            'user_path' => $user->path(),
+            'player' => $player->name,
+            'player_path' => $player->path(),
+            'player_photo' => $playerPhoto,
+            'category' => $category,
+            'date_sent' => $this->date_sent,
+            'date_returned' => $this->returned_date,
             'turnaround_days' => $this->returned_date && $this->date_sent
                 ? (int) $this->date_sent->diffInDays($this->returned_date)
                 : null,
-            'card_photos'  => $cardPhotos,
-            'cards_count'  => $cards->count(),
+            'card_photos' => $cardPhotos,
+            'cards_count' => $cards->count(),
             ...$overrides,
         ];
     }

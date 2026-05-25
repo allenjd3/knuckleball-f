@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeaturedListingResource\Pages;
 use App\Models\FeaturedListing;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -14,7 +15,7 @@ use Filament\Tables\Table;
 class FeaturedListingResource extends Resource
 {
     protected static ?string $model = FeaturedListing::class;
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
     protected static ?string $navigationLabel = 'Featured Events';
     protected static ?int $navigationSort = 6;
 
@@ -64,17 +65,17 @@ class FeaturedListingResource extends Resource
                     ->badge()
                     ->getStateUsing(fn (FeaturedListing $record): string => $record->isActive() ? 'active' : 'expired')
                     ->color(fn (string $state): string => match ($state) {
-                        'active'  => 'success',
+                        'active' => 'success',
                         'expired' => 'gray',
-                        default   => 'gray',
+                        default => 'gray',
                     }),
             ])
             ->filters([
                 SelectFilter::make('plan_type')
                     ->options([
                         'one_time' => 'One-time',
-                        'monthly'  => 'Monthly',
-                        'yearly'   => 'Yearly',
+                        'monthly' => 'Monthly',
+                        'yearly' => 'Yearly',
                     ]),
             ])
             ->recordActions([

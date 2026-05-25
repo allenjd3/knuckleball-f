@@ -158,7 +158,6 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ->where(
                 fn ($query) => $query->where('published_at', '<', now()->endOfDay())
                     ->where('rejected', false)
-            )
-;
+            );
     }
 }

@@ -90,6 +90,12 @@ class ViewWantLists extends Component implements HasActions, HasForms, HasTable
             });
     }
 
+    public function render()
+    {
+        return view('livewire.view-want-lists')
+            ->layout('layouts.app');
+    }
+
     private function formSchema(): array
     {
         return [
@@ -105,11 +111,5 @@ class ViewWantLists extends Component implements HasActions, HasForms, HasTable
                 ->default(true)
                 ->helperText('Public lists can be browsed and followed by other users.'),
         ];
-    }
-
-    public function render()
-    {
-        return view('livewire.view-want-lists')
-            ->layout('layouts.app');
     }
 }

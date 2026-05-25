@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CardShopResource\Pages;
 
 use App\Filament\Resources\CardShopResource;
 use App\Models\ShopClaim;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Pages\ManageRelatedRecords;
@@ -14,7 +15,7 @@ class ManageShopClaims extends ManageRelatedRecords
 {
     protected static string $resource = CardShopResource::class;
     protected static string $relationship = 'claims';
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-identification';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
 
     public static function getNavigationLabel(): string
     {
@@ -32,7 +33,7 @@ class ManageShopClaims extends ManageRelatedRecords
                     ->color(fn ($state) => match ($state) {
                         'approved' => 'success',
                         'rejected' => 'danger',
-                        default    => 'warning',
+                        default => 'warning',
                     }),
                 TextColumn::make('verification_notes')->label('Notes')->limit(60)->default('—'),
                 TextColumn::make('reviewed_at')->label('Reviewed')->dateTime()->placeholder('—'),
@@ -65,9 +66,9 @@ class ManageShopClaims extends ManageRelatedRecords
                     ])
                     ->action(function (ShopClaim $record, array $data) {
                         $record->update([
-                            'status'           => 'rejected',
+                            'status' => 'rejected',
                             'rejection_reason' => $data['rejection_reason'],
-                            'reviewed_at'      => now(),
+                            'reviewed_at' => now(),
                         ]);
                     }),
             ]);

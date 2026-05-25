@@ -4,14 +4,14 @@ use App\Models\Event;
 use App\Models\FeaturedListing;
 
 test('featuredListing returns an active one-time listing', function () {
-    $event   = Event::factory()->approved()->create();
+    $event = Event::factory()->approved()->create();
     $listing = FeaturedListing::factory()->for($event)->create();
 
     expect($event->featuredListing->id)->toBe($listing->id);
 });
 
 test('featuredListing returns a subscription listing with null expires_at', function () {
-    $event   = Event::factory()->approved()->create();
+    $event = Event::factory()->approved()->create();
     $listing = FeaturedListing::factory()->subscription()->for($event)->create();
 
     expect($event->featuredListing->id)->toBe($listing->id);

@@ -6,9 +6,9 @@ use App\Actions\CreateFeedItem;
 use App\Enums\SetEntryStatus;
 use App\Http\Controllers\ReturnCardController;
 use App\Jobs\GenerateReturnCard;
-use App\Models\Comment;
 use App\Models\FeeMaterial;
 use App\Models\Player;
+use App\Models\PostalMail;
 use App\Models\SetEntry;
 use App\Services\ReturnCardService;
 use Filament\Actions\Action;
@@ -31,12 +31,12 @@ class FeedComposer extends Component implements HasActions, HasForms
     public string $body = '';
 
     // Share return prompt
-    public ?int  $shareMailId    = null;
-    public bool  $shareOpen      = false;
-    public bool  $shareGenerating = false;
+    public ?int $shareMailId = null;
+    public bool $shareOpen = false;
+    public bool $shareGenerating = false;
 
     // Set connection prompt (shown after logging a return if player is in Need It sets)
-    public bool  $setPromptOpen   = false;
+    public bool $setPromptOpen = false;
     public array $setPromptEntries = [];
 
     public function submit(): void
@@ -94,10 +94,10 @@ class FeedComposer extends Component implements HasActions, HasForms
                 $player = Player::with('signer')->findOrFail($data['player_id']);
 
                 $postalMail = auth()->user()->postalMails()->create([
-                    'signer_id'       => $player->signer->id,
-                    'date_sent'       => $data['date_sent'],
+                    'signer_id' => $player->signer->id,
+                    'date_sent' => $data['date_sent'],
                     'fee_material_id' => $data['fee_material_id'],
-                    'comment'         => $data['comment'] ?? null,
+                    'comment' => $data['comment'] ?? null,
                 ]);
 
                 $postalMail->feeMaterials()->attach($data['fee_material_id']);
@@ -130,6 +130,7 @@ class FeedComposer extends Component implements HasActions, HasForms
                             ->mapWithKeys(function ($pm) {
                                 $name = optional($pm->player)->name ?? 'Unknown';
                                 $date = $pm->date_sent?->format('M j, Y') ?? '—';
+
                                 return [$pm->id => "{$name} · sent {$date}"];
                             });
                     }),
@@ -150,7 +151,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
                 $postalMail->update([
                     'returned_date' => $data['returned_date'],
-                    'comment'       => $data['comment'] ?? $postalMail->comment,
+                    'comment' => $data['comment'] ?? $postalMail->comment,
                 ]);
 
                 // PostalMail::booted() updated hook calls UpdateFeedItem automatically,
@@ -159,7 +160,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
                 // Trigger the share prompt
                 $this->shareMailId = $postalMail->id;
-                $this->shareOpen   = true;
+                $this->shareOpen = true;
                 GenerateReturnCard::dispatch($postalMail->id);
 
                 // Check if this player is in any Need It set entries
@@ -174,7 +175,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
                     if ($entries->isNotEmpty()) {
                         $this->setPromptEntries = $entries->map(fn ($e) => [
-                            'id'       => $e->id,
+                            'id' => $e->id,
                             'set_name' => $e->cardSet->name,
                             'set_path' => $e->cardSet->path(),
                         ])->toArray();
@@ -186,7 +187,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
     public function closeShare(): void
     {
-        $this->shareOpen   = false;
+        $this->shareOpen = false;
         $this->shareMailId = null;
     }
 
@@ -196,37 +197,46 @@ class FeedComposer extends Component implements HasActions, HasForms
         SetEntry::whereIn('id', $ids)
             ->whereHas('cardSet', fn ($q) => $q->where('user_id', auth()->id()))
             ->update([
-                'status'      => SetEntryStatus::HaveItSigned->value,
+                'status' => SetEntryStatus::HaveItSigned->value,
                 'date_signed' => now()->toDateString(),
             ]);
-        $this->setPromptOpen   = false;
+        $this->setPromptOpen = false;
         $this->setPromptEntries = [];
     }
 
     public function dismissSetPrompt(): void
     {
-        $this->setPromptOpen   = false;
+        $this->setPromptOpen = false;
         $this->setPromptEntries = [];
     }
 
     public function shareSquareUrl(): string
     {
-        if (! $this->shareMailId) return '#';
-        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        if (! $this->shareMailId) {
+            return '#';
+        }
+        $mail = PostalMail::find($this->shareMailId);
+
         return $mail ? ReturnCardController::signedUrl($mail, 'square') : '#';
     }
 
     public function shareStoryUrl(): string
     {
-        if (! $this->shareMailId) return '#';
-        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        if (! $this->shareMailId) {
+            return '#';
+        }
+        $mail = PostalMail::find($this->shareMailId);
+
         return $mail ? ReturnCardController::signedUrl($mail, 'story') : '#';
     }
 
     public function sharePreviewUrl(): ?string
     {
-        if (! $this->shareMailId) return null;
-        $mail = \App\Models\PostalMail::find($this->shareMailId);
+        if (! $this->shareMailId) {
+            return null;
+        }
+        $mail = PostalMail::find($this->shareMailId);
+
         return $mail ? app(ReturnCardService::class)->previewUrl($mail, 'square') : null;
     }
 

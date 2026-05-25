@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class GeocodingService
 {
@@ -19,7 +20,7 @@ class GeocodingService
         try {
             $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
                 'address' => $address,
-                'key'     => $key,
+                'key' => $key,
             ]);
 
             $data = $response->json();
@@ -31,11 +32,12 @@ class GeocodingService
             $location = $data['results'][0]['geometry']['location'];
 
             return [
-                'latitude'  => $location['lat'],
+                'latitude' => $location['lat'],
                 'longitude' => $location['lng'],
             ];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::warning('Geocoding failed', ['address' => $address, 'error' => $e->getMessage()]);
+
             return null;
         }
     }

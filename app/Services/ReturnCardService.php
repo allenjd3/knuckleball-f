@@ -9,26 +9,26 @@ use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Geometry\Factories\RectangleFactory;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Typography\FontFactory;
+use Throwable;
 
 class ReturnCardService
 {
+    // Brand colours
+    private const BG = '#0F1117';
+    private const RED = '#D93C3F';
+    private const MUTED = '#9CA3AF';
+    private const BADGE = '#1E2230';
+    private const BORDER = '#3A4055';
     private ImageManager $manager;
     private string $boldFont;
     private string $regularFont;
     private string $mediumFont;
 
-    // Brand colours
-    private const BG     = '#0F1117';
-    private const RED    = '#D93C3F';
-    private const MUTED  = '#9CA3AF';
-    private const BADGE  = '#1E2230';
-    private const BORDER = '#3A4055';
-
     public function __construct()
     {
-        $this->manager     = new ImageManager(new Driver());
-        $this->boldFont    = resource_path('fonts/Inter-Bold.ttf');
-        $this->mediumFont  = resource_path('fonts/Inter-Medium.ttf');
+        $this->manager = new ImageManager(new Driver);
+        $this->boldFont = resource_path('fonts/Inter-Bold.ttf');
+        $this->mediumFont = resource_path('fonts/Inter-Medium.ttf');
         $this->regularFont = resource_path('fonts/Inter-Regular.ttf');
     }
 
@@ -58,7 +58,7 @@ class ReturnCardService
 
         return [
             'square' => $this->buildSquare($mail->id, $data),
-            'story'  => $this->buildStory($mail->id, $data),
+            'story' => $this->buildStory($mail->id, $data),
         ];
     }
 
@@ -87,11 +87,11 @@ class ReturnCardService
             'signer.fees',
         ]);
 
-        $player     = $mail->player;
+        $player = $mail->player;
         $playerName = $player?->name ?? 'Unknown Player';
 
         $playerPhotoPath = $this->resolveStoragePath($player instanceof Player ? $player->media?->url : null);
-        $cardPhotoPath   = $this->resolveStoragePath($mail->cards->first()?->media->first()?->url);
+        $cardPhotoPath = $this->resolveStoragePath($mail->cards->first()?->media->first()?->url);
 
         $turnaroundDays = ($mail->returned_date && $mail->date_sent)
             ? (int) $mail->date_sent->diffInDays($mail->returned_date)
@@ -109,18 +109,20 @@ class ReturnCardService
         }
 
         return [
-            'playerName'      => $playerName,
+            'playerName' => $playerName,
             'playerPhotoPath' => $playerPhotoPath,
-            'cardPhotoPath'   => $cardPhotoPath,
-            'turnaroundDays'  => $turnaroundDays,
-            'feeText'         => $feeText,
-            'userName'        => $mail->user->name ?? 'Unknown',
+            'cardPhotoPath' => $cardPhotoPath,
+            'turnaroundDays' => $turnaroundDays,
+            'feeText' => $feeText,
+            'userName' => $mail->user->name ?? 'Unknown',
         ];
     }
 
     private function resolveStoragePath(?string $url): ?string
     {
-        if (! $url) return null;
+        if (! $url) {
+            return null;
+        }
 
         if (Storage::disk('public')->exists($url)) {
             return Storage::disk('public')->path($url);
@@ -145,7 +147,8 @@ class ReturnCardService
                 // Bottom fade overlay
                 $fade = $this->manager->create(1080, 300)->fill(self::BG);
                 $canvas->place($fade, 'top-left', 0, 240, 75);
-            } catch (\Throwable) { /* no hero – dark bg is fine */ }
+            } catch (Throwable) { /* no hero – dark bg is fine */
+            }
         }
 
         // Top bar
@@ -193,7 +196,8 @@ class ReturnCardService
                 $canvas->place($hero, 'top-left', 0, 0);
                 $fade = $this->manager->create(1080, 500)->fill(self::BG);
                 $canvas->place($fade, 'top-left', 0, 500, 75);
-            } catch (\Throwable) { /* dark bg */ }
+            } catch (Throwable) { /* dark bg */
+            }
         }
 
         // Top bar
@@ -248,15 +252,13 @@ class ReturnCardService
         $daysText = $d['turnaroundDays'] !== null ? "{$d['turnaroundDays']} DAYS" : '— DAYS';
 
         // Turnaround badge (red)
-        $canvas->drawRectangle($startX, $y, fn (RectangleFactory $r) =>
-            $r->size($daysWidth, $badgeH)->background(self::RED));
+        $canvas->drawRectangle($startX, $y, fn (RectangleFactory $r) => $r->size($daysWidth, $badgeH)->background(self::RED));
         $canvas->text($daysText, $startX + intdiv($daysWidth, 2), $y + intdiv($badgeH, 2), fn (FontFactory $f) => $f
             ->filename($this->boldFont)->size($daysFontSize)->color('#FFFFFF')->align('center')->valign('middle'));
 
         // Fee badge (dark)
         $feeX = $startX + $daysWidth + $gap;
-        $canvas->drawRectangle($feeX, $y, fn (RectangleFactory $r) =>
-            $r->size($feeWidth, $badgeH)->background(self::BADGE)->border(self::BORDER));
+        $canvas->drawRectangle($feeX, $y, fn (RectangleFactory $r) => $r->size($feeWidth, $badgeH)->background(self::BADGE)->border(self::BORDER));
         $canvas->text($d['feeText'], $feeX + intdiv($feeWidth, 2), $y + intdiv($badgeH, 2), fn (FontFactory $f) => $f
             ->filename($this->mediumFont)->size($feeFontSize)->color(self::MUTED)->align('center')->valign('middle'));
     }

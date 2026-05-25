@@ -5,16 +5,17 @@ namespace App\Filament\Resources;
 use App\Actions\CreateShopSpotlightFeedItem;
 use App\Filament\Resources\CardShopResource\Pages;
 use App\Helpers\Countries;
-use App\Services\GeocodingService;
 use App\Models\CardShop;
+use App\Services\GeocodingService;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\Collection;
 class CardShopResource extends Resource
 {
     protected static ?string $model = CardShop::class;
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-storefront';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?int $navigationSort = 4;
     protected static ?string $navigationLabel = 'Card Shops';
 
@@ -56,7 +57,7 @@ class CardShopResource extends Resource
                     ->color(fn ($state) => match ($state) {
                         'approved' => 'success',
                         'rejected' => 'danger',
-                        default    => 'warning',
+                        default => 'warning',
                     }),
                 TextColumn::make('user.name')->label('Submitted By'),
                 TextColumn::make('ownerUser.name')->label('Owner')->default('—'),
@@ -91,7 +92,7 @@ class CardShopResource extends Resource
                     ])
                     ->action(function (CardShop $record, array $data) {
                         $record->update([
-                            'status'           => 'rejected',
+                            'status' => 'rejected',
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
                     }),
@@ -144,8 +145,8 @@ class CardShopResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCardShops::route('/'),
-            'edit'   => Pages\EditCardShop::route('/{record}/edit'),
+            'index' => Pages\ListCardShops::route('/'),
+            'edit' => Pages\EditCardShop::route('/{record}/edit'),
             'claims' => Pages\ManageShopClaims::route('/{record}/claims'),
         ];
     }

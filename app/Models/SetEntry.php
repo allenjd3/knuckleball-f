@@ -11,7 +11,7 @@ class SetEntry extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'status'      => SetEntryStatus::class,
+        'status' => SetEntryStatus::class,
         'date_signed' => 'date',
     ];
 
