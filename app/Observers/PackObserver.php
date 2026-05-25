@@ -27,13 +27,13 @@ class PackObserver
         $pack->loadMissing('user', 'category');
 
         $packData = [
-            'id'            => $pack->id,
-            'name'          => $pack->name,
-            'description'   => $pack->description,
-            'slug'          => $pack->slug,
-            'cover_image'   => $pack->cover_image,
-            'path'          => $pack->path(),
-            'category'      => $pack->category?->name,
+            'id' => $pack->id,
+            'name' => $pack->name,
+            'description' => $pack->description,
+            'slug' => $pack->slug,
+            'cover_image' => $pack->cover_image,
+            'path' => $pack->path(),
+            'category' => $pack->category?->name,
             'players_count' => $pack->players()->count(),
         ];
 
@@ -44,19 +44,20 @@ class PackObserver
             ->first();
 
         if ($existing) {
-            $packs   = data_get($existing->meta, 'packs', []);
+            $packs = data_get($existing->meta, 'packs', []);
             $packs[] = $packData;
             $existing->update(['meta' => array_merge($existing->meta ?? [], ['packs' => $packs])]);
         } else {
             Feed::create([
                 'followable_id' => $pack->user_id,
                 'feedable_type' => Pack::class,
-                'feedable_id'   => $pack->id,
-                'meta'          => [
-                    'photo'     => $pack->user->profile_photo_url,
-                    'user'      => $pack->user->name,
+                'feedable_id' => $pack->id,
+                'comment' => '',
+                'meta' => [
+                    'photo' => $pack->user->profile_photo_url,
+                    'user' => $pack->user->name,
                     'user_path' => $pack->user->path(),
-                    'packs'     => [$packData],
+                    'packs' => [$packData],
                 ],
             ]);
         }
