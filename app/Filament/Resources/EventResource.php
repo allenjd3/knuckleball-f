@@ -3,7 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Actions\CreateEventFeedItem;
-use App\Filament\Resources\EventResource\Pages;
+use App\Filament\Resources\EventResource\Pages\EditEvent;
+use App\Filament\Resources\EventResource\Pages\ListEvents;
 use App\Helpers\Countries;
 use App\Models\Event;
 use BackedEnum;
@@ -154,8 +155,8 @@ class EventResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListEvents::route('/'),
-            'edit' => Pages\EditEvent::route('/{record}/edit'),
+            'index' => ListEvents::route('/'),
+            'edit' => EditEvent::route('/{record}/edit'),
         ];
     }
 }

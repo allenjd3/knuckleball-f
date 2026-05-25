@@ -3,7 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Actions\CreateShopSpotlightFeedItem;
-use App\Filament\Resources\CardShopResource\Pages;
+use App\Filament\Resources\CardShopResource\Pages\EditCardShop;
+use App\Filament\Resources\CardShopResource\Pages\ListCardShops;
+use App\Filament\Resources\CardShopResource\Pages\ManageShopClaims;
 use App\Helpers\Countries;
 use App\Models\CardShop;
 use App\Services\GeocodingService;
@@ -145,9 +147,9 @@ class CardShopResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCardShops::route('/'),
-            'edit' => Pages\EditCardShop::route('/{record}/edit'),
-            'claims' => Pages\ManageShopClaims::route('/{record}/claims'),
+            'index' => ListCardShops::route('/'),
+            'edit' => EditCardShop::route('/{record}/edit'),
+            'claims' => ManageShopClaims::route('/{record}/claims'),
         ];
     }
 }

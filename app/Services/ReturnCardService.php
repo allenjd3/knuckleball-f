@@ -19,6 +19,7 @@ class ReturnCardService
     private const MUTED = '#9CA3AF';
     private const BADGE = '#1E2230';
     private const BORDER = '#3A4055';
+
     private ImageManager $manager;
     private string $boldFont;
     private string $regularFont;

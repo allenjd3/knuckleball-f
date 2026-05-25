@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FeaturedListingResource\Pages;
+use App\Filament\Resources\FeaturedListingResource\Pages\ListFeaturedListings;
 use App\Models\FeaturedListing;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -96,7 +96,7 @@ class FeaturedListingResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListFeaturedListings::route('/'),
+            'index' => ListFeaturedListings::route('/'),
         ];
     }
 }
