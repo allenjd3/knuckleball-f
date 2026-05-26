@@ -43,7 +43,7 @@ class ReturnCardService
     {
         $path = $this->storagePath($mail->id, $format);
 
-        if (! Storage::disk('public')->exists($path)) {
+        if (! Storage::exists($path)) {
             $this->generate($mail);
         }
 
@@ -70,8 +70,8 @@ class ReturnCardService
     {
         $path = $this->storagePath($mail->id, $format);
 
-        return Storage::disk('public')->exists($path)
-            ? Storage::disk('public')->url($path)
+        return Storage::exists($path)
+            ? Storage::url($path)
             : null;
     }
 
@@ -125,8 +125,8 @@ class ReturnCardService
             return null;
         }
 
-        if (Storage::disk('public')->exists($url)) {
-            return Storage::disk('public')->path($url);
+        if (Storage::exists($url)) {
+            return Storage::url($url);
         }
 
         return null;
@@ -177,7 +177,7 @@ class ReturnCardService
             ->filename($this->regularFont)->size(18)->color('#4B5563')->align('center')->valign('middle'));
 
         $path = $this->storagePath($mailId, 'square');
-        Storage::disk('public')->put($path, $canvas->toJpeg(92)->toString());
+        Storage::put($path, $canvas->toJpeg(92)->toString(), 'public');
 
         return $path;
     }
@@ -226,7 +226,7 @@ class ReturnCardService
             ->filename($this->regularFont)->size(22)->color('#4B5563')->align('center')->valign('middle'));
 
         $path = $this->storagePath($mailId, 'story');
-        Storage::disk('public')->put($path, $canvas->toJpeg(92)->toString());
+        Storage::put($path, $canvas->toJpeg(92)->toString(), 'public');
 
         return $path;
     }

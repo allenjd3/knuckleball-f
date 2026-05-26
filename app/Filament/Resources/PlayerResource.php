@@ -67,6 +67,7 @@ class PlayerResource extends Resource
                 DatePicker::make('deceased_at'),
                 FileUpload::make('url')
                     ->directory('avatars')
+                    ->visibility('public')
                     ->avatar(),
                 Checkbox::make('dmca_certification')
                     ->label('I certify that I own this image or have a legitimate license/permission to share it. I understand that Knuckleball follows a strict DMCA policy and will remove infringing content and terminate repeat infringer accounts.')

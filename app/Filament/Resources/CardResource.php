@@ -37,6 +37,7 @@ class CardResource extends Resource
                 FileUpload::make('url')
                     ->required()
                     ->directory('cards')
+                    ->visibility('public')
                     ->image(),
                 Checkbox::make('dmca_certification')
                     ->label('I certify that I own this image or have a legitimate license/permission to share it. I understand that Knuckleball follows a strict DMCA policy and will remove infringing content and terminate repeat infringer accounts.')

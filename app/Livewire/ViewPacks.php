@@ -98,8 +98,8 @@ class ViewPacks extends Component implements HasActions, HasForms
             FileUpload::make('cover_image')
                 ->label('Cover Image')
                 ->image()
-                ->disk('public')
                 ->directory('packs')
+                ->visibility('public')
                 ->nullable(),
         ];
     }
