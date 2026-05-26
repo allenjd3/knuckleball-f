@@ -36,12 +36,12 @@ class ReturnCardController extends Controller
         $service = app(ReturnCardService::class);
         $path = $service->getOrGenerate($mail, $format);
 
-        abort_unless(Storage::disk('public')->exists($path), 404);
+        abort_unless(Storage::exists($path), 404);
 
         $player = $mail->player;
         $slug = str($player?->name ?? 'return')->slug('-');
         $filename = "knuckleball-{$slug}-{$format}.jpg";
 
-        return Storage::disk('public')->download($path, $filename, ['Content-Type' => 'image/jpeg']);
+        return Storage::download($path, $filename, ['Content-Type' => 'image/jpeg']);
     }
 }
