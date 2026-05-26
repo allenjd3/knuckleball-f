@@ -71,7 +71,9 @@ class SubmitCardShop extends Component
             'name' => 'required|string|max:255',
             'ownerName' => 'nullable|string|max:255',
             'city' => 'required|string|max:255',
-            'state' => ['required', 'string', 'size:2', Rule::in(array_keys(States::forCountry($this->country) ?? []))],
+            'state' => States::forCountry($this->country)
+                ? ['required', 'string', Rule::in(array_keys(States::forCountry($this->country)))]
+                : ['nullable', 'string', 'max:100'],
             'country' => 'required|string|size:2',
             'address' => 'nullable|string|max:255',
             'zipCode' => 'nullable|string|max:10',
