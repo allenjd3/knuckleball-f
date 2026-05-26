@@ -89,8 +89,8 @@ class SubmitCardShop extends Component
         }
 
         $filteredHours = collect($this->hours)->filter(fn ($h) => ! empty($h['open']))->toArray();
-        $logoPath = $this->logo ? $this->logo->store('shops/logos', 'public') : null;
-        $storePhotoPath = $this->storePhoto ? $this->storePhoto->store('shops/photos', 'public') : null;
+        $logoPath = $this->logo ? $this->logo->storePublicly('shops/logos') : null;
+        $storePhotoPath = $this->storePhoto ? $this->storePhoto->storePublicly('shops/photos') : null;
 
         $shop = CardShop::create([
             'name' => $this->name,

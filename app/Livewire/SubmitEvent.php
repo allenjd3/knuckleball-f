@@ -272,7 +272,7 @@ class SubmitEvent extends Component
         }
 
         if ($this->heroImage) {
-            $data['photos'] = [$this->heroImage->store('events', 'public')];
+            $data['photos'] = [$this->heroImage->storePublicly('events')];
         }
 
         $addScheme = fn (?string $url): ?string => $url && ! preg_match('#^https?://#i', $url) ? 'https://' . $url : $url;
