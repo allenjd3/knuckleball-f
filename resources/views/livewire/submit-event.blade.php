@@ -289,20 +289,21 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Event Image</label>
                 <p class="text-xs text-gray-400 mb-2">Flyer, banner, or any image that represents the event. Shown prominently on the listing.</p>
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                    @if ($heroImage)
-                        <img src="{{ $heroImage->temporaryUrl() }}" class="h-full w-full object-cover rounded-xl" />
-                    @else
-                        <div class="flex flex-col items-center gap-1 text-gray-400">
+                <div x-data="{ preview: null }" wire:ignore>
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
+                        <img x-show="preview" :src="preview" class="h-full w-full object-cover rounded-xl" />
+                        <div x-show="!preview" class="flex flex-col items-center gap-1 text-gray-400">
                             <x-heroicon-o-photo class="size-7" />
                             <span class="text-sm">Click to upload image</span>
                             <span class="text-xs">JPG, PNG, WEBP up to 5MB</span>
                         </div>
-                    @endif
-                    <input type="file" wire:model="heroImage" accept="image/*" class="hidden" />
-                </label>
+                        <input type="file" wire:model="heroImage"
+                               @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                               accept="image/*" class="hidden" />
+                    </label>
+                    <div wire:loading wire:target="heroImage" class="text-xs text-gray-400 mt-1">Uploading…</div>
+                </div>
                 @error('heroImage') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                <div wire:loading wire:target="heroImage" class="text-xs text-gray-400 mt-1">Uploading…</div>
             </div>
         </div>
 
