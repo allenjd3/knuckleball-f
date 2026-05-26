@@ -43,40 +43,42 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Shop Logo</label>
                 <p class="text-xs text-gray-400 mb-2">Your shop's logo or brand mark. Shown as the shop icon throughout the directory.</p>
-                <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                    @if ($logo)
-                        <img src="{{ $logo->temporaryUrl() }}" class="h-full w-full object-contain rounded-xl p-2" />
-                    @else
-                        <div class="flex flex-col items-center gap-1 text-gray-400">
+                <div x-data="{ preview: null }" wire:ignore>
+                    <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors">
+                        <img x-show="preview" :src="preview" class="h-full w-full object-contain rounded-xl p-2" />
+                        <div x-show="!preview" class="flex flex-col items-center gap-1 text-gray-400">
                             <x-heroicon-o-building-storefront class="size-7" />
                             <span class="text-sm">Upload logo</span>
                             <span class="text-xs">JPG, PNG, WEBP up to 5MB</span>
                         </div>
-                    @endif
-                    <input type="file" wire:model="logo" accept="image/*" class="hidden" />
-                </label>
+                        <input type="file" wire:model="logo"
+                               @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                               accept="image/*" class="hidden" />
+                    </label>
+                    <div wire:loading wire:target="logo" class="text-xs text-gray-400 mt-1">Uploading…</div>
+                </div>
                 @error('logo') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                <div wire:loading wire:target="logo" class="text-xs text-gray-400 mt-1">Uploading…</div>
             </div>
 
             {{-- Store Photo --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Store Photo</label>
                 <p class="text-xs text-gray-400 mb-2">A photo of your storefront, interior, or display cases. Used as the hero image on your listing.</p>
-                <label class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors overflow-hidden">
-                    @if ($storePhoto)
-                        <img src="{{ $storePhoto->temporaryUrl() }}" class="h-full w-full object-cover" />
-                    @else
-                        <div class="flex flex-col items-center gap-1 text-gray-400">
+                <div x-data="{ preview: null }" wire:ignore>
+                    <label class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-gray-300 hover:bg-gray-50 transition-colors overflow-hidden">
+                        <img x-show="preview" :src="preview" class="h-full w-full object-cover" />
+                        <div x-show="!preview" class="flex flex-col items-center gap-1 text-gray-400">
                             <x-heroicon-o-camera class="size-7" />
                             <span class="text-sm">Upload store photo</span>
                             <span class="text-xs">JPG, PNG, WEBP up to 5MB</span>
                         </div>
-                    @endif
-                    <input type="file" wire:model="storePhoto" accept="image/*" class="hidden" />
-                </label>
+                        <input type="file" wire:model="storePhoto"
+                               @change="preview = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : null"
+                               accept="image/*" class="hidden" />
+                    </label>
+                    <div wire:loading wire:target="storePhoto" class="text-xs text-gray-400 mt-1">Uploading…</div>
+                </div>
                 @error('storePhoto') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                <div wire:loading wire:target="storePhoto" class="text-xs text-gray-400 mt-1">Uploading…</div>
             </div>
 
             <div>
