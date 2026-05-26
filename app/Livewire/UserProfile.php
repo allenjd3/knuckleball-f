@@ -232,8 +232,8 @@ class UserProfile extends Component implements HasActions, HasForms
                 FileUpload::make('cover_photo')
                     ->label('Cover Photo')
                     ->image()
-                    ->disk('public')
                     ->directory('covers')
+                    ->visibility('public')
                     ->maxSize(10240)
                     ->helperText('Max 10MB. JPG or PNG recommended.')
                     ->nullable(),

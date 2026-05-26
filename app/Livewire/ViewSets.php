@@ -106,8 +106,8 @@ class ViewSets extends Component implements HasActions, HasForms
             FileUpload::make('cover_image')
                 ->label('Cover Image')
                 ->image()
-                ->disk('public')
                 ->directory('sets')
+                ->visibility('public')
                 ->nullable(),
         ];
     }
