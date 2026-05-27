@@ -70,3 +70,22 @@ test('Players cannot be updated by non-users', function () {
     $player = Player::factory()->published()->create();
     Livewire::test('ViewPlayers')->assertActionHidden(TestAction::make('edit')->table($player));
 });
+
+test('Creating a player requires a name', function () {
+    $user = User::factory()->isSuperAdmin()->create();
+
+    Livewire::actingAs($user)
+        ->test(ViewPlayers::class)
+        ->callAction('create', ['name' => null, 'team_id' => null])
+        ->assertHasActionErrors(['name' => 'required']);
+});
+
+test('Editing a player requires a name', function () {
+    $user = User::factory()->isSuperAdmin()->create();
+    $player = Player::factory()->published()->create();
+
+    Livewire::actingAs($user)
+        ->test(ViewPlayers::class)
+        ->callAction(TestAction::make('edit')->table($player), ['name' => null])
+        ->assertHasActionErrors(['name' => 'required']);
+});

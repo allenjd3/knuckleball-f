@@ -71,7 +71,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ->recordActions([
                 EditAction::make()
                     ->schema([
-                        TextInput::make('name'),
+                        TextInput::make('name')->required(),
                         Select::make('team_id')
                             ->label('Team')
                             ->options(fn () => Team::get()->pluck('name', 'id')->toArray())
@@ -107,7 +107,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ->model(Player::class)
             ->label(__('New Player'))
             ->schema([
-                TextInput::make('name'),
+                TextInput::make('name')->required(),
                 Select::make('team_id')
                     ->label('Team')
                     ->relationship('team')
@@ -120,7 +120,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->createOptionModalHeading('Create Team')
                     ->createOptionForm(function () {
                         return [
-                            TextInput::make('name'),
+                            TextInput::make('name')->required(),
                         ];
                     })
                     ->createOptionUsing(function (array $data) {

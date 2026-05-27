@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\PostalMail;
 use App\Services\ReturnCardService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReturnCardController extends Controller
 {
@@ -28,7 +28,7 @@ class ReturnCardController extends Controller
      * Serve the generated image as a download.
      * Route is protected by a signed URL (no auth required, expires 24h).
      */
-    public function download(Request $request, PostalMail $mail, string $format): StreamedResponse
+    public function download(Request $request, PostalMail $mail, string $format): Response
     {
         abort_unless(in_array($format, ['square', 'story']), 404);
         abort_unless($request->hasValidSignature(), 403);
@@ -42,6 +42,9 @@ class ReturnCardController extends Controller
         $slug = str($player?->name ?? 'return')->slug('-');
         $filename = "knuckleball-{$slug}-{$format}.jpg";
 
-        return Storage::download($path, $filename, ['Content-Type' => 'image/jpeg']);
+        return response(Storage::get($path), 200, [
+            'Content-Type' => 'image/jpeg',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }
