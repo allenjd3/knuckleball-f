@@ -246,10 +246,12 @@ class ReturnCardService
             imageline($gd, 0, $y, 1079, $y, $color);
         }
 
-        ob_start();
-        imagepng($gd);
-        $png = ob_get_clean();
+        $stream = fopen('php://memory', 'r+');
+        imagepng($gd, $stream);
         imagedestroy($gd);
+        rewind($stream);
+        $png = stream_get_contents($stream);
+        fclose($stream);
 
         $canvas->place($this->manager->read($png), 'top-left', 0, $startY);
     }
