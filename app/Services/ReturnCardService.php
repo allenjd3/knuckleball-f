@@ -145,9 +145,7 @@ class ReturnCardService
             try {
                 $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 540);
                 $canvas->place($hero, 'top-left', 0, 0);
-                // Bottom fade overlay
-                $fade = $this->manager->create(1080, 300)->fill(self::BG);
-                $canvas->place($fade, 'top-left', 0, 240, 75);
+                $this->drawGradientFade($canvas, 240, 540);
             } catch (Throwable) { /* no hero – dark bg is fine */
             }
         }
@@ -195,8 +193,7 @@ class ReturnCardService
             try {
                 $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 1000);
                 $canvas->place($hero, 'top-left', 0, 0);
-                $fade = $this->manager->create(1080, 500)->fill(self::BG);
-                $canvas->place($fade, 'top-left', 0, 500, 75);
+                $this->drawGradientFade($canvas, 500, 1000);
             } catch (Throwable) { /* dark bg */
             }
         }
@@ -232,6 +229,20 @@ class ReturnCardService
     }
 
     // ── Shared helpers ────────────────────────────────────────────
+
+    private function drawGradientFade($canvas, int $startY, int $endY, int $steps = 24): void
+    {
+        [$red, $green, $blue] = sscanf(ltrim(self::BG, '#'), '%02x%02x%02x');
+        $stepHeight = (int) ceil(($endY - $startY) / $steps);
+
+        for ($i = 0; $i < $steps; $i++) {
+            $alpha = round($i / max(1, $steps - 1), 4);
+            $y = $startY + ($i * $stepHeight);
+            $color = "rgba({$red}, {$green}, {$blue}, {$alpha})";
+            $canvas->drawRectangle(0, $y, fn (RectangleFactory $rect) => $rect->size(1080, $stepHeight + 1)->background($color)
+            );
+        }
+    }
 
     /**
      * Draw the turnaround + fee badges centred on the canvas at the given $y position.
