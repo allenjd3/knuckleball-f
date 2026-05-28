@@ -230,18 +230,30 @@ class ReturnCardService
 
     // ── Shared helpers ────────────────────────────────────────────
 
-    private function drawGradientFade($canvas, int $startY, int $endY, int $steps = 24): void
+    private function drawGradientFade($canvas, int $startY, int $endY): void
     {
         [$red, $green, $blue] = sscanf(ltrim(self::BG, '#'), '%02x%02x%02x');
-        $stepHeight = (int) ceil(($endY - $startY) / $steps);
+        $height = $endY - $startY;
 
-        for ($i = 0; $i < $steps; $i++) {
-            $alpha = round($i / max(1, $steps - 1), 4);
-            $y = $startY + ($i * $stepHeight);
-            $color = "rgba({$red}, {$green}, {$blue}, {$alpha})";
-            $canvas->drawRectangle(0, $y, fn (RectangleFactory $rect) => $rect->size(1080, $stepHeight + 1)->background($color)
-            );
+        $gd = imagecreatetruecolor(1080, $height);
+        imagealphablending($gd, false);
+        imagesavealpha($gd, true);
+
+        for ($y = 0; $y < $height; $y++) {
+            // GD alpha: 0 = fully opaque, 127 = fully transparent
+            $gdAlpha = (int) round(127 * (1 - $y / max(1, $height - 1)));
+            $color = imagecolorallocatealpha($gd, $red, $green, $blue, $gdAlpha);
+            imageline($gd, 0, $y, 1079, $y, $color);
         }
+
+        $stream = fopen('php://memory', 'r+');
+        imagepng($gd, $stream);
+        imagedestroy($gd);
+        rewind($stream);
+        $png = stream_get_contents($stream);
+        fclose($stream);
+
+        $canvas->place($this->manager->read($png), 'top-left', 0, $startY);
     }
 
     /**
