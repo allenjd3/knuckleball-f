@@ -126,7 +126,7 @@ class ReturnCardService
         }
 
         if (Storage::exists($url)) {
-            return Storage::url($url);
+            return $url;
         }
 
         return null;
@@ -143,7 +143,7 @@ class ReturnCardService
         $heroPath = $d['cardPhotoPath'] ?? $d['playerPhotoPath'];
         if ($heroPath) {
             try {
-                $hero = $this->manager->read($heroPath)->cover(1080, 540);
+                $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 540);
                 $canvas->place($hero, 'top-left', 0, 0);
                 // Bottom fade overlay
                 $fade = $this->manager->create(1080, 300)->fill(self::BG);
@@ -193,7 +193,7 @@ class ReturnCardService
         $heroPath = $d['cardPhotoPath'] ?? $d['playerPhotoPath'];
         if ($heroPath) {
             try {
-                $hero = $this->manager->read($heroPath)->cover(1080, 1000);
+                $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 1000);
                 $canvas->place($hero, 'top-left', 0, 0);
                 $fade = $this->manager->create(1080, 500)->fill(self::BG);
                 $canvas->place($fade, 'top-left', 0, 500, 75);

@@ -20,9 +20,14 @@ class ShowReturn extends Component
 
         $this->mail = $mail;
 
-        // Pre-generate cards so the OG image is ready immediately for crawlers
-        app(ReturnCardService::class)->getOrGenerate($mail, 'square');
-        app(ReturnCardService::class)->getOrGenerate($mail, 'story');
+        $service = app(ReturnCardService::class);
+
+        if (request()->boolean('refresh')) {
+            $service->generate($mail);
+        } else {
+            $service->getOrGenerate($mail, 'square');
+            $service->getOrGenerate($mail, 'story');
+        }
     }
 
     public function openShare(): void
