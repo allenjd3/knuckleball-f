@@ -66,9 +66,31 @@
                         </div>
                     </div>
 
+                    {{-- Load previous button --}}
+                    @if ($hasPrevious)
+                        <div x-data class="flex justify-center py-2">
+                            <button
+                                wire:loading.attr="disabled"
+                                @click="
+                                    $wire.loadPrevious().then(() => {
+                                        requestAnimationFrame(() => {
+                                            document.querySelectorAll('[data-trending-id]')[0]
+                                                ?.scrollIntoView({ block: 'start' });
+                                        });
+                                    });
+                                "
+                                class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors disabled:opacity-40"
+                            >
+                                &uarr; Load previous
+                            </button>
+                        </div>
+                    @endif
+
                     <div class="space-y-3">
                         @forelse ($this->trendingReturns as $feed)
-                            <x-feeds.celebration-card :$feed />
+                            <div wire:key="trending-{{ $feed->id }}" data-trending-id="{{ $feed->id }}">
+                                <x-feeds.celebration-card :$feed />
+                            </div>
                         @empty
                             <div class="text-center py-12 text-gray-400">
                                 <p class="text-sm">No trending returns yet.</p>
@@ -76,19 +98,44 @@
                         @endforelse
                     </div>
 
+                    {{-- Load more: auto-sentinel while growing, button once sliding --}}
                     @if ($hasMore)
-                        <div
-                            x-data
-                            x-init="
-                                const obs = new IntersectionObserver((entries) => {
-                                    if (entries[0].isIntersecting) { obs.disconnect(); $wire.loadMore(); }
-                                }, { rootMargin: '200px' });
-                                obs.observe($el);
-                            "
-                            class="flex justify-center py-6"
-                        >
-                            <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
-                        </div>
+                        @if ($perPage < $maxWindow)
+                            <div
+                                wire:key="trending-sentinel-{{ $perPage }}"
+                                x-data
+                                x-init="
+                                    requestAnimationFrame(() => {
+                                        const obs = new IntersectionObserver((entries) => {
+                                            if (!entries[0].isIntersecting) return;
+                                            obs.disconnect();
+                                            $wire.loadMore();
+                                        }, { rootMargin: '200px' });
+                                        obs.observe($el);
+                                    });
+                                "
+                                class="flex justify-center py-6"
+                            >
+                                <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
+                            </div>
+                        @else
+                            <div x-data class="flex justify-center py-2">
+                                <button
+                                    wire:loading.attr="disabled"
+                                    @click="
+                                        const lastEl = [...document.querySelectorAll('[data-trending-id]')].pop();
+                                        $wire.loadMore().then(() => {
+                                            requestAnimationFrame(() => {
+                                                lastEl?.scrollIntoView({ block: 'end' });
+                                            });
+                                        });
+                                    "
+                                    class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors disabled:opacity-40"
+                                >
+                                    Load more &darr;
+                                </button>
+                            </div>
+                        @endif
                     @endif
                 </div>
 

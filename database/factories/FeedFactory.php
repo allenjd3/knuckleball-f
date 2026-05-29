@@ -68,6 +68,28 @@ class FeedFactory extends Factory
         ]);
     }
 
+    public function returnedPostalMail(?Player $player = null, ?User $user = null)
+    {
+        $user ??= User::factory()->create();
+        $player ??= Player::factory()->create();
+        $postalMail = PostalMail::factory()->returned()->create();
+
+        return $this->state([
+            'feedable_id' => $postalMail->id,
+            'feedable_type' => PostalMail::class,
+            'followable_id' => $user->id,
+            'meta' => [
+                'player' => $player->name,
+                'player_path' => $player->path(),
+                'user' => $user->name,
+                'user_path' => $user->path(),
+                'photo' => $user->profile_photo_url,
+                'date_sent' => now()->subWeek(),
+                'date_returned' => now()->subDay(),
+            ],
+        ]);
+    }
+
     public function forUser(User $user, $model = PostalMail::class)
     {
         return $this->state([
