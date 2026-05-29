@@ -119,7 +119,9 @@
                         wire:key="top-sentinel-{{ $offset }}"
                         x-data
                         x-init="
+                            let initialized = false;
                             const obs = new IntersectionObserver((entries) => {
+                                if (!initialized) { initialized = true; return; }
                                 if (entries[0].isIntersecting) {
                                     obs.disconnect();
                                     $wire.loadPrevious();
