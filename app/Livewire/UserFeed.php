@@ -11,8 +11,12 @@ use Livewire\Component;
 class UserFeed extends Component
 {
     public int $perPage = 15;
+    public int $offset = 0;
     public bool $hasMore = true;
+    public bool $hasPrevious = false;
     public string $filter = 'global'; // 'following' | 'global'
+
+    private int $maxWindow = 45;
 
     public function render()
     {
@@ -34,10 +38,12 @@ class UserFeed extends Component
             ->withCount('feedComments')
             ->with(['reactions', 'feedable'])
             ->orderByDesc('created_at')
+            ->skip($this->offset)
             ->limit($this->perPage + 1);
 
         $results = $query->get();
         $this->hasMore = $results->count() > $this->perPage;
+        $this->hasPrevious = $this->offset > 0;
 
         return $results->take($this->perPage);
     }
@@ -66,7 +72,17 @@ class UserFeed extends Component
 
     public function loadMore(): void
     {
-        $this->perPage += 15;
+        if ($this->perPage < $this->maxWindow) {
+            $this->perPage += 15;
+        } else {
+            $this->offset += 15;
+        }
+        unset($this->feeds);
+    }
+
+    public function loadPrevious(): void
+    {
+        $this->offset = max(0, $this->offset - 15);
         unset($this->feeds);
     }
 
@@ -74,12 +90,15 @@ class UserFeed extends Component
     {
         $this->filter = $filter;
         $this->perPage = 15;
+        $this->offset = 0;
         unset($this->feeds);
     }
 
     #[On('feed-updated')]
     public function updateFeed(): void
     {
+        $this->perPage = 15;
+        $this->offset = 0;
         unset($this->feeds, $this->trendingStrip);
     }
 }
