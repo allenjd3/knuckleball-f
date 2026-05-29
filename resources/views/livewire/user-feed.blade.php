@@ -113,25 +113,12 @@
                     @endauth
                 </div>
 
-                {{-- Load previous sentinel --}}
+                {{-- Load previous button --}}
                 @if ($hasPrevious)
-                    <div
-                        wire:key="top-sentinel-{{ $offset }}"
-                        x-data
-                        x-init="
-                            requestAnimationFrame(() => {
-                                const obs = new IntersectionObserver((entries) => {
-                                    if (entries[0].isIntersecting) {
-                                        obs.disconnect();
-                                        $wire.loadPrevious();
-                                    }
-                                }, { rootMargin: '200px' });
-                                obs.observe($el);
-                            });
-                        "
-                        class="flex justify-center py-6"
-                    >
-                        <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
+                    <div class="flex justify-center py-2">
+                        <button wire:click="loadPrevious" class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors">
+                            &uarr; Load previous
+                        </button>
                     </div>
                 @endif
 
@@ -149,26 +136,33 @@
                     @endforelse
                 </div>
 
-                {{-- Load more sentinel --}}
+                {{-- Load more: auto-sentinel while window is growing, button once sliding --}}
                 @if ($hasMore)
-                    <div
-                        wire:key="bottom-sentinel-{{ $offset }}-{{ $perPage }}"
-                        x-data
-                        x-init="
-                            requestAnimationFrame(() => {
-                                const obs = new IntersectionObserver((entries) => {
-                                    if (entries[0].isIntersecting) {
+                    @if ($perPage < $maxWindow)
+                        <div
+                            wire:key="bottom-sentinel-{{ $offset }}-{{ $perPage }}"
+                            x-data
+                            x-init="
+                                requestAnimationFrame(() => {
+                                    const obs = new IntersectionObserver((entries) => {
+                                        if (!entries[0].isIntersecting) return;
                                         obs.disconnect();
                                         $wire.loadMore();
-                                    }
-                                }, { rootMargin: '200px' });
-                                obs.observe($el);
-                            });
-                        "
-                        class="flex justify-center py-6"
-                    >
-                        <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
-                    </div>
+                                    }, { rootMargin: '200px' });
+                                    obs.observe($el);
+                                });
+                            "
+                            class="flex justify-center py-6"
+                        >
+                            <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
+                        </div>
+                    @else
+                        <div class="flex justify-center py-2">
+                            <button wire:click="loadMore" class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors">
+                                Load more &darr;
+                            </button>
+                        </div>
+                    @endif
                 @else
                     <p class="text-center text-gray-400 text-sm py-8">You're all caught up.</p>
                 @endif

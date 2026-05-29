@@ -16,7 +16,7 @@ class UserFeed extends Component
     public bool $hasPrevious = false;
     public string $filter = 'global'; // 'following' | 'global'
 
-    private int $maxWindow = 45;
+    public int $maxWindow = 45;
 
     public function render()
     {
