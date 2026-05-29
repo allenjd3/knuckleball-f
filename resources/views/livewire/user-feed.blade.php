@@ -113,10 +113,32 @@
                     @endauth
                 </div>
 
+                {{-- Load previous sentinel --}}
+                @if ($hasPrevious)
+                    <div
+                        wire:key="top-sentinel-{{ $offset }}"
+                        x-data
+                        x-init="
+                            const obs = new IntersectionObserver((entries) => {
+                                if (entries[0].isIntersecting) {
+                                    obs.disconnect();
+                                    $wire.loadPrevious();
+                                }
+                            }, { rootMargin: '200px' });
+                            obs.observe($el);
+                        "
+                        class="flex justify-center py-6"
+                    >
+                        <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
+                    </div>
+                @endif
+
                 {{-- Feed items --}}
                 <div class="space-y-2">
                     @forelse ($this->feeds as $feed)
-                        <x-dynamic-component :component="$feed->componentName()" :$feed />
+                        <div wire:key="feed-{{ $feed->id }}">
+                            <x-dynamic-component :component="$feed->componentName()" :$feed />
+                        </div>
                     @empty
                         <div class="text-center py-12 text-gray-400">
                             <x-heroicon-o-inbox class="size-10 mx-auto mb-3 opacity-40" />
@@ -125,9 +147,10 @@
                     @endforelse
                 </div>
 
-                {{-- Infinite scroll sentinel --}}
+                {{-- Load more sentinel --}}
                 @if ($hasMore)
                     <div
+                        wire:key="bottom-sentinel-{{ $offset }}-{{ $perPage }}"
                         x-data
                         x-init="
                             const obs = new IntersectionObserver((entries) => {
