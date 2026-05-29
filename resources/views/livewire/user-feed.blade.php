@@ -115,8 +115,19 @@
 
                 {{-- Load previous button --}}
                 @if ($hasPrevious)
-                    <div class="flex justify-center py-2">
-                        <button wire:click="loadPrevious" class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors">
+                    <div x-data class="flex justify-center py-2">
+                        <button
+                            wire:loading.attr="disabled"
+                            @click="
+                                $wire.loadPrevious().then(() => {
+                                    requestAnimationFrame(() => {
+                                        document.querySelectorAll('[data-feed-id]')[0]
+                                            ?.scrollIntoView({ block: 'start' });
+                                    });
+                                });
+                            "
+                            class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors disabled:opacity-40"
+                        >
                             &uarr; Load previous
                         </button>
                     </div>
@@ -125,7 +136,7 @@
                 {{-- Feed items --}}
                 <div class="space-y-2">
                     @forelse ($this->feeds as $feed)
-                        <div wire:key="feed-{{ $feed->id }}">
+                        <div wire:key="feed-{{ $feed->id }}" data-feed-id="{{ $feed->id }}">
                             <x-dynamic-component :component="$feed->componentName()" :$feed />
                         </div>
                     @empty
@@ -157,8 +168,19 @@
                             <div class="size-5 rounded-full border-2 border-[#D93C3F] border-t-transparent animate-spin opacity-60"></div>
                         </div>
                     @else
-                        <div class="flex justify-center py-2">
-                            <button wire:click="loadMore" class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors">
+                        <div x-data class="flex justify-center py-2">
+                            <button
+                                wire:loading.attr="disabled"
+                                @click="
+                                    const lastEl = [...document.querySelectorAll('[data-feed-id]')].pop();
+                                    $wire.loadMore().then(() => {
+                                        requestAnimationFrame(() => {
+                                            lastEl?.scrollIntoView({ block: 'end' });
+                                        });
+                                    });
+                                "
+                                class="text-sm font-medium text-[#D93C3F] hover:text-[#b82e31] transition-colors disabled:opacity-40"
+                            >
                                 Load more &darr;
                             </button>
                         </div>
