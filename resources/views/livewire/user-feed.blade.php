@@ -119,13 +119,15 @@
                         wire:key="top-sentinel-{{ $offset }}"
                         x-data
                         x-init="
-                            const obs = new IntersectionObserver((entries) => {
-                                if (entries[0].isIntersecting) {
-                                    obs.disconnect();
-                                    $wire.loadPrevious();
-                                }
-                            }, { rootMargin: '200px' });
-                            obs.observe($el);
+                            requestAnimationFrame(() => {
+                                const obs = new IntersectionObserver((entries) => {
+                                    if (entries[0].isIntersecting) {
+                                        obs.disconnect();
+                                        $wire.loadPrevious();
+                                    }
+                                }, { rootMargin: '200px' });
+                                obs.observe($el);
+                            });
                         "
                         class="flex justify-center py-6"
                     >
@@ -153,13 +155,15 @@
                         wire:key="bottom-sentinel-{{ $offset }}-{{ $perPage }}"
                         x-data
                         x-init="
-                            const obs = new IntersectionObserver((entries) => {
-                                if (entries[0].isIntersecting) {
-                                    obs.disconnect();
-                                    $wire.loadMore();
-                                }
-                            }, { rootMargin: '200px' });
-                            obs.observe($el);
+                            requestAnimationFrame(() => {
+                                const obs = new IntersectionObserver((entries) => {
+                                    if (entries[0].isIntersecting) {
+                                        obs.disconnect();
+                                        $wire.loadMore();
+                                    }
+                                }, { rootMargin: '200px' });
+                                obs.observe($el);
+                            });
                         "
                         class="flex justify-center py-6"
                     >
