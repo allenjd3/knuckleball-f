@@ -11,7 +11,10 @@ use Livewire\Component;
 class TrendingFeed extends Component
 {
     public int $perPage = 20;
+    public int $offset = 0;
     public bool $hasMore = true;
+    public bool $hasPrevious = false;
+    public int $maxWindow = 60;
     public string $sort = 'reactions'; // 'reactions' | 'fastest' | 'comments'
 
     public function render()
@@ -40,7 +43,7 @@ class TrendingFeed extends Component
 
         // For 'fastest' we sort in PHP to avoid cross-DB JSON extraction differences; cap at 500 for safety
         if ($this->sort !== 'fastest') {
-            $query->limit($this->perPage + 1);
+            $query->skip($this->offset)->limit($this->perPage + 1);
         } else {
             $query->limit(500);
         }
@@ -54,11 +57,13 @@ class TrendingFeed extends Component
                 ->values();
 
             $this->hasMore = false;
+            $this->hasPrevious = false;
 
             return $results->take($this->perPage);
         }
 
         $this->hasMore = $results->count() > $this->perPage;
+        $this->hasPrevious = $this->offset > 0;
 
         return $results->take($this->perPage);
     }
@@ -97,7 +102,17 @@ class TrendingFeed extends Component
 
     public function loadMore(): void
     {
-        $this->perPage += 20;
+        if ($this->perPage < $this->maxWindow) {
+            $this->perPage += 20;
+        } else {
+            $this->offset += 20;
+        }
+        unset($this->trendingReturns);
+    }
+
+    public function loadPrevious(): void
+    {
+        $this->offset = max(0, $this->offset - 20);
         unset($this->trendingReturns);
     }
 
@@ -105,6 +120,7 @@ class TrendingFeed extends Component
     {
         $this->sort = $sort;
         $this->perPage = 20;
+        $this->offset = 0;
         unset($this->trendingReturns);
     }
 }
