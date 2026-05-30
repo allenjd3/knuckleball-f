@@ -42,111 +42,16 @@
     <div class="px-4 space-y-8 mt-4">
 
         {{-- Stats card --}}
-        <div class="rounded-2xl p-8 md:p-10 text-white" style="background-color:#D93C3F; font-family:'Inter',sans-serif;">
-
-            {{-- Header --}}
-            <div class="flex items-center justify-between mb-10">
+        <x-stats-card :stats="$this->stats">
+            <x-slot:header>
                 <p class="text-xs font-bold uppercase tracking-widest">All-Time Stats</p>
                 <a href="{{ route('users.snapshot', [$this->user, now()->year]) }}"
-                   class="bg-white rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors"
+                   class="bg-white rounded-full px-5 py-2 text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-colors shrink-0"
                    style="color:#D93C3F;">
                     Share Snapshot ↗
                 </a>
-            </div>
-
-            {{-- 4 headline numbers --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-                <div>
-                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_sends'] }}</p>
-                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Sends</p>
-                </div>
-                <div>
-                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['total_returns'] }}</p>
-                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Returns</p>
-                </div>
-                <div>
-                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['success_rate'] }}<span class="text-4xl font-black">%</span></p>
-                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Success</p>
-                </div>
-                <div>
-                    <p class="text-8xl font-black leading-none tabular-nums">{{ $this->stats['unique_players'] }}</p>
-                    <p class="text-xs font-bold uppercase tracking-widest mt-3 text-white/70">Players</p>
-                </div>
-            </div>
-
-            {{-- Divider --}}
-            <div class="border-t border-white/20 mb-6"></div>
-
-            {{-- Detail rows --}}
-            <div class="space-y-4">
-                @if ($this->stats['fastest_return'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-bolt class="size-5 text-white/70 shrink-0" />
-                            Fastest Return
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['fastest_return']['player_name'] }} · {{ $this->stats['fastest_return']['days'] }} days</span>
-                    </div>
-                @endif
-                @if ($this->stats['longest_wait'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-clock class="size-5 text-white/70 shrink-0" />
-                            Longest Wait
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['longest_wait']['player_name'] }} · {{ $this->stats['longest_wait']['days'] }} days</span>
-                    </div>
-                @endif
-                @if ($this->stats['favorite_team'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-trophy class="size-5 text-white/70 shrink-0" />
-                            Favorite Team
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['favorite_team'] }}</span>
-                    </div>
-                @endif
-                @if ($this->stats['favorite_category'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-tag class="size-5 text-white/70 shrink-0" />
-                            Top Category
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['favorite_category'] }}</span>
-                    </div>
-                @endif
-                @if ($this->stats['most_reacted_return'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-s-heart class="size-5 text-white/70 shrink-0" />
-                            Most Reacted
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['most_reacted_return']['player_name'] }} · {{ $this->stats['most_reacted_return']['reaction_count'] }} reactions</span>
-                    </div>
-                @endif
-                @if ($this->stats['first_send'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-paper-airplane class="size-5 text-white/70 shrink-0" />
-                            First Send
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['first_send']->format('M j, Y') }}</span>
-                    </div>
-                @endif
-                @if ($this->stats['most_recent_return'])
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 text-sm font-medium">
-                            <x-heroicon-o-inbox-arrow-down class="size-5 text-white/70 shrink-0" />
-                            Latest Return
-                        </div>
-                        <span class="text-sm font-semibold">{{ $this->stats['most_recent_return']->format('M j, Y') }}</span>
-                    </div>
-                @endif
-                @if ($this->stats['total_sends'] === 0)
-                    <p class="text-white/50 text-sm text-center py-2">No activity yet — send some mail to see stats here.</p>
-                @endif
-            </div>
-        </div>
+            </x-slot:header>
+        </x-stats-card>
 
         {{-- Past Snapshots --}}
         @if ($this->snapshots->isNotEmpty())
