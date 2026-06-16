@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('temp-directory:clean')->hourly();
 Schedule::command('shops:post-spotlights')->monthlyOn(1, '09:00');
+Schedule::command('shops:fetch')->monthlyOn(1, '03:00');
 
 Schedule::command('notify:pending-approvals')->weeklyOn(2, '1:00');
 Schedule::command('featured:expire')->dailyAt('02:00');
