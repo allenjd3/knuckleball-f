@@ -22,12 +22,54 @@ class FetchCardShops extends Command
     ];
 
     private const DEFAULT_METROS = [
+        // Northeast
+        'New York, NY',
+        'Philadelphia, PA',
+        'Boston, MA',
+        'Pittsburgh, PA',
+        'Baltimore, MD',
+        'Washington, DC',
+        // Southeast
+        'Atlanta, GA',
+        'Charlotte, NC',
+        'Nashville, TN',
+        'Miami, FL',
+        'Orlando, FL',
+        'Tampa, FL',
+        'Richmond, VA',
+        'Raleigh, NC',
+        // Midwest
+        'Chicago, IL',
+        'Detroit, MI',
+        'Cleveland, OH',
+        'Columbus, OH',
         'Cincinnati, OH',
         'Dayton, OH',
-        'Columbus, OH',
-        'Lynchburg, VA',
-        'Richmond, VA',
-        'Charlotte, NC',
+        'Indianapolis, IN',
+        'Milwaukee, WI',
+        'Minneapolis, MN',
+        'St. Louis, MO',
+        'Kansas City, MO',
+        // South
+        'Dallas, TX',
+        'Houston, TX',
+        'San Antonio, TX',
+        'Austin, TX',
+        'New Orleans, LA',
+        'Oklahoma City, OK',
+        // Mountain/Southwest
+        'Phoenix, AZ',
+        'Denver, CO',
+        'Las Vegas, NV',
+        'Salt Lake City, UT',
+        'Albuquerque, NM',
+        // West Coast
+        'Los Angeles, CA',
+        'San Diego, CA',
+        'San Francisco, CA',
+        'Sacramento, CA',
+        'Portland, OR',
+        'Seattle, WA',
     ];
 
     private const CARD_SHOP_KEYWORDS = '/\b(card|cards|collectible|collectibles|hobby|memorabilia|comic|autograph|baseball|sports)\b/i';
