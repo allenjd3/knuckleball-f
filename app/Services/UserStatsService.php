@@ -6,7 +6,6 @@ use App\Models\Feed;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class UserStatsService
@@ -105,8 +104,8 @@ class UserStatsService
             'total_returns' => $totalReturns,
             'success_rate' => $successRate,
             'unique_players' => $uniquePlayers,
-            'first_send' => $firstSend ? Carbon::parse($firstSend) : null,
-            'most_recent_return' => $mostRecentReturn ? Carbon::parse($mostRecentReturn) : null,
+            'first_send' => $firstSend,
+            'most_recent_return' => $mostRecentReturn,
             'fastest_return' => $fastest ? [
                 'player_name' => $fastest->player_name,
                 'player_slug' => $fastest->player_slug,

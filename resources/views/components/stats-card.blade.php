@@ -84,7 +84,7 @@
                     <x-heroicon-o-paper-airplane class="size-4 sm:size-5 text-white/70 shrink-0" />
                     First Send
                 </div>
-                <span class="text-sm font-semibold text-right">{{ ($firstSend instanceof \Carbon\Carbon ? $firstSend : \Carbon\Carbon::parse($firstSend))->format('M j, Y') }}</span>
+                <span class="text-sm font-semibold text-right">{{ rescue(fn () => \Carbon\Carbon::parse($firstSend)->format('M j, Y'), '') }}</span>
             </div>
         @endif
         @if (data_get($stats, 'most_recent_return'))
@@ -94,7 +94,7 @@
                     <x-heroicon-o-inbox-arrow-down class="size-4 sm:size-5 text-white/70 shrink-0" />
                     Latest Return
                 </div>
-                <span class="text-sm font-semibold text-right">{{ ($latestReturn instanceof \Carbon\Carbon ? $latestReturn : \Carbon\Carbon::parse($latestReturn))->format('M j, Y') }}</span>
+                <span class="text-sm font-semibold text-right">{{ rescue(fn () => \Carbon\Carbon::parse($latestReturn)->format('M j, Y'), '') }}</span>
             </div>
         @endif
         @if (data_get($stats, 'total_sends', 0) === 0)
