@@ -37,7 +37,7 @@ class UserFeed extends Component
             )
             ->withCount('feedComments')
             ->with(['reactions', 'feedable'])
-            ->orderByDesc('created_at')
+            ->orderByDesc('updated_at')
             ->skip($this->offset)
             ->limit($this->perPage + 1);
 
