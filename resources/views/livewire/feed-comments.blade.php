@@ -2,7 +2,7 @@
     {{-- Toggle row --}}
     <div class="flex items-center justify-between">
         @if ($this->commentCount > 0 && ! $expanded)
-            <p class="text-xs text-gray-400">{{ $this->commentCount }} {{ Str::plural('comment', $this->commentCount) }}</p>
+            <button wire:click="toggle" class="text-xs text-gray-400 hover:text-gray-600 transition-colors">{{ $this->commentCount }} {{ Str::plural('comment', $this->commentCount) }}</button>
         @else
             <span></span>
         @endif

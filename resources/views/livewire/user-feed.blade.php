@@ -57,6 +57,50 @@
             {{-- Main content --}}
             <main class="flex-1 min-w-0 space-y-4">
 
+                {{-- Mobile user card + nav --}}
+                <div class="md:hidden">
+                    @auth
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="{{ $this->authUser->profile_photo_url }}" alt="{{ $this->authUser->name }}"
+                                 class="size-14 rounded-full shrink-0 ring-2 ring-gray-100" />
+                            <div class="min-w-0">
+                                <p class="font-bold text-gray-900 truncate">{{ $this->authUser->name }}</p>
+                                <div class="flex gap-4 mt-1 text-sm">
+                                    <span><span class="font-bold text-gray-900">{{ $this->authUser->following_count }}</span> <span class="text-gray-400 text-xs">Following</span></span>
+                                    <span><span class="font-bold text-gray-900">{{ $this->authUser->followers_count }}</span> <span class="text-gray-400 text-xs">Followers</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="flex gap-1 overflow-x-auto pb-1 -mx-1 px-1">
+                            <a href="{{ route('users.feed') }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('users.feed') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                                <x-heroicon-o-inbox class="size-4 shrink-0" /> Feed
+                            </a>
+                            <a href="{{ route('users.trending') }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('users.trending') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                                <x-heroicon-o-fire class="size-4 shrink-0" /> Trending
+                            </a>
+                            <a href="{{ route('packs.browse') }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('packs.*') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                                <x-heroicon-o-bookmark class="size-4 shrink-0" /> Packs
+                            </a>
+                            <a href="{{ route('sets.browse') }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('sets.*') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                                <x-heroicon-o-squares-2x2 class="size-4 shrink-0" /> Sets
+                            </a>
+                            <a href="{{ route('users.profile', auth()->user()) }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 text-gray-500 hover:text-gray-800">
+                                <x-heroicon-o-user-circle class="size-4 shrink-0" /> My Profile
+                            </a>
+                        </nav>
+                    @else
+                        <div class="flex items-center justify-between mb-4">
+                            <p class="text-sm font-medium text-gray-700">Sign in to personalize your feed</p>
+                            <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-900 underline underline-offset-2">Log in</a>
+                        </div>
+                    @endauth
+                </div>
+
                 {{-- Compose --}}
                 @auth
                     <livewire:feed-composer />
