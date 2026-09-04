@@ -40,6 +40,9 @@ class CpPanelProvider extends PanelProvider
                 NavigationItem::make('Approve Tags')
                     ->url('/cp/players/approve-tags')
                     ->icon('heroicon-o-check-badge'),
+                NavigationItem::make('Duplicate Players')
+                    ->url('/cp/players/duplicates')
+                    ->icon('heroicon-o-square-2-stack'),
             ])
             ->middleware([
                 EncryptCookies::class,
