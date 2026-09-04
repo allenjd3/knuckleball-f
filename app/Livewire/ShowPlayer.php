@@ -17,6 +17,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -103,6 +104,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     {
         return CreateAction::make('createAddress')
             ->label(fn () => $this->address?->exists ? 'Suggest New Address' : 'Add the address!')
+            // Only the empty-state "Add the address!" CTA should compete visually
+            // with primary actions elsewhere on the page — once a real address is
+            // already showing, suggesting an alternative is a lower-priority action.
+            ->color(fn () => $this->address?->exists ? 'gray' : 'primary')
+            ->outlined(fn () => (bool) $this->address?->exists)
             ->model(Address::class)
             ->authorize(fn () => request()->user()?->can('create', Address::class))
             ->schema([
@@ -111,6 +117,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextInput::make('city')->required(),
                 TextInput::make('state')->required(),
                 TextInput::make('postal_code')->required(),
+                DatePicker::make('expires_at')
+                    ->label('Temporary — expires on')
+                    ->helperText('Leave blank for a permanent address. Once this date passes, the address is archived automatically (still visible/editable in the admin panel).')
+                    ->minDate(now()->addDay())
+                    ->nullable(),
             ])
             ->using(
                 function (array $data) {
@@ -253,9 +264,10 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->icon('heroicon-o-rectangle-stack')
                     ->visible(fn (Model $record) => $record->card->exists)
                     ->modalContent(fn (Model $record) => view('card-table', ['postalMail' => $record]))
+                    ->modalWidth('2xl')
                     ->modalSubmitActionLabel('Ok'),
                 CreateAction::make('createCard')
-                    ->modalHeading('Create Card')
+                    ->modalHeading('Add Cards')
                     ->label('Add Card')
                     ->icon('heroicon-o-plus-circle')
                     ->visible(function (?Model $record) {
@@ -266,28 +278,38 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         return request()->user()?->can('update', $record);
                     })
                     ->schema([
-                        TextInput::make('manufacturer')->maxLength(255)->required(),
-                        TextInput::make('series')->maxLength(255)->required(),
-                        TextInput::make('year')->numeric()->required(),
-                        TextInput::make('number')->nullable(),
-                        TextInput::make('variation')->nullable(),
-                        FileUpload::make('url')
-                            ->label('Card Image')
-                            ->required()
-                            ->directory('cards')
-                            ->image(),
+                        Repeater::make('cards')
+                            ->label('')
+                            ->schema([
+                                TextInput::make('manufacturer')->maxLength(255)->required(),
+                                TextInput::make('series')->maxLength(255)->required(),
+                                TextInput::make('year')->numeric()->required(),
+                                TextInput::make('number')->nullable(),
+                                TextInput::make('variation')->nullable(),
+                                FileUpload::make('url')
+                                    ->label('Card Image')
+                                    ->required()
+                                    ->directory('cards')
+                                    ->image(),
+                            ])
+                            ->addActionLabel('Add another card')
+                            ->defaultItems(0)
+                            ->minItems(1)
+                            ->required(),
                     ])
                     ->using(function (array $data, Model $record) {
-                        $card = $record->cards()->create([
-                            'manufacturer' => data_get($data, 'manufacturer'),
-                            'user_id' => request()->user()->id,
-                            'series' => data_get($data, 'series'),
-                            'year' => data_get($data, 'year'),
-                            'number' => data_get($data, 'number'),
-                            'variation' => data_get($data, 'variation'),
-                        ]);
+                        foreach (data_get($data, 'cards', []) as $cardData) {
+                            $card = $record->cards()->create([
+                                'manufacturer' => data_get($cardData, 'manufacturer'),
+                                'user_id' => request()->user()->id,
+                                'series' => data_get($cardData, 'series'),
+                                'year' => data_get($cardData, 'year'),
+                                'number' => data_get($cardData, 'number'),
+                                'variation' => data_get($cardData, 'variation'),
+                            ]);
 
-                        $card->media()->create(['url' => data_get($data, 'url')]);
+                            $card->media()->create(['url' => data_get($cardData, 'url')]);
+                        }
 
                         return $record;
                     }),
