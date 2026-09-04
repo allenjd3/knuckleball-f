@@ -21,6 +21,14 @@
         <div>
             <h1 class="text-2xl font-bold">{{ $this->user->name }}</h1>
             <p class="text-gray-500 text-sm">{{ '@' . $this->user->handle }} · Joined {{ $this->user->created_at?->format('M Y') }}</p>
+            <div class="flex items-center gap-3 mt-1 text-sm">
+                <button wire:click="mountAction('followers')" class="text-gray-700 hover:underline">
+                    <span class="font-semibold">{{ $this->user->followers_count }}</span> Followers
+                </button>
+                <button wire:click="mountAction('following')" class="text-gray-700 hover:underline">
+                    <span class="font-semibold">{{ $this->user->following_count }}</span> Following
+                </button>
+            </div>
             @if ($this->user->bio)
                 <p class="mt-2 text-gray-700 text-sm max-w-md">{{ $this->user->bio }}</p>
             @endif
@@ -29,6 +37,7 @@
             @if ($this->isOwner)
                 {{ $this->editProfile }}
                 {{ $this->changeHandle }}
+                {{ $this->importReturns }}
             @elseif (auth()->check())
                 @if ($this->isFollowing)
                     <button wire:click="unfollow" class="px-4 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50">Unfollow</button>
@@ -76,7 +85,7 @@
     <div x-data="{ tab: 'activity' }" class="mt-6">
 
         {{-- Tab nav --}}
-        <div class="sticky top-16 z-10 bg-white border-b border-gray-200 px-4">
+        <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4">
             <div class="flex gap-6">
                 <button
                     @click="tab = 'activity'"

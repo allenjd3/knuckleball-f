@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Filament\Imports\PostalMailImporter;
 use App\Models\CardSet;
 use App\Models\Feed;
 use App\Models\Pack;
@@ -12,6 +13,7 @@ use App\Services\UserStatsService;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -132,6 +134,28 @@ class UserProfile extends Component implements HasActions, HasForms
         unset($this->user, $this->isFollowing);
     }
 
+    public function followersAction(): Action
+    {
+        return Action::make('followers')
+            ->label('Followers')
+            ->modalHeading('Followers')
+            ->modalContent(fn () => view('user-follow-list', ['users' => $this->user->followers()->orderBy('name')->get()]))
+            ->modalWidth('md')
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close');
+    }
+
+    public function followingAction(): Action
+    {
+        return Action::make('following')
+            ->label('Following')
+            ->modalHeading('Following')
+            ->modalContent(fn () => view('user-follow-list', ['users' => $this->user->following()->orderBy('name')->get()]))
+            ->modalWidth('md')
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Close');
+    }
+
     public function changeHandleAction(): Action
     {
         return Action::make('changeHandle')
@@ -211,6 +235,22 @@ class UserProfile extends Component implements HasActions, HasForms
 
         auth()->user()->watchlist()->detach($playerId);
         unset($this->watchlist);
+    }
+
+    public function importReturnsAction(): ImportAction
+    {
+        return ImportAction::make('importReturns')
+            ->importer(PostalMailImporter::class)
+            ->label('Import Returns')
+            ->visible(fn () => $this->isOwner)
+            ->modalDescription(
+                'Bring in your existing TTM history from a spreadsheet. Columns: player_name and date_sent '
+                . '(required); returned_date, item (e.g. "Card", default), manufacturer/series/year/number/variation, '
+                . 'and comment (all optional). If a player isn\'t already on Knuckleball, we\'ll create a draft for '
+                . 'it and an admin will review it before it appears publicly. Multiple rows for the same player and '
+                . 'date are combined into one return with multiple cards, and rows matching a return and card '
+                . 'you\'ve already logged are skipped as duplicates.'
+            );
     }
 
     public function editProfileAction(): Action

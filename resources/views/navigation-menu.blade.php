@@ -91,6 +91,16 @@
                         </div>
                     @endif
 
+                    <!-- Search -->
+                    <button
+                        type="button"
+                        @click="window.dispatchEvent(new CustomEvent('open-search'))"
+                        class="flex items-center justify-center size-9 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+                        aria-label="Search"
+                    >
+                        <x-heroicon-o-magnifying-glass class="size-4" />
+                    </button>
+
                     <!-- Notification Bell -->
                     @auth
                     <div class="ms-3 relative">
@@ -180,6 +190,16 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <div class="px-4 pt-3">
+            <button
+                type="button"
+                @click="open = false; window.dispatchEvent(new CustomEvent('open-search'))"
+                class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-500 border border-gray-200 rounded-full"
+            >
+                <x-heroicon-o-magnifying-glass class="size-4" />
+                {{ __('Search players, teams...') }}
+            </button>
+        </div>
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('users.feed') }}" :active="request()->routeIs('users.feed')">
                 {{ __('Feed') }}
@@ -296,4 +316,6 @@
             @endauth
         </div>
     </div>
+
+    @livewire('global-search')
 </nav>
