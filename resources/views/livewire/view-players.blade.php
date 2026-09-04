@@ -6,6 +6,27 @@
         @endif
         </div>
         <h1 class="text-3xl mb-6">{{ __('Players') . (isset($teamName) ? ': ' . $teamName : '') }}</h1>
+
+        @if ($this->shouldShowCategoryTabs())
+            <x-filament::tabs label="Category" class="mb-6 flex-wrap gap-y-2">
+                <x-filament::tabs.item
+                    :active="is_null($categoryTab)"
+                    wire:click="setCategoryTab(null)"
+                >
+                    {{ __('All') }}
+                </x-filament::tabs.item>
+
+                @foreach ($this->categoryTabs() as $category)
+                    <x-filament::tabs.item
+                        :active="$categoryTab === $category->id"
+                        wire:click="setCategoryTab({{ $category->id }})"
+                    >
+                        {{ $category->name }}
+                    </x-filament::tabs.item>
+                @endforeach
+            </x-filament::tabs>
+        @endif
+
         {{ $this->table }}
 
         @can('create', \App\Models\Player::class)
