@@ -14,7 +14,15 @@ class UpdateFeedItem
 
     public static function execute(PostalMail|Comment|InPersonAutograph $feedItem, ?string $comment)
     {
-        $feed = Feed::firstWhere('feedable_id', $feedItem->id);
+        // feedable_id alone isn't unique across feedable types — PostalMail,
+        // Comment, and InPersonAutograph all auto-increment independently,
+        // so id collisions between them are routine, not edge cases. Without
+        // scoping by feedable_type too, updating one record could silently
+        // overwrite a completely unrelated feed post's content.
+        $feed = Feed::where('feedable_type', $feedItem->getMorphClass())
+            ->where('feedable_id', $feedItem->id)
+            ->first();
+
         if (! $feed) {
             return;
         }
