@@ -34,6 +34,7 @@ class ViewCategories extends Component implements HasActions, HasForms, HasTable
                     ->sortable()
                     ->searchable(),
             ])
+            ->defaultSort('name')
             ->recordActions([
                 Action::make('show_teams')
                     ->label('Teams')
