@@ -32,13 +32,17 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
                 $user = User::firstWhere('name', data_get($importData->data, 'user'));
                 $lastTeam = Team::firstWhere('name', data_get($importData->data, 'lastTeam'));
 
+                $retiredAtRaw = data_get($importData->data, 'retired_at');
+                $retiredAt = ParseDates::handle($retiredAtRaw);
+
                 $player = Player::firstOrCreate(
                     [
                         'name' => data_get($importData->data, 'name'),
                         'team_id' => $team?->id ?? null,
                     ],
                     [
-                        'retired_at' => ParseDates::handle(data_get($importData->data, 'retired_at')),
+                        'retired_at' => $retiredAt,
+                        'is_retired' => filled($retiredAtRaw),
                         'user_id' => $user?->id ?? null,
                         'published_at' => ParseDates::handle(data_get($importData->data, 'published_at')),
                         'last_team_id' => $lastTeam?->id ?? null,

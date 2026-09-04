@@ -25,6 +25,7 @@ class WantListPlayerAdded extends Notification implements ShouldQueue
     public function toDatabase($notifiable): array
     {
         return [
+            'type' => 'want_list_player_added',
             'want_list_id' => $this->wantList->id,
             'want_list_name' => $this->wantList->name,
             'want_list_path' => $this->wantList->path(),

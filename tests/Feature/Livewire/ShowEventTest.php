@@ -2,6 +2,7 @@
 
 use App\Livewire\ShowEvent;
 use App\Models\Event;
+use App\Models\Player;
 use App\Models\User;
 use Livewire\Livewire;
 use Stripe\ApiRequestor;
@@ -69,6 +70,19 @@ test('an approved event is visible to all', function () {
 
     Livewire::test(ShowEvent::class, ['event' => $event])
         ->assertStatus(200);
+});
+
+test('guests cannot see the signing player\'s photo but authenticated users can', function () {
+    $player = Player::factory()->create();
+    $player->media()->create(['url' => 'avatars/test.jpg']);
+    $event = Event::factory()->approved()->playerSigning($player)->create();
+
+    Livewire::test(ShowEvent::class, ['event' => $event])
+        ->assertDontSee('avatars/test.jpg');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(ShowEvent::class, ['event' => $event])
+        ->assertSee('avatars/test.jpg');
 });
 
 // ── confirmPayment ────────────────────────────────────────────────────────
