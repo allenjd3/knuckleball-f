@@ -34,7 +34,10 @@ class WantList extends Model
 
     public function players(): BelongsToMany
     {
-        return $this->belongsToMany(Player::class)
+        // Eloquent's default pivot table name (player_want_list) doesn't
+        // match the migrated table (want_list_player) — must be named
+        // explicitly.
+        return $this->belongsToMany(Player::class, 'want_list_player')
             ->withPivot('note')
             ->withTimestamps();
     }
