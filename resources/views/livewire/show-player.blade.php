@@ -1,13 +1,19 @@
 <div class="max-w-7xl mx-auto py-12">
     <div class="flex flex-col md:flex-row gap-8 justify-center max-w-3xl mx-auto">
         <div class="mx-auto flex flex-col items-center gap-3 min-w-36">
-            @if ($this->player->media?->url)
-                <img src="{{ Storage::url($this->player->media?->url) }}" alt="{{ $player->name }}" class="size-44 rounded-full" />
+            @auth
+                @if ($this->player->media?->url)
+                    <img src="{{ Storage::url($this->player->media?->url) }}" alt="{{ $player->name }}" class="size-44 rounded-full" />
+                @else
+                    <div class="flex size-44 border-4 border-dashed border-gray-200 rounded-full text-center text-gray-500 justify-center items-center">
+                        <p class="">No photo</p>
+                    </div>
+                @endif
             @else
-                <div class="flex size-44 border-4 border-dashed border-gray-200 rounded-full text-center text-gray-500 justify-center items-center">
-                    <p class="">No photo</p>
+                <div class="flex size-44 border-4 border-dashed border-gray-200 rounded-full text-center text-gray-500 justify-center items-center p-4">
+                    <p class="text-sm"><a href="{{ route('login') }}" class="font-semibold hover:underline">Login</a> to view photo</p>
                 </div>
-            @endif
+            @endauth
 
             @auth
                 @php
@@ -56,14 +62,20 @@
             <div class="border-b border-black"></div>
             <div class="mb-4 text-lg">
                 @if ($player->response_rate)
-                    Response Rate: {{ $player->response_rate }}
+                    TTM Response Rate: {{ $player->response_rate }}
+                @endif
+                @if ($player->in_person_response_rate)
+                    @if ($player->response_rate)
+                        |
+                    @endif
+                    In Person Response Rate: {{ $player->in_person_response_rate }}
                 @endif
                 @if ($player->fees_required)
                     | Fees Required
                 @endif
             </div>
             <div class="mb-4 p-2">
-                <h3 class="font-bold">Address:</h3>
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Address</p>
                 @if ($this->address?->exists || $this->address?->exists && $this->hasUnpublishedAddress)
                     @if ($this->player->is_not_deceased)
                         @can('viewAny', App\Models\Address::class)
@@ -123,7 +135,7 @@
             </div>
             <div>
                 @if (auth()->check() && $this->tags->count())
-                    <h3 class="font-bold px-2">Tags:</h3>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 px-2 mb-1">Tags</p>
                     <div class="flex flex-wrap">
                         @foreach ($this->tags as $tag)
                             <x-filament::button
@@ -137,7 +149,7 @@
                 @endif
             </div>
             <div>
-                <h3 class="font-bold px-2">Fees:</h3>
+                <p class="text-xs font-bold uppercase tracking-widest text-gray-400 px-2 mb-1">Fees</p>
                 <div class="flex divide-x divide-black">
                     @forelse ($this->fees as $fee)
                         <div class="px-2">
@@ -153,14 +165,36 @@
             </div>
             @if ($this->player->note)
                 <div>
-                    <h3 class="font-bold px-2 mt-8">Note:</h3>
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 px-2 mt-8 mb-1">Note</p>
                     <div>{!! nl2br($this->player->note) !!}</div>
                 </div>
             @endif
         </div>
     </div>
     <div class="mt-4">
-        <h2 class="text-3xl">Recent TTM</h2>
-        {{ $this->table }}
+        <livewire:compare-autographs :player="$player" wire:key="compare-autographs-{{ $player->id }}" />
+    </div>
+    <div class="mt-4" x-data="{ autographTab: 'ttm' }">
+        <x-filament::tabs label="Autograph Type" class="mb-4">
+            <x-filament::tabs.item
+                x-on:click="autographTab = 'ttm'"
+                :alpine-active="'autographTab === \'ttm\''"
+            >
+                TTM
+            </x-filament::tabs.item>
+            <x-filament::tabs.item
+                x-on:click="autographTab = 'in_person'"
+                :alpine-active="'autographTab === \'in_person\''"
+            >
+                In Person
+            </x-filament::tabs.item>
+        </x-filament::tabs>
+
+        <div x-show="autographTab === 'ttm'" class="overflow-x-auto">
+            {{ $this->table }}
+        </div>
+        <div x-show="autographTab === 'in_person'" x-cloak class="overflow-x-auto">
+            <livewire:in-person-autographs-table :player="$player" wire:key="in-person-autographs-{{ $player->id }}" />
+        </div>
     </div>
 </div>
