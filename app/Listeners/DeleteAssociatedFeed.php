@@ -3,12 +3,13 @@
 namespace App\Listeners;
 
 use App\Events\CommentDeleted;
+use App\Events\InPersonAutographDeleted;
 use App\Events\PostalMailDeleted;
 use App\Models\Feed;
 
 class DeleteAssociatedFeed
 {
-    public function handle(PostalMailDeleted|CommentDeleted $event): void
+    public function handle(PostalMailDeleted|CommentDeleted|InPersonAutographDeleted $event): void
     {
         Feed::where('feedable_type', $this->type($event))
             ->where('feedable_id', $event->feedableId)
@@ -21,6 +22,7 @@ class DeleteAssociatedFeed
         return match (true) {
             $event instanceof PostalMailDeleted => 'App\Models\PostalMail',
             $event instanceof CommentDeleted => 'App\Models\Comment',
+            $event instanceof InPersonAutographDeleted => 'App\Models\InPersonAutograph',
         };
     }
 }
