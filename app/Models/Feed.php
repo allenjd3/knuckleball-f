@@ -32,6 +32,7 @@ class Feed extends Model
     {
         return match (true) {
             $this->feedable_type === PostalMail::class => $this->postalMailComponentName(),
+            $this->feedable_type === InPersonAutograph::class => 'feeds.in-person-card',
             $this->feedable_type === Pack::class => 'feeds.pack-card',
             $this->feedable_type === CardSet::class => $this->setCardComponentName(),
             $this->feedable_type === Comment::class => 'feeds.comment',

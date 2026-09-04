@@ -29,6 +29,11 @@ trait Signable
         return $this->signer->fees();
     }
 
+    public function inPersonAutographs(): HasMany
+    {
+        return $this->signer->inPersonAutographs();
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->signer->tags();

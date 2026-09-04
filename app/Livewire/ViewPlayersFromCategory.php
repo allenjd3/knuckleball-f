@@ -21,4 +21,9 @@ class ViewPlayersFromCategory extends ViewPlayers
             ->with(['team', 'lastTeam', 'media'])
             ->where('published_at', '<', now()->endOfDay());
     }
+
+    public function shouldShowCategoryTabs(): bool
+    {
+        return false;
+    }
 }

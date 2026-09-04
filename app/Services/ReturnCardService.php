@@ -143,7 +143,7 @@ class ReturnCardService
         $heroPath = $d['cardPhotoPath'] ?? $d['playerPhotoPath'];
         if ($heroPath) {
             try {
-                $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 540);
+                $hero = $this->manager->read(Storage::get($heroPath))->contain(1080, 540, self::BG);
                 $canvas->place($hero, 'top-left', 0, 0);
                 $this->drawGradientFade($canvas, 240, 540);
             } catch (Throwable) { /* no hero – dark bg is fine */
@@ -191,7 +191,7 @@ class ReturnCardService
         $heroPath = $d['cardPhotoPath'] ?? $d['playerPhotoPath'];
         if ($heroPath) {
             try {
-                $hero = $this->manager->read(Storage::get($heroPath))->cover(1080, 1000);
+                $hero = $this->manager->read(Storage::get($heroPath))->contain(1080, 1000, self::BG);
                 $canvas->place($hero, 'top-left', 0, 0);
                 $this->drawGradientFade($canvas, 500, 1000);
             } catch (Throwable) { /* dark bg */

@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Comment;
+use App\Models\InPersonAutograph;
 use App\Models\PostalMail;
 use App\Traits\ProcessLastLinkable;
 
@@ -10,7 +11,7 @@ class CreateFeedItem
 {
     use ProcessLastLinkable;
 
-    public static function execute(PostalMail|Comment $feedItem, ?string $comment)
+    public static function execute(PostalMail|Comment|InPersonAutograph $feedItem, ?string $comment)
     {
         $feed = $feedItem->feeds()->create([
             'comment' => $comment ?? '',

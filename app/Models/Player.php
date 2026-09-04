@@ -21,12 +21,36 @@ class Player extends Model
     use HasSlug;
     use Signable;
 
+    /**
+     * Generational suffixes to skip over when deriving last_name, so "Cal
+     * Ripken Jr." sorts under "Ripken" rather than "Jr.".
+     */
+    private const NAME_SUFFIXES = ['jr', 'sr', 'ii', 'iii', 'iv', 'v'];
+
     protected $guarded = [];
+
+    public static function lastNameFrom(string $name): string
+    {
+        $parts = preg_split('/\s+/', trim($name));
+
+        if (count($parts) > 1 && in_array(strtolower(rtrim(end($parts), '.')), self::NAME_SUFFIXES, true)) {
+            array_pop($parts);
+        }
+
+        return end($parts) ?: $name;
+    }
 
     protected static function booted()
     {
         static::created(function (Player $player) {
             $player->signer()->create();
+        });
+
+        // Keep last_name (used to sort the players table alphabetically by
+        // last name) in sync with whatever name is saved, so callers never
+        // have to remember to set it themselves.
+        static::saving(function (Player $player) {
+            $player->last_name = static::lastNameFrom($player->name);
         });
     }
 
@@ -57,7 +81,7 @@ class Player extends Model
 
     public function address()
     {
-        return $this->addresses()->latest()->published()->notRejected()->first();
+        return $this->addresses()->latest()->published()->notRejected()->notExpired()->first();
     }
 
     public function path(): string
@@ -100,6 +124,7 @@ class Player extends Model
         return [
             'published_at' => 'datetime',
             'retired_at' => 'datetime',
+            'is_retired' => 'boolean',
             'deceased_at' => 'datetime',
         ];
     }
@@ -108,6 +133,13 @@ class Player extends Model
     {
         return Attribute::make(
             get: fn () => $this->signer->response_rate,
+        );
+    }
+
+    protected function inPersonResponseRate(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->signer->in_person_response_rate,
         );
     }
 
@@ -122,6 +154,13 @@ class Player extends Model
     {
         return Attribute::get(
             get: fn (mixed $value, array $attributes) => is_null(data_get($attributes, 'deceased_at'))
+        );
+    }
+
+    protected function isCurrentlyRetired(): Attribute
+    {
+        return Attribute::get(
+            get: fn () => $this->is_retired || (! is_null($this->retired_at) && $this->retired_at->isPast())
         );
     }
 }

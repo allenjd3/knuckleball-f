@@ -72,7 +72,7 @@
                     <div class="flex gap-4">
                         {{-- Photo --}}
                         <div class="size-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center">
-                            @if ($event->heroPhoto())
+                            @if ($event->heroPhoto() && (auth()->check() || $event->type !== 'player_signing'))
                                 <img src="{{ $event->heroPhoto() }}" class="w-full h-full object-cover" alt="{{ $event->name }}" />
                             @else
                                 <x-heroicon-o-calendar class="size-7 text-gray-300" />
