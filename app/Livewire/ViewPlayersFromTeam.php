@@ -34,6 +34,11 @@ class ViewPlayersFromTeam extends ViewPlayers
             ->where('published_at', '<', now()->endOfDay());
     }
 
+    public function shouldShowCategoryTabs(): bool
+    {
+        return false;
+    }
+
     public function createAction(): Action
     {
         return CreateAction::make()
