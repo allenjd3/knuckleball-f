@@ -2,6 +2,7 @@
 
 namespace App\Filament\Imports;
 
+use App\Actions\ParseDates;
 use App\Models\Player;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
@@ -30,7 +31,18 @@ class PlayerImporter extends Importer
                 ->relationship(resolveUsing: ['name'])
                 ->rules(['nullable']),
             ImportColumn::make('retired_at')
-                ->rules(['nullable', 'date']),
+                ->rules(['nullable'])
+                ->fillRecordUsing(function (Player $record, ?string $state): void {
+                    // Some source lists give a retirement year, others just say
+                    // "Retired" with no year. Either way we don't want that to
+                    // silently fall back to "Active" — parse a year if we can,
+                    // but always flag is_retired when anything was provided.
+                    $record->retired_at = ParseDates::handle($state);
+
+                    if (filled($state)) {
+                        $record->is_retired = true;
+                    }
+                }),
         ];
     }
 

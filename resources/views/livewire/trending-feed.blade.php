@@ -146,7 +146,7 @@
                         @forelse ($this->trendingPlayers as $i => $player)
                             <div class="flex items-center gap-4 px-4 py-3">
                                 <span class="text-sm font-bold text-gray-300 w-5 text-center">{{ $i + 1 }}</span>
-                                @if ($player->media)
+                                @if (auth()->check() && $player->media)
                                     <img src="{{ Storage::url($player->media->url) }}" alt="{{ $player->name }}"
                                          class="size-10 rounded-full object-cover flex-shrink-0 bg-gray-100" />
                                 @else

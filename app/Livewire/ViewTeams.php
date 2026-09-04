@@ -25,6 +25,17 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
 
     public ?Category $category;
 
+    public bool $searchPrimedFromUrl = false;
+
+    public function boot(): void
+    {
+        if (! $this->searchPrimedFromUrl && request()->filled('search')) {
+            $this->tableSearch = (string) request()->query('search');
+        }
+
+        $this->searchPrimedFromUrl = true;
+    }
+
     public function render()
     {
         return view('livewire.view-teams');
@@ -61,7 +72,9 @@ class ViewTeams extends Component implements HasActions, HasForms, HasTable
                     ->url(fn (Team $record) => route('teams.show', $record))
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('category.name'),
-            ]);
+                TextColumn::make('category.name')
+                    ->sortable(),
+            ])
+            ->defaultSort('name');
     }
 }

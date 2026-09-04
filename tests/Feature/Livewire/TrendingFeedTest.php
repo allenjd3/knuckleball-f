@@ -87,6 +87,27 @@ test('setSort resets offset and perPage', function () {
     expect($component->get('perPage'))->toBe(20);
 });
 
+it('hides trending player photos from guests but shows them to authenticated users', function () {
+    $player = Player::factory()->create();
+    $player->media()->create(['url' => 'avatars/test.jpg']);
+    $signer = Signer::factory()->create([
+        'signable_id' => $player->id,
+        'signable_type' => Player::class,
+    ]);
+    PostalMail::factory()->count(3)->create([
+        'signer_id' => $signer->id,
+        'date_sent' => now()->subWeek(),
+        'created_at' => now()->subDays(10),
+    ]);
+
+    Livewire::test(TrendingFeed::class)
+        ->assertDontSee('avatars/test.jpg');
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(TrendingFeed::class)
+        ->assertSee('avatars/test.jpg');
+});
+
 it('shows the trending players ranked by send count', function () {
     $topPlayer = Player::factory()->create();
     $topSigner = Signer::factory()->create([

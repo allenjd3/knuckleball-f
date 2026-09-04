@@ -36,6 +36,10 @@ return [
         'key' => env('GOOGLE_PLACES_API_KEY'),
     ],
 
+    'eventbrite' => [
+        'token' => env('EVENTBRITE_PRIVATE_TOKEN'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

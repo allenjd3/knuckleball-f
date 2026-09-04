@@ -31,6 +31,10 @@
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('users.trending') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
                             <x-heroicon-o-fire class="size-5 shrink-0" /> Trending
                         </a>
+                        <a href="{{ route('leaderboard.index') }}"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('leaderboard.index') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                            <x-heroicon-o-trophy class="size-5 shrink-0" /> Leaderboard
+                        </a>
                         <a href="{{ route('packs.browse') }}"
                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors {{ request()->routeIs('packs.*') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
                             <x-heroicon-o-bookmark class="size-5 shrink-0" /> Packs
@@ -80,6 +84,10 @@
                                class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('users.trending') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
                                 <x-heroicon-o-fire class="size-4 shrink-0" /> Trending
                             </a>
+                            <a href="{{ route('leaderboard.index') }}"
+                               class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('leaderboard.index') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
+                                <x-heroicon-o-trophy class="size-4 shrink-0" /> Leaderboard
+                            </a>
                             <a href="{{ route('packs.browse') }}"
                                class="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors shrink-0 {{ request()->routeIs('packs.*') ? 'bg-red-50 text-[#D93C3F]' : 'text-gray-500 hover:text-gray-800' }}">
                                 <x-heroicon-o-bookmark class="size-4 shrink-0" /> Packs
@@ -122,8 +130,10 @@
                                 <a href="{{ data_get($item->meta, 'player_path', '#') }}"
                                    class="shrink-0 bg-white border border-gray-100 rounded-xl p-3 w-44 hover:border-gray-200 transition-colors block">
                                     @if ($heroPhoto)
-                                        <img src="{{ Storage::url($heroPhoto) }}"
-                                             class="w-full h-20 object-cover rounded-lg mb-2" />
+                                        <div class="w-full h-20 bg-gray-50 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
+                                            <img src="{{ Storage::url($heroPhoto) }}"
+                                                 class="max-w-full max-h-full object-contain" />
+                                        </div>
                                     @else
                                         <div class="w-full h-20 bg-gray-50 rounded-lg mb-2 flex items-center justify-center">
                                             <x-heroicon-o-photo class="size-6 text-gray-200" />

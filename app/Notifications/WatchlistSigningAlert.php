@@ -22,6 +22,7 @@ class WatchlistSigningAlert extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
+            'type' => 'watchlist_signing_alert',
             'event_id' => $this->event->id,
             'event_name' => $this->event->name,
             'event_path' => $this->event->path(),

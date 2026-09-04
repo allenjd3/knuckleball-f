@@ -17,6 +17,13 @@ test('Teams are visible in the livewire component', function () {
         ->assertSee($team->name);
 });
 
+test('Teams are listed alphabetically by default', function () {
+    $teams = Team::factory(10)->state(['published_at' => now()->subWeek()])->create();
+
+    Livewire::test(ViewTeams::class)
+        ->assertCanSeeTableRecords($teams->sortBy('name'), inOrder: true);
+});
+
 test('Teams can be sorted', function () {
     $teams = Team::factory(10)->state(['published_at' => now()->subWeek()])->create();
 
@@ -57,6 +64,15 @@ test('approved teams are still visible', function () {
 
     Livewire::test(ViewTeams::class)
         ->assertCanSeeTableRecords(Team::find([$team->id]));
+});
+
+test('a search query string pre-fills the teams table search', function () {
+    Team::factory()->published()->create(['name' => 'Thunderbolts']);
+    Team::factory()->published()->create(['name' => 'Warriors']);
+
+    $this->get('teams?search=Thunder')
+        ->assertSee('Thunderbolts')
+        ->assertDontSee('Warriors');
 });
 
 test('an admin is emailed if new teams are added', function () {

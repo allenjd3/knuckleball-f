@@ -20,8 +20,10 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class AddressResource extends Resource
@@ -67,6 +69,10 @@ class AddressResource extends Resource
                     ->label('Published At')
                     ->default(now()->subDay())
                     ->nullable(),
+                DatePicker::make('expires_at')
+                    ->label('Expires At')
+                    ->helperText('Optional. Once passed, the address drops off the player\'s public page but stays here for review/editing.')
+                    ->nullable(),
                 Checkbox::make('rejected')
                     ->label('Reject Address (hide it from review)')
                     ->default(false),
@@ -93,6 +99,16 @@ class AddressResource extends Resource
                 TextColumn::make('published_at')
                     ->dateTime()
                     ->sortable(),
+                TextColumn::make('expires_at')
+                    ->label('Expires')
+                    ->dateTime()
+                    ->sortable()
+                    ->placeholder('Never')
+                    ->badge()
+                    ->color(fn (Address $record) => $record->isExpired() ? 'danger' : null)
+                    ->formatStateUsing(fn (Address $record) => $record->expires_at
+                        ? $record->expires_at->format('M j, Y') . ($record->isExpired() ? ' (expired)' : '')
+                        : 'Never'),
                 CheckboxColumn::make('rejected'),
             ])
             ->recordActions([
@@ -100,6 +116,10 @@ class AddressResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('rejected'),
+                Filter::make('expired')
+                    ->label('Expired')
+                    ->toggle()
+                    ->query(fn (Builder $query) => $query->whereNotNull('expires_at')->where('expires_at', '<=', now())),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
