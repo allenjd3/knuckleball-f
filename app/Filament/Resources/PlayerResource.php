@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Imports\ImportDataImporter;
 use App\Filament\Resources\PlayerResource\Pages\ApproveTags;
 use App\Filament\Resources\PlayerResource\Pages\CreatePlayer;
+use App\Filament\Resources\PlayerResource\Pages\DuplicatePlayers;
 use App\Filament\Resources\PlayerResource\Pages\EditPlayer;
 use App\Filament\Resources\PlayerResource\Pages\ListPlayers;
 use App\Models\Player;
@@ -62,7 +63,11 @@ class PlayerResource extends Resource
                     ->relationship(name: 'user', titleAttribute: 'name')
                     ->nullable(),
                 DatePicker::make('published_at'),
+                Checkbox::make('is_retired')
+                    ->label('Retired')
+                    ->helperText('Turn on if the player is retired, even if the year below is unknown.'),
                 DatePicker::make('retired_at')
+                    ->label('Retirement Year')
                     ->default(fn (?Player $record) => $record?->retired_at),
                 DatePicker::make('deceased_at'),
                 FileUpload::make('url')
@@ -99,7 +104,7 @@ class PlayerResource extends Resource
                             return 'Unpublished';
                         }
 
-                        return ! is_null($record->retired_at) && $record->retired_at?->isPast() ? 'Retired' : 'Active';
+                        return $record->is_currently_retired ? 'Retired' : 'Active';
                     })
                     ->badge()
                     ->color(fn ($state) => match ($state) {
@@ -110,7 +115,9 @@ class PlayerResource extends Resource
                 TextColumn::make('team.name'),
                 TextColumn::make('lastTeam.name')->label('Last Team')->sortable(),
                 TextColumn::make('retired_at')
-                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? 'NULL'),
+                    ->label('Retirement Year')
+                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? ($record->is_retired ? 'Yes' : 'NULL')),
+                CheckboxColumn::make('is_retired'),
                 CheckboxColumn::make('rejected'),
                 TextColumn::make('published_at')->sortable()->date(),
                 TextColumn::make('user.name')->searchable(),
@@ -146,6 +153,7 @@ class PlayerResource extends Resource
             'create' => CreatePlayer::route('/create'),
             'edit' => EditPlayer::route('/{record}/edit'),
             'approve-tags' => ApproveTags::route('/approve-tags'),
+            'duplicates' => DuplicatePlayers::route('/duplicates'),
         ];
     }
 }
