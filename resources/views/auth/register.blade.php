@@ -5,7 +5,7 @@
 
     <x-authentication-card>
         <x-slot name="logo">
-            <h3 style="--color-600: var(--primary-600)" class="text-[26px] tracking-tight text-custom-600">Knuckleball</h3>
+            <x-authentication-card-logo />
         </x-slot>
 
         <x-validation-errors class="mb-4" />
