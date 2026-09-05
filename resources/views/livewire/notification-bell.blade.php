@@ -64,7 +64,7 @@
                             <p class="text-sm text-gray-800 leading-snug">
                                 <a href="{{ route('users.profile', ['user' => data_get($data, 'commenter_slug')]) }}"
                                    class="font-semibold hover:underline">{{ data_get($data, 'commenter_name') }}</a>
-                                commented: <span class="text-gray-500 italic">"{{ data_get($data, 'body') }}"</span>
+                                {{ data_get($data, 'is_reply') ? 'replied to your comment' : 'commented' }}: <span class="text-gray-500 italic">"{{ data_get($data, 'body') }}"</span>
                             </p>
                         @elseif (data_get($data, 'type') === 'pack_player_added')
                             <p class="text-sm text-gray-800 leading-snug">
@@ -73,21 +73,33 @@
                                 <a href="{{ route('packs.show', data_get($data, 'pack_slug')) }}"
                                    class="font-semibold hover:underline">{{ data_get($data, 'pack_name') }}</a>.
                             </p>
-                        @elseif (isset($data['event_id']) && isset($data['player_name']))
+                        @elseif (data_get($data, 'type') === 'want_list_player_added')
+                            <p class="text-sm text-gray-800 leading-snug">
+                                <a href="{{ data_get($data, 'player_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'player_name') }}</a>
+                                was added to
+                                <a href="{{ data_get($data, 'want_list_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'want_list_name') }}</a>.
+                            </p>
+                        @elseif (data_get($data, 'type') === 'watchlist_signing_alert')
                             <p class="text-sm text-gray-800 leading-snug">
                                 <span class="font-semibold">Signing alert:</span>
                                 <a href="{{ data_get($data, 'event_path', '#') }}" class="hover:underline">{{ data_get($data, 'player_name') }}</a>
                                 — {{ data_get($data, 'event_name') }}
                                 @if (data_get($data, 'city')) · {{ data_get($data, 'city') }}@if (data_get($data, 'state')), {{ data_get($data, 'state') }}@endif @endif
                             </p>
-                        @elseif (isset($data['event_id']))
+                        @elseif (data_get($data, 'type') === 'card_show_alert')
                             <p class="text-sm text-gray-800 leading-snug">
                                 <span class="font-semibold">Card show near you:</span>
                                 <a href="{{ data_get($data, 'event_path', '#') }}" class="hover:underline">{{ data_get($data, 'event_name') }}</a>
                                 @if (data_get($data, 'city')) · {{ data_get($data, 'city') }}@if (data_get($data, 'state')), {{ data_get($data, 'state') }}@endif @endif
                             </p>
+                        @elseif (data_get($data, 'type') === 'event_approved')
+                            <p class="text-sm text-gray-800 leading-snug">
+                                Your {{ data_get($data, 'event_type') === 'player_signing' ? 'Player Signing' : 'Card Show' }} listing
+                                <a href="{{ data_get($data, 'event_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'event_name') }}</a>
+                                was approved and is now live.
+                            </p>
                         @else
-                            <p class="text-sm text-gray-800">New notification</p>
+                            <p class="text-sm text-gray-800">{{ data_get($data, 'message', 'New notification') }}</p>
                         @endif
                         <p class="text-xs text-gray-400 mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
                     </div>

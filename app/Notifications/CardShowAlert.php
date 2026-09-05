@@ -22,6 +22,7 @@ class CardShowAlert extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
+            'type' => 'card_show_alert',
             'event_id' => $this->event->id,
             'event_name' => $this->event->name,
             'event_path' => $this->event->path(),

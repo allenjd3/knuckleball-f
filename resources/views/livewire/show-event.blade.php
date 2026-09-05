@@ -8,7 +8,7 @@
     </a>
 
     {{-- Hero --}}
-    @if ($event->heroPhoto())
+    @if ($event->heroPhoto() && (auth()->check() || $event->type !== 'player_signing'))
         <div class="h-56 rounded-2xl overflow-hidden bg-gray-100 mb-6">
             <img src="{{ $event->heroPhoto() }}" class="w-full h-full object-cover" alt="{{ $event->name }}" />
         </div>
@@ -43,7 +43,7 @@
     @if ($event->player)
         <div class="flex items-center gap-3 bg-white border border-gray-100 rounded-2xl p-4 mb-6">
             <div class="size-12 rounded-full overflow-hidden bg-gray-100 shrink-0">
-                @if ($event->player->media?->url)
+                @if (auth()->check() && $event->player->media?->url)
                     <img src="{{ \Illuminate\Support\Facades\Storage::url($event->player->media->url) }}" class="w-full h-full object-cover" />
                 @else
                     <x-heroicon-o-user class="size-6 text-gray-300 m-3" />

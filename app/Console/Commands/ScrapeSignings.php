@@ -7,6 +7,7 @@ use App\Models\Player;
 use DOMDocument;
 use DOMXPath;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -16,6 +17,7 @@ class ScrapeSignings extends Command
 
     protected $signature = 'signings:scrape
                             {--source=* : Source in name:url format (repeatable)}
+                            {--eventbrite : Search Eventbrite for autograph signing events}
                             {--dry-run : Print results without saving}';
 
     protected $description = 'Scrape player signing events and import as pending';
@@ -35,6 +37,18 @@ class ScrapeSignings extends Command
 
         foreach ($sources as [$name, $url]) {
             foreach ($this->jsonLdSource($name, [$url]) as $signing) {
+                $hash = $this->dedupeHash($signing);
+                if (isset($seen[$hash])) {
+                    continue;
+                }
+                $seen[$hash] = true;
+                $signing['source_hash'] = $hash;
+                $allSignings[] = $signing;
+            }
+        }
+
+        if ($this->option('eventbrite')) {
+            foreach ($this->eventbriteSource() as $signing) {
                 $hash = $this->dedupeHash($signing);
                 if (isset($seen[$hash])) {
                     continue;
@@ -174,7 +188,13 @@ class ScrapeSignings extends Command
         foreach ($urls as $url) {
             sleep(2);
 
-            $response = Http::withUserAgent(self::USER_AGENT)->get($url);
+            try {
+                $response = Http::withUserAgent(self::USER_AGENT)->get($url);
+            } catch (ConnectionException $e) {
+                $this->warn("Connection failed for {$url}: {$e->getMessage()}");
+
+                continue;
+            }
 
             if (! $response->ok()) {
                 $this->warn("Fetch failed for {$url} ({$response->status()})");
@@ -301,6 +321,111 @@ class ScrapeSignings extends Command
             'event_format' => $eventFormat,
             'source_url' => $sourceUrl,
             'source_name' => $sourceName,
+        ];
+    }
+
+    private function eventbriteSource(): array
+    {
+        $token = config('services.eventbrite.token');
+
+        if (! $token) {
+            $this->warn('Skipping Eventbrite — EVENTBRITE_PRIVATE_TOKEN not set in .env');
+
+            return [];
+        }
+
+        $signings = [];
+        $seen = [];
+        $terms = ['autograph signing', 'sports card signing', 'baseball signing'];
+
+        foreach ($terms as $term) {
+            $page = 1;
+
+            do {
+                sleep(1);
+
+                $response = Http::withToken($token)
+                    ->get('https://www.eventbriteapi.com/v3/events/search/', [
+                        'q' => $term,
+                        'location.address' => 'United States',
+                        'expand' => 'venue,organizer',
+                        'start_date.range_start' => now()->toIso8601String(),
+                        'page' => $page,
+                    ]);
+
+                if (! $response->ok()) {
+                    $this->warn("Eventbrite search failed ({$response->status()}) for '{$term}'");
+                    break;
+                }
+
+                $data = $response->json();
+
+                foreach ($data['events'] ?? [] as $event) {
+                    if (isset($seen[$event['id']])) {
+                        continue;
+                    }
+                    $seen[$event['id']] = true;
+
+                    $signing = $this->parseEventbriteEvent($event);
+                    if ($signing) {
+                        $signings[] = $signing;
+                    }
+                }
+
+                $hasMore = $data['pagination']['has_more_items'] ?? false;
+                $page++;
+            } while ($hasMore && $page <= 5);
+
+            $this->line("Eventbrite '{$term}': " . count($signings) . ' total so far');
+        }
+
+        return $signings;
+    }
+
+    private function parseEventbriteEvent(array $event): ?array
+    {
+        $title = $event['name']['text'] ?? '';
+        $start = $this->isoDate((string) ($event['start']['local'] ?? ''));
+
+        if (! $title || ! $start) {
+            return null;
+        }
+
+        if (! preg_match('/\b(sport|baseball|football|basketball|hockey|card|autograph|signing|memorabilia|collector)\b/i', $title)) {
+            return null;
+        }
+
+        $end = $this->isoDate((string) ($event['end']['local'] ?? ''));
+        if ($end === $start) {
+            $end = null;
+        }
+
+        $venue = $event['venue'] ?? [];
+        $addr = $venue['address'] ?? [];
+        $description = $event['description']['text'] ?? '';
+        $blob = $title . ' ' . $description;
+
+        $eventFormat = preg_match('/\b(mail[\s-]?in|send[\s-]?in|mail order)\b/i', $blob)
+            ? 'mail_in'
+            : 'in_person';
+
+        return [
+            'title' => trim($title),
+            'start_date' => $start,
+            'end_date' => $end,
+            'player_name' => null,
+            'venue' => $venue['name'] ?? null,
+            'address' => $addr['address_1'] ?? null,
+            'city' => $addr['city'] ?? null,
+            'state' => $addr['region'] ?? null,
+            'zip_code' => $addr['postal_code'] ?? null,
+            'admission' => null,
+            'promoter' => $event['organizer']['name'] ?? null,
+            'contact' => null,
+            'event_type' => 'player_signing',
+            'event_format' => $eventFormat,
+            'source_url' => $event['url'] ?? null,
+            'source_name' => 'eventbrite',
         ];
     }
 

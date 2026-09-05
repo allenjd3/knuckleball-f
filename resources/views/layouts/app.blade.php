@@ -70,6 +70,8 @@
 
         @stack('modals')
 
+        <x-lightbox />
+
         @livewire('notifications')
 
         @filamentScripts

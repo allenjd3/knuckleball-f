@@ -43,15 +43,19 @@
         @endphp
 
         @if ($heroUrl)
-            <div class="rounded-3xl overflow-hidden shadow-2xl mb-8">
+            <button type="button"
+                    class="block w-full rounded-3xl overflow-hidden shadow-2xl mb-8 cursor-zoom-in"
+                    @click="$dispatch('open-lightbox', { src: '{{ $heroUrl }}', alt: '{{ data_get($meta, 'player') }}' })">
                 <img src="{{ $heroUrl }}" alt="{{ data_get($meta, 'player') }}"
                      class="w-full object-cover" />
-            </div>
+            </button>
         @elseif ($cardPhoto)
-            <div class="rounded-3xl overflow-hidden shadow-2xl mb-8">
+            <button type="button"
+                    class="flex items-center justify-center w-full max-h-96 bg-gray-100 rounded-3xl overflow-hidden shadow-2xl mb-8 cursor-zoom-in"
+                    @click="$dispatch('open-lightbox', { src: '{{ Storage::url($cardPhoto) }}', alt: '{{ data_get($meta, 'player') }}' })">
                 <img src="{{ Storage::url($cardPhoto) }}" alt="{{ data_get($meta, 'player') }}"
-                     class="w-full max-h-96 object-cover" />
-            </div>
+                     class="max-w-full max-h-96 object-contain" />
+            </button>
         @endif
 
         {{-- Info card --}}
@@ -113,9 +117,11 @@
             @if ($shareOpen)
                 {{-- Card preview + downloads --}}
                 @if ($heroUrl)
-                    <div class="rounded-xl overflow-hidden border border-gray-100 mb-4">
+                    <button type="button"
+                            class="block w-full rounded-xl overflow-hidden border border-gray-100 mb-4 cursor-zoom-in"
+                            @click="$dispatch('open-lightbox', { src: '{{ $heroUrl }}', alt: 'Share card preview' })">
                         <img src="{{ $heroUrl }}" alt="Share card preview" class="w-full" />
-                    </div>
+                    </button>
                 @endif
 
                 <div class="flex flex-col gap-2">
@@ -159,8 +165,12 @@
                 <p class="text-sm font-bold uppercase tracking-widest text-gray-400 mb-4">Signed Cards</p>
                 <div class="grid grid-cols-2 gap-3">
                     @foreach (data_get($meta, 'card_photos', []) as $photo)
-                        <img src="{{ Storage::url($photo) }}" alt="Signed card"
-                             class="w-full aspect-[3/4] object-cover rounded-xl bg-gray-50" />
+                        <button type="button"
+                                class="flex items-center justify-center w-full aspect-[3/4] rounded-xl bg-gray-50 overflow-hidden cursor-zoom-in"
+                                @click="$dispatch('open-lightbox', { src: '{{ Storage::url($photo) }}', alt: 'Signed card' })">
+                            <img src="{{ Storage::url($photo) }}" alt="Signed card"
+                                 class="max-w-full max-h-full object-contain" />
+                        </button>
                     @endforeach
                 </div>
             </div>

@@ -25,6 +25,7 @@ class PackPlayerAdded extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
+            'type' => 'pack_player_added',
             'pack_id' => $this->pack->id,
             'pack_name' => $this->pack->name,
             'pack_slug' => $this->pack->slug,
