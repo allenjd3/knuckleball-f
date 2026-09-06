@@ -51,16 +51,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
      */
     public static function placeholderAvatarUrl(): string
     {
-        $svg = <<<'SVG'
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="12" fill="#f3f4f6"/>
-                <g transform="translate(12 12) scale(0.62) translate(-12 -12)">
-                    <path fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                </g>
-            </svg>
-            SVG;
-
-        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+        return asset('images/player-avatar-placeholder.svg');
     }
 
     public function boot(): void
@@ -112,94 +103,14 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 fn (Action $action) => $action->icon(Heroicon::OutlinedAdjustmentsHorizontal)
             )
             ->filters([
-                SelectFilter::make('team_id')
-                    ->label('Team')
-                    ->relationship('team', 'name')
-                    ->searchable()
-                    ->preload(),
-                SelectFilter::make('category')
-                    ->options(fn () => Category::pluck('name', 'id'))
-                    ->query(fn (Builder $query, array $data) => $query->when(
-                        $data['value'] ?? null,
-                        fn (Builder $query, $categoryId) => $query->whereHas('team', fn (Builder $q) => $q->where('category_id', $categoryId))
-                    )),
-                SelectFilter::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'retired' => 'Retired',
-                        'deceased' => 'Deceased',
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query->when($data['value'] ?? null, function (Builder $query, string $status) {
-                            return match ($status) {
-                                'deceased' => $query->whereNotNull('deceased_at')->where('deceased_at', '<=', now()),
-                                'retired' => $query->where(fn (Builder $q) => $q->where('is_retired', true)
-                                    ->orWhere(fn (Builder $q) => $q->whereNotNull('retired_at')->where('retired_at', '<=', now())))
-                                    ->where(fn (Builder $q) => $q->whereNull('deceased_at')->orWhere('deceased_at', '>', now())),
-                                'active' => $query->where('is_retired', false)
-                                    ->where(fn (Builder $q) => $q->whereNull('retired_at')->orWhere('retired_at', '>', now()))
-                                    ->where(fn (Builder $q) => $q->whereNull('deceased_at')->orWhere('deceased_at', '>', now())),
-                                default => $query,
-                            };
-                        });
-                    }),
-                Filter::make('fees_required')
-                    ->label('Requires a fee')
-                    ->toggle()
-                    ->query(fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas('fees'))),
-                SelectFilter::make('response_rate')
-                    ->label('Response Rate')
-                    ->options([
-                        'high' => '80%+ (high)',
-                        'medium' => '40–79% (medium)',
-                        'low' => 'Under 40% (low)',
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        return $query->when($data['value'] ?? null, function (Builder $query, string $bucket) {
-                            // Filament applies every filter's query() inside a nested
-                            // $query->where(function ($query) {...}) group so filters
-                            // combine with AND. That nested closure only carries WHERE
-                            // conditions back to the parent query — groupBy()/havingRaw()
-                            // called in here get silently dropped. So this compares the
-                            // same ttm_resolved_count/ttm_success_count definition (see
-                            // withReturnStatsSelects()) as inline correlated subqueries
-                            // in a WHERE clause instead of referencing the SELECT aliases.
-                            [$resolvedSql, $successSql] = $this->returnStatsSubquerySql();
-
-                            return match ($bucket) {
-                                'high' => $query->whereRaw("{$resolvedSql} > 0 AND ({$successSql} * 1.0 / {$resolvedSql}) >= 0.8"),
-                                'medium' => $query->whereRaw("{$resolvedSql} > 0 AND ({$successSql} * 1.0 / {$resolvedSql}) >= 0.4 AND ({$successSql} * 1.0 / {$resolvedSql}) < 0.8"),
-                                'low' => $query->whereRaw("{$resolvedSql} > 0 AND ({$successSql} * 1.0 / {$resolvedSql}) < 0.4"),
-                                default => $query,
-                            };
-                        });
-                    }),
-                SelectFilter::make('tags')
-                    ->label('Tags')
-                    ->multiple()
-                    ->options(fn () => Tag::pluck('label', 'id'))
-                    ->query(fn (Builder $query, array $data) => $query->when(
-                        filled($data['values'] ?? null),
-                        // wherePivotNotNull() silently fails to filter when used inside
-                        // a whereHas() closure (it doesn't scope to the pivot table
-                        // correctly in the generated EXISTS subquery) — referencing the
-                        // signer_tag table explicitly works correctly instead.
-                        fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas(
-                            'tags',
-                            fn (Builder $q2) => $q2->whereIn('tags.id', $data['values'])->whereNotNull('signer_tag.approved_at')
-                        ))
-                    )),
-                Filter::make('has_photo')
-                    ->label('Has a photo')
-                    ->toggle()
-                    ->query(fn (Builder $query) => $query->whereHas('media')),
-                Filter::make('recently_active')
-                    ->label('Return in last 90 days')
-                    ->toggle()
-                    ->query(fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas(
-                        'postalMails',
-                        fn (Builder $q2) => $q2->whereNotNull('returned_date')->where('returned_date', '>=', now()->subDays(90))
-                    ))),
+                $this->teamFilter(),
+                $this->categoryFilter(),
+                $this->statusFilter(),
+                $this->feesRequiredFilter(),
+                $this->responseRateFilter(),
+                $this->tagsFilter(),
+                $this->hasPhotoFilter(),
+                $this->recentlyActiveFilter(),
             ])
             ->columns([
                 ImageColumn::make('media.url')
@@ -343,6 +254,142 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     fn (Builder $q) => $q->where('category_id', $categoryId)
                 )
             );
+    }
+
+    protected function teamFilter(): SelectFilter
+    {
+        return SelectFilter::make('team_id')
+            ->label('Team')
+            ->relationship('team', 'name')
+            ->searchable()
+            ->preload();
+    }
+
+    protected function categoryFilter(): SelectFilter
+    {
+        return SelectFilter::make('category')
+            ->options(fn () => Category::pluck('name', 'id'))
+            ->query(fn (Builder $query, array $data) => $query->when(
+                $data['value'] ?? null,
+                fn (Builder $query, $categoryId) => $query->whereHas('team', fn (Builder $q) => $q->where('category_id', $categoryId))
+            ));
+    }
+
+    protected function statusFilter(): SelectFilter
+    {
+        return SelectFilter::make('status')
+            ->options([
+                'active' => 'Active',
+                'retired' => 'Retired',
+                'deceased' => 'Deceased',
+            ])
+            ->query(function (Builder $query, array $data) {
+                return $query->when($data['value'] ?? null, function (Builder $query, string $status) {
+                    return match ($status) {
+                        'deceased' => $query->whereNotNull('deceased_at')->where('deceased_at', '<=', now()),
+                        'retired' => $query->where(fn (Builder $q) => $q->where('is_retired', true)
+                            ->orWhere(fn (Builder $q) => $q->whereNotNull('retired_at')->where('retired_at', '<=', now())))
+                            ->where(fn (Builder $q) => $q->whereNull('deceased_at')->orWhere('deceased_at', '>', now())),
+                        'active' => $query->where('is_retired', false)
+                            ->where(fn (Builder $q) => $q->whereNull('retired_at')->orWhere('retired_at', '>', now()))
+                            ->where(fn (Builder $q) => $q->whereNull('deceased_at')->orWhere('deceased_at', '>', now())),
+                        default => $query,
+                    };
+                });
+            });
+    }
+
+    protected function feesRequiredFilter(): Filter
+    {
+        return Filter::make('fees_required')
+            ->label('Requires a fee')
+            ->toggle()
+            ->query(fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas('fees')));
+    }
+
+    protected function responseRateFilter(): SelectFilter
+    {
+        return SelectFilter::make('response_rate')
+            ->label('Response Rate')
+            ->options([
+                'high' => '80%+ (high)',
+                'medium' => '40–79% (medium)',
+                'low' => 'Under 40% (low)',
+            ])
+            ->query(fn (Builder $query, array $data) => $query->when(
+                $data['value'] ?? null,
+                fn (Builder $query, string $bucket) => $this->applyResponseRateBucket($query, $bucket)
+            ));
+    }
+
+    /**
+     * Filament applies every filter's query() inside a nested
+     * $query->where(function ($query) {...}) group so filters combine with
+     * AND. That nested closure only carries WHERE conditions back to the
+     * parent query — groupBy()/havingRaw() called in here get silently
+     * dropped. So this compares the same ttm_resolved_count/ttm_success_count
+     * definition (see withReturnStatsSelects()) as an inline correlated
+     * subquery in a WHERE clause instead of referencing the SELECT aliases.
+     *
+     * $resolvedSql/$successSql and the bucket thresholds below are all fixed
+     * values we control (not user input — see returnStatsSubquerySql()), so
+     * they're interpolated directly rather than bound. Binding the thresholds
+     * instead doesn't work: PDO returns float params as strings on sqlite, and
+     * sqlite's storage-class comparison rules mean a TEXT value never sorts
+     * >= a NUMERIC one, so `{$rateSql} >= ?` silently matches nothing in tests.
+     */
+    protected function applyResponseRateBucket(Builder $query, string $bucket): Builder
+    {
+        [$resolvedSql, $successSql] = $this->returnStatsSubquerySql();
+        $hasResponses = "{$resolvedSql} > 0";
+        $rate = "({$successSql} * 1.0 / {$resolvedSql})";
+
+        return match ($bucket) {
+            'high' => $query->whereRaw("{$hasResponses} AND {$rate} >= 0.8"),
+            'medium' => $query->whereRaw("{$hasResponses} AND {$rate} >= 0.4 AND {$rate} < 0.8"),
+            'low' => $query->whereRaw("{$hasResponses} AND {$rate} < 0.4"),
+            default => $query,
+        };
+    }
+
+    /**
+     * wherePivotNotNull() silently fails to filter when used inside a
+     * whereHas() closure (it doesn't scope to the pivot table correctly in
+     * the generated EXISTS subquery) — referencing the signer_tag table
+     * explicitly works correctly instead.
+     */
+    protected function tagsFilter(): SelectFilter
+    {
+        return SelectFilter::make('tags')
+            ->label('Tags')
+            ->multiple()
+            ->options(fn () => Tag::pluck('label', 'id'))
+            ->query(fn (Builder $query, array $data) => $query->when(
+                filled($data['values'] ?? null),
+                fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas(
+                    'tags',
+                    fn (Builder $q2) => $q2->whereIn('tags.id', $data['values'])->whereNotNull('signer_tag.approved_at')
+                ))
+            ));
+    }
+
+    protected function hasPhotoFilter(): Filter
+    {
+        return Filter::make('has_photo')
+            ->label('Has a photo')
+            ->toggle()
+            ->query(fn (Builder $query) => $query->whereHas('media'));
+    }
+
+    protected function recentlyActiveFilter(): Filter
+    {
+        return Filter::make('recently_active')
+            ->label('Return in last 90 days')
+            ->toggle()
+            ->query(fn (Builder $query) => $query->whereHas('signer', fn (Builder $q) => $q->whereHas(
+                'postalMails',
+                fn (Builder $q2) => $q2->whereNotNull('returned_date')->where('returned_date', '>=', now()->subDays(90))
+            )));
     }
 
     /**

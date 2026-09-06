@@ -19,10 +19,11 @@ test('Unauthenticated users can view players', function () {
 
 test('the players table shows a placeholder avatar to guests but the real photo to authenticated users', function () {
     // ImageColumn checks file existence against Filament's configured default
-    // disk ("local", storage/app/private — not the "public" disk everything
-    // else in this app renders through Storage::url()).
-    Storage::fake('local');
-    Storage::disk('local')->put('avatars/test.jpg', 'fake-image-content');
+    // disk (config('filament.default_filesystem_disk'), which is "public" in
+    // this app — the same disk everything else renders through via
+    // Storage::url()).
+    Storage::fake('public');
+    Storage::disk('public')->put('avatars/test.jpg', 'fake-image-content');
 
     $player = Player::factory()->published()->create();
     $player->media()->create(['url' => 'avatars/test.jpg']);
