@@ -149,7 +149,12 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('team.name')->url(fn (Player $record) => $record?->team ? route('teams.show', $record->team) : '#')->label('Team')->sortable(),
                 TextColumn::make('retired_at')
                     ->label('Retired Year')
-                    ->state(fn ($record) => $record->retired_at?->format('Y') ?? ($record->is_retired ? 'Yes' : '')),
+                    // Gated on is_currently_retired (not just retired_at presence) so a
+                    // player with a future retired_at — not yet actually retired, per
+                    // the Status column — doesn't show a retirement year here too.
+                    ->state(fn ($record) => $record->is_currently_retired
+                        ? ($record->retired_at?->format('Y') ?? 'Yes')
+                        : ''),
             ])
             ->recordActions([
                 EditAction::make()
@@ -248,10 +253,10 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                     ->where('rejected', false)
             )
             ->when(
-                $this->categoryTab,
-                fn (Builder $query, int $categoryId) => $query->whereHas(
+                $this->categoryTab !== null,
+                fn (Builder $query) => $query->whereHas(
                     'team',
-                    fn (Builder $q) => $q->where('category_id', $categoryId)
+                    fn (Builder $q) => $q->where('category_id', $this->categoryTab)
                 )
             );
     }
