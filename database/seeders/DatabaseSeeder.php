@@ -62,9 +62,11 @@ class DatabaseSeeder extends Seeder
                 );
 
             $this->call([
+                CategorySeeder::class,
                 TagSeeder::class,
                 AddressSeeder::class,
                 FeedSeeder::class,
+                PlayerFilterDemoSeeder::class,
             ]);
         }
     }

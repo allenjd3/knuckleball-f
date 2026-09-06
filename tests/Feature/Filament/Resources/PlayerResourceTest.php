@@ -221,9 +221,10 @@ it('can set dates for player', function () {
 
     assertDatabaseHas('players', [
         'name' => 'Test Player',
-        'published_at' => $publishedAt->toDateString(),
-        'retired_at' => $retiredAt->toDateString(),
-        'deceased_at' => $deceasedAt->toDateString(),
+        // DatePicker fields store midnight of the picked date, not a bare date.
+        'published_at' => $publishedAt->startOfDay()->toDateTimeString(),
+        'retired_at' => $retiredAt->startOfDay()->toDateTimeString(),
+        'deceased_at' => $deceasedAt->startOfDay()->toDateTimeString(),
     ]);
 });
 
