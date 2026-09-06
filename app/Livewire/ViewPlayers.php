@@ -186,7 +186,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                         }
                     }),
             ])
-            ->defaultSort('name');
+            ->defaultSort('last_name');
     }
 
     public function createAction(): Action
