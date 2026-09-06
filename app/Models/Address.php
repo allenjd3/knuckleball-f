@@ -28,6 +28,16 @@ class Address extends Model
         $builder->where('rejected', false);
     }
 
+    public function scopeNotExpired(Builder $builder)
+    {
+        $builder->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()));
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at !== null && $this->expires_at->isPast();
+    }
+
     public function player()
     {
         return $this->signer?->signable();
@@ -42,6 +52,7 @@ class Address extends Model
     {
         return [
             'published_at' => 'datetime',
+            'expires_at' => 'datetime',
             'reject' => 'boolean',
         ];
     }
