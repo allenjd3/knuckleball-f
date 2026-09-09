@@ -71,7 +71,10 @@
                     In Person Response Rate: {{ $player->in_person_response_rate }}
                 @endif
                 @if ($player->fees_required)
-                    | Fees Required
+                    @if ($player->response_rate || $player->in_person_response_rate)
+                        |
+                    @endif
+                    Fees Required
                 @endif
             </div>
             <div class="mb-4 p-2">

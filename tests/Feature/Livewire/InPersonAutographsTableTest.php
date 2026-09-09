@@ -100,6 +100,24 @@ test('editing an in-person autograph to declined removes its feed post', functio
     expect($autograph->fresh()->feeds()->exists())->toBeFalse();
 });
 
+test('editing a declined in-person autograph to obtained creates a feed post', function () {
+    $player = Player::factory()->create();
+    $autograph = InPersonAutograph::factory()->create(['signer_id' => $player->signer->id, 'is_declined' => true]);
+
+    expect($autograph->feeds()->exists())->toBeFalse();
+
+    Livewire::actingAs($autograph->user)->test(InPersonAutographsTable::class, ['player' => $player])
+        ->callAction(TestAction::make('edit')->table($autograph), [
+            'obtained_date' => $autograph->obtained_date->toDateString(),
+            'location' => $autograph->location,
+            'is_declined' => false,
+            'comment' => $autograph->comment,
+        ])
+        ->assertHasNoActionErrors();
+
+    expect($autograph->fresh()->feeds()->exists())->toBeTrue();
+});
+
 test('a photo can be attached when logging an in-person autograph', function () {
     Storage::fake('public');
 

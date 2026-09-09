@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\CreateFeedItem;
 use App\Actions\UpdateFeedItem;
 use App\Events\InPersonAutographDeleted;
 use Database\Factories\InPersonAutographFactory;
@@ -23,6 +24,12 @@ class InPersonAutograph extends Model
         static::updated(function (InPersonAutograph $autograph) {
             if ($autograph->is_declined) {
                 $autograph->feeds()->delete();
+
+                return;
+            }
+
+            if ($autograph->feeds()->doesntExist()) {
+                CreateFeedItem::execute($autograph, $autograph->comment);
 
                 return;
             }
@@ -87,8 +94,8 @@ class InPersonAutograph extends Model
             'photo' => $user->profile_photo_url,
             'user' => $user->name,
             'user_path' => $user->path(),
-            'player' => $player->name,
-            'player_path' => $player->path(),
+            'player' => $player?->name,
+            'player_path' => $player?->path(),
             'player_photo' => $playerPhoto,
             'category' => $category,
             'obtained_date' => $this->obtained_date,
