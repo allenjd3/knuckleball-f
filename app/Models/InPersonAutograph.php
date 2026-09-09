@@ -21,6 +21,12 @@ class InPersonAutograph extends Model
     protected static function booted(): void
     {
         static::updated(function (InPersonAutograph $autograph) {
+            if ($autograph->is_declined) {
+                $autograph->feeds()->delete();
+
+                return;
+            }
+
             UpdateFeedItem::execute($autograph, $autograph->comment);
         });
 

@@ -29,7 +29,7 @@ class InPersonAutographForm
     public static function schema(): array
     {
         return [
-            static::dateField(),
+            static::dateField()->required(),
             Select::make('fee_material_id')
                 ->label('Item signed')
                 ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
@@ -67,7 +67,6 @@ class InPersonAutographForm
     {
         return DatePicker::make('obtained_date')
             ->label('Date')
-            ->required()
             ->maxDate(now());
     }
 

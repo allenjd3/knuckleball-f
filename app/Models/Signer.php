@@ -65,8 +65,12 @@ class Signer extends Model
 
     protected function inPersonResponseRate(): Attribute
     {
-        $total = $this->inPersonAutographs()->count();
-        $obtained = $this->inPersonAutographs()->where('is_declined', false)->count();
+        $counts = $this->inPersonAutographs()
+            ->selectRaw('count(*) as total, sum(case when is_declined = 0 then 1 else 0 end) as obtained')
+            ->first();
+
+        $total = (int) $counts->total;
+        $obtained = (int) $counts->obtained;
 
         $successRate = $total ? round(($obtained / $total) * 100) . '%' : '';
 
