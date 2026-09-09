@@ -35,6 +35,11 @@ class Signer extends Model
         return $this->hasMany(Fee::class);
     }
 
+    public function inPersonAutographs(): HasMany
+    {
+        return $this->hasMany(InPersonAutograph::class);
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class)->withPivot('approved_at', 'user_id');
@@ -55,6 +60,22 @@ class Signer extends Model
 
         return Attribute::make(
             get: fn () => ($totalReturned ? "{$successRate} successful. " : '') . "{$pending} {$isOrAre} pending.",
+        );
+    }
+
+    protected function inPersonResponseRate(): Attribute
+    {
+        $counts = $this->inPersonAutographs()
+            ->selectRaw('count(*) as total, sum(case when is_declined = 0 then 1 else 0 end) as obtained')
+            ->first();
+
+        $total = (int) $counts->total;
+        $obtained = (int) $counts->obtained;
+
+        $successRate = $total ? round(($obtained / $total) * 100) . '%' : '';
+
+        return Attribute::make(
+            get: fn () => $total ? "{$successRate} obtained in person ({$obtained} of {$total})." : '',
         );
     }
 }

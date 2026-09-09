@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\Comment;
 use App\Models\Feed;
+use App\Models\InPersonAutograph;
 use App\Models\PostalMail;
 use App\Traits\ProcessLastLinkable;
 
@@ -11,7 +12,7 @@ class UpdateFeedItem
 {
     use ProcessLastLinkable;
 
-    public static function execute(PostalMail|Comment $feedItem, ?string $comment)
+    public static function execute(PostalMail|Comment|InPersonAutograph $feedItem, ?string $comment)
     {
         $feed = Feed::firstWhere('feedable_id', $feedItem->id);
         if (! $feed) {

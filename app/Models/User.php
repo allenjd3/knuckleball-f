@@ -75,6 +75,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(PostalMail::class);
     }
 
+    public function inPersonAutographs(): HasMany
+    {
+        return $this->hasMany(InPersonAutograph::class);
+    }
+
     public function isSuperAdmin(): bool
     {
         return (bool) $this->role->isAdmin();
