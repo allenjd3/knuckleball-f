@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class InPersonAutograph extends Model
 {
@@ -38,7 +39,7 @@ class InPersonAutograph extends Model
         return $this->belongsTo(Signer::class);
     }
 
-    public function player(): BelongsTo
+    public function player(): MorphTo
     {
         return $this->signer->signable();
     }

@@ -15,7 +15,7 @@ class InPersonCard extends Component
     public string $userPath;
     public string $player;
     public string $playerPath;
-    public string $obtainedDate;
+    public ?string $obtainedDate;
     public ?string $item;
     public ?string $location;
     public ?string $category;
@@ -29,7 +29,8 @@ class InPersonCard extends Component
         $this->userPath = data_get($feed->meta, 'user_path', '');
         $this->player = data_get($feed->meta, 'player', '');
         $this->playerPath = data_get($feed->meta, 'player_path', '');
-        $this->obtainedDate = Carbon::parse(data_get($feed->meta, 'obtained_date'))->format('M j, Y');
+        $obtainedDate = data_get($feed->meta, 'obtained_date');
+        $this->obtainedDate = $obtainedDate ? Carbon::parse($obtainedDate)->format('M j, Y') : null;
         $this->item = data_get($feed->meta, 'item');
         $this->location = data_get($feed->meta, 'location');
         $this->category = data_get($feed->meta, 'category');

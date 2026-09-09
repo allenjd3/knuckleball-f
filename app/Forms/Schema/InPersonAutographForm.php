@@ -29,10 +29,7 @@ class InPersonAutographForm
     public static function schema(): array
     {
         return [
-            DatePicker::make('obtained_date')
-                ->label('Date')
-                ->required()
-                ->maxDate(now()),
+            static::dateField(),
             Select::make('fee_material_id')
                 ->label('Item signed')
                 ->options(fn () => FeeMaterial::pluck('name', 'id')->toArray())
@@ -43,13 +40,7 @@ class InPersonAutographForm
                     TextInput::make('name'),
                 ])
                 ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
-            TextInput::make('location')
-                ->label('Where')
-                ->placeholder('e.g. National Card Show, stage door')
-                ->maxLength(255),
-            Toggle::make('is_declined')
-                ->label('They declined to sign / no-show?'),
-            Textarea::make('comment')->maxLength(255),
+            ...static::editableFields(),
             FileUpload::make('photos')
                 ->label('Photos')
                 ->multiple()
@@ -57,6 +48,27 @@ class InPersonAutographForm
                 ->directory('in-person-autographs')
                 ->nullable(),
         ];
+    }
+
+    public static function editableFields(): array
+    {
+        return [
+            TextInput::make('location')
+                ->label('Where')
+                ->placeholder('e.g. National Card Show, stage door')
+                ->maxLength(255),
+            Toggle::make('is_declined')
+                ->label('They declined to sign / no-show?'),
+            Textarea::make('comment')->maxLength(255),
+        ];
+    }
+
+    public static function dateField(): DatePicker
+    {
+        return DatePicker::make('obtained_date')
+            ->label('Date')
+            ->required()
+            ->maxDate(now());
     }
 
     public static function shouldBeVisibleFor(?User $user): bool

@@ -10,11 +10,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\ImageColumn;
@@ -95,10 +91,8 @@ class InPersonAutographsTable extends Component implements HasActions, HasForms,
                 EditAction::make()
                     ->visible(fn (Model $record) => request()->user()?->can('update', $record))
                     ->schema([
-                        DatePicker::make('obtained_date')->label('Date')->maxDate(now()),
-                        TextInput::make('location')->label('Where')->maxLength(255),
-                        Toggle::make('is_declined')->label('They declined to sign / no-show?'),
-                        Textarea::make('comment')->maxLength(255),
+                        InPersonAutographForm::dateField(),
+                        ...InPersonAutographForm::editableFields(),
                     ])
                     ->using(function (array $data, Model $record) {
                         $record->update($data);
