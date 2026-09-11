@@ -159,3 +159,12 @@ test('delete purges a player along with its TTM mail, in-person autographs, addr
         ->and(Fee::where('signer_id', $signerId)->count())->toBe(0)
         ->and(InPersonAutograph::where('signer_id', $signerId)->count())->toBe(0);
 });
+
+test('delete also removes the player photo instead of leaving it orphaned', function () {
+    $player = Player::factory()->create();
+    $media = Media::factory()->create(['imageable_id' => $player->id, 'imageable_type' => $player->getMorphClass()]);
+
+    mergeService()->delete($player);
+
+    expect(Media::find($media->id))->toBeNull();
+});

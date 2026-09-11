@@ -31,12 +31,12 @@ class DuplicatePlayers extends Page implements HasTable
         return $table
             ->query(fn () => Player::query()
                 ->whereIn('id', app(DuplicatePlayerFinder::class)->find()->flatten(1)->pluck('id'))
-                ->selectRaw("players.*, lower(trim(name)) || '-' || coalesce(team_id, 0) as duplicate_key")
+                ->selectRaw("players.*, CONCAT(LOWER(TRIM(name)), '-', COALESCE(team_id, 0)) as duplicate_key")
                 ->with(['team', 'media', 'signer.postalMails', 'signer.addresses', 'signer.fees']))
             ->groups([
                 Group::make('duplicate_key')
                     ->label('Duplicate group')
-                    ->getTitleFromRecordUsing(fn (Player $record) => "{$record->name} — " . ($record->team?->name ?? 'No team')),
+                    ->getTitleFromRecordUsing(fn (Player $record) => "{$record->name} — ".($record->team?->name ?? 'No team')),
             ])
             ->defaultGroup('duplicate_key')
             ->defaultSort('created_at')

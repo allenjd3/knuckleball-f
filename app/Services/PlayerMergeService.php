@@ -66,8 +66,9 @@ class PlayerMergeService
 
     /**
      * Permanently deletes a player and everything that hangs off it (TTM
-     * mail, cards, addresses, fees, tags). Pack/want-list/watchlist/event
-     * rows are cleaned up by the database's own cascading foreign keys.
+     * mail, cards, addresses, fees, tags, photo). Pack/want-list/watchlist/
+     * event rows are cleaned up by the database's own cascading foreign
+     * keys.
      */
     public function delete(Player $player): void
     {
@@ -75,6 +76,8 @@ class PlayerMergeService
             $this->purgeSignerData($player);
 
             PlayerTag::where('player_id', $player->id)->delete();
+
+            $player->media?->delete();
 
             $player->delete();
         });
