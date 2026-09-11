@@ -36,7 +36,7 @@ class DuplicatePlayers extends Page implements HasTable
             ->groups([
                 Group::make('duplicate_key')
                     ->label('Duplicate group')
-                    ->getTitleFromRecordUsing(fn (Player $record) => "{$record->name} — ".($record->team?->name ?? 'No team')),
+                    ->getTitleFromRecordUsing(fn (Player $record) => "{$record->name} — " . ($record->team?->name ?? 'No team')),
             ])
             ->defaultGroup('duplicate_key')
             ->defaultSort('created_at')
