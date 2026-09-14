@@ -4,6 +4,7 @@ use App\Filament\Imports\PostalMailImporter;
 use App\Models\Feed;
 use App\Models\Player;
 use App\Models\PostalMail;
+use App\Models\Team;
 use App\Models\User;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\Models\Import;
@@ -21,7 +22,7 @@ beforeEach(function () {
             'total_rows' => 1,
             'user_id' => $this->user->id,
         ]),
-        collect(['player_name', 'date_sent', 'returned_date', 'item', 'manufacturer', 'series', 'year', 'number', 'variation', 'comment'])
+        collect(['player_name', 'team', 'date_sent', 'returned_date', 'item', 'manufacturer', 'series', 'year', 'number', 'variation', 'comment'])
             ->mapWithKeys(fn (string $column) => [$column => $column])
             ->all(),
         [],
@@ -29,6 +30,7 @@ beforeEach(function () {
 
     $this->row = fn (array $overrides = []) => array_merge([
         'player_name' => 'Ken Griffey Jr.',
+        'team' => '',
         'date_sent' => '2024-01-01',
         'returned_date' => '',
         'item' => '',
@@ -58,21 +60,35 @@ it('matches a player whose slug only differs by punctuation that slugifies away'
     expect(Player::count())->toBe(1);
 });
 
-it('matches an existing player whose slug has a disambiguating numeric suffix', function () {
-    $player = Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => 'ken-griffey-jr-2']);
-
-    ($this->importer)()(($this->row)(['player_name' => 'Ken Griffey Jr.']));
-
-    expect(Player::count())->toBe(1)
-        ->and(PostalMail::first()->signer_id)->toBe($player->signer->id);
-});
-
 it('does not fuzzy match players with genuinely different names', function () {
     Player::factory()->create(['name' => 'Ken Griffey Sr.', 'slug' => Str::slug('Ken Griffey Sr.')]);
 
     ($this->importer)()(($this->row)(['player_name' => 'Ken Griffey Jr.']));
 
     expect(Player::count())->toBe(2);
+});
+
+it('does not guess between two players sharing a name, even with a team hint', function () {
+    $mariners = Team::factory()->create(['name' => 'Mariners']);
+    $reds = Team::factory()->create(['name' => 'Reds']);
+
+    $marinersGriffey = Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => Str::slug('Ken Griffey Jr.'), 'team_id' => $mariners->id]);
+    Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => Str::slug('Ken Griffey Jr.') . '-2', 'team_id' => $reds->id]);
+
+    // The exact slug only ever identifies one player, so the "Reds" team hint
+    // on the CSV row is not used to try to guess the other one instead.
+    ($this->importer)()(($this->row)(['team' => 'Reds']));
+
+    expect(Player::count())->toBe(2)
+        ->and(PostalMail::first()->signer_id)->toBe($marinersGriffey->signer->id);
+});
+
+it('sets the team on a newly created player when one is given', function () {
+    $reds = Team::factory()->create(['name' => 'Reds']);
+
+    ($this->importer)()(($this->row)(['player_name' => 'Someone Totally New', 'team' => 'Reds']));
+
+    expect(Player::first()->team_id)->toBe($reds->id);
 });
 
 it('creates an unpublished draft player when no match is found', function () {

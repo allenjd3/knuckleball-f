@@ -5,6 +5,7 @@ namespace App\Filament\Imports;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
+use App\Models\Team;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
@@ -31,6 +32,9 @@ class PostalMailImporter extends Importer
             ImportColumn::make('player_name')
                 ->requiredMapping()
                 ->rules(['required'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('team')
+                ->rules(['nullable'])
                 ->fillRecordUsing(fn () => null),
             ImportColumn::make('date_sent')
                 ->requiredMapping()
@@ -92,7 +96,7 @@ class PostalMailImporter extends Importer
             throw new RowImportFailedException("Could not parse date_sent \"{$data['date_sent']}\".");
         }
 
-        $player = $this->findOrCreatePlayer($data['player_name']);
+        $player = $this->findOrCreatePlayer($data['player_name'], $data['team'] ?? null);
         $signer = $player->signer;
 
         $existingMail = PostalMail::query()
@@ -148,27 +152,27 @@ class PostalMailImporter extends Importer
         return null;
     }
 
-    protected function findOrCreatePlayer(string $name): Player
+    protected function findOrCreatePlayer(string $name, ?string $teamName): Player
     {
         $slug = Str::slug($name);
 
-        // spatie/laravel-sluggable only disambiguates collisions by appending
-        // a numeric suffix (e.g. "michael-jordan-2"), so a name matching an
-        // existing slug once that suffix is stripped is still the same player.
-        $baseSlug = preg_replace('/-\d+$/', '', $slug);
-
-        $player = Player::where('slug', $slug)
-            ->orWhere('slug', $baseSlug)
-            ->orWhere('slug', 'like', $baseSlug . '-%')
-            ->get(['id', 'name', 'slug'])
-            ->first(fn (Player $candidate) => preg_replace('/-\d+$/', '', $candidate->slug) === $baseSlug);
-
-        if ($player) {
+        // `slug` is globally unique, so an exact match uniquely identifies the
+        // player. Anything less than exact (fuzzy matching, or stripping the
+        // numeric suffix spatie/laravel-sluggable adds for a genuine same-name
+        // collision) risks silently merging two different players who happen
+        // to share a name — a mistake that's much harder to undo later than a
+        // duplicate draft player, which the duplicate-player tool can catch.
+        if ($player = Player::where('slug', $slug)->first()) {
             return $player;
         }
 
+        $team = filled($teamName)
+            ? Team::whereRaw('lower(name) = ?', [strtolower($teamName)])->first()
+            : null;
+
         return Player::create([
             'name' => $name,
+            'team_id' => $team?->id,
             'published_at' => null,
         ]);
     }
