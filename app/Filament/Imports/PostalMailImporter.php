@@ -152,26 +152,19 @@ class PostalMailImporter extends Importer
     {
         $slug = Str::slug($name);
 
-        if ($player = Player::where('slug', $slug)->first()) {
-            return $player;
-        }
+        // spatie/laravel-sluggable only disambiguates collisions by appending
+        // a numeric suffix (e.g. "michael-jordan-2"), so a name matching an
+        // existing slug once that suffix is stripped is still the same player.
+        $baseSlug = preg_replace('/-\d+$/', '', $slug);
 
-        $bestMatch = null;
-        $bestScore = 0.0;
-
-        Player::where('slug', 'like', substr($slug, 0, 3) . '%')
+        $player = Player::where('slug', $slug)
+            ->orWhere('slug', $baseSlug)
+            ->orWhere('slug', 'like', $baseSlug . '-%')
             ->get(['id', 'name', 'slug'])
-            ->each(function (Player $candidate) use ($slug, &$bestMatch, &$bestScore): void {
-                similar_text($slug, $candidate->slug, $percent);
+            ->first(fn (Player $candidate) => preg_replace('/-\d+$/', '', $candidate->slug) === $baseSlug);
 
-                if ($percent > $bestScore) {
-                    $bestScore = $percent;
-                    $bestMatch = $candidate;
-                }
-            });
-
-        if ($bestMatch && $bestScore >= 90.0) {
-            return $bestMatch;
+        if ($player) {
+            return $player;
         }
 
         return Player::create([
@@ -194,6 +187,7 @@ class PostalMailImporter extends Importer
             ->whereRaw('lower(series) = ?', [strtolower($data['series'] ?? '')])
             ->where('year', $data['year'] ?? null)
             ->where('number', $data['number'] ?? null)
+            ->whereRaw('lower(coalesce(variation, \'\')) = ?', [strtolower($data['variation'] ?? '')])
             ->exists();
     }
 }

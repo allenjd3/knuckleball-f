@@ -50,12 +50,29 @@ it('matches an existing player by exact name', function () {
         ->and(PostalMail::first()->signer_id)->toBe($player->signer->id);
 });
 
-it('fuzzy matches a player with a slightly different name instead of creating a duplicate', function () {
+it('matches a player whose slug only differs by punctuation that slugifies away', function () {
     Player::factory()->create(['name' => 'Ken Griffey, Jr.', 'slug' => Str::slug('Ken Griffey, Jr.')]);
 
     ($this->importer)()(($this->row)(['player_name' => 'Ken Griffey Jr.']));
 
     expect(Player::count())->toBe(1);
+});
+
+it('matches an existing player whose slug has a disambiguating numeric suffix', function () {
+    $player = Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => 'ken-griffey-jr-2']);
+
+    ($this->importer)()(($this->row)(['player_name' => 'Ken Griffey Jr.']));
+
+    expect(Player::count())->toBe(1)
+        ->and(PostalMail::first()->signer_id)->toBe($player->signer->id);
+});
+
+it('does not fuzzy match players with genuinely different names', function () {
+    Player::factory()->create(['name' => 'Ken Griffey Sr.', 'slug' => Str::slug('Ken Griffey Sr.')]);
+
+    ($this->importer)()(($this->row)(['player_name' => 'Ken Griffey Jr.']));
+
+    expect(Player::count())->toBe(2);
 });
 
 it('creates an unpublished draft player when no match is found', function () {
@@ -90,6 +107,17 @@ it('skips a row as a duplicate when the same card was already logged', function 
 
     expect(PostalMail::count())->toBe(1)
         ->and(PostalMail::first()->cards)->toHaveCount(1);
+});
+
+it('does not treat a different variation of the same card as a duplicate', function () {
+    Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => Str::slug('Ken Griffey Jr.')]);
+
+    $importer = ($this->importer)();
+    $importer(($this->row)(['manufacturer' => 'Topps', 'series' => '1', 'year' => 1989, 'number' => '1', 'variation' => 'Base']));
+    $importer(($this->row)(['manufacturer' => 'Topps', 'series' => '1', 'year' => 1989, 'number' => '1', 'variation' => 'Refractor']));
+
+    expect(PostalMail::count())->toBe(1)
+        ->and(PostalMail::first()->cards)->toHaveCount(2);
 });
 
 it('does not post imported returns to the feed', function () {
