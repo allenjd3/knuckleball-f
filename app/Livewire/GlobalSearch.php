@@ -15,7 +15,7 @@ class GlobalSearch extends Component
     #[Computed]
     public function players(): Collection
     {
-        if (strlen(trim($this->query)) < 2) {
+        if (! $this->hasSearchableQuery()) {
             return collect();
         }
 
@@ -32,7 +32,7 @@ class GlobalSearch extends Component
     #[Computed]
     public function teams(): Collection
     {
-        if (strlen(trim($this->query)) < 2) {
+        if (! $this->hasSearchableQuery()) {
             return collect();
         }
 
@@ -49,5 +49,10 @@ class GlobalSearch extends Component
     public function render()
     {
         return view('livewire.global-search');
+    }
+
+    protected function hasSearchableQuery(): bool
+    {
+        return strlen(trim($this->query)) >= 2;
     }
 }
