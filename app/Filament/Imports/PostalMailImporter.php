@@ -80,21 +80,21 @@ class PostalMailImporter extends Importer
     {
         $data = $this->getData();
 
-        if (blank($data['player_name'] ?? null)) {
+        if (blank(data_get($data, 'player_name'))) {
             throw new RowImportFailedException('player_name is required.');
         }
 
-        if (blank($data['date_sent'] ?? null)) {
+        if (blank(data_get($data, 'date_sent'))) {
             throw new RowImportFailedException('date_sent is required.');
         }
 
         try {
-            $dateSent = Carbon::parse($data['date_sent']);
+            $dateSent = Carbon::parse(data_get($data, 'date_sent'));
         } catch (Throwable) {
             throw new RowImportFailedException("Could not parse date_sent \"{$data['date_sent']}\".");
         }
 
-        $player = $this->findOrCreatePlayer($data['player_name'], $data['team'] ?? null);
+        $player = $this->findOrCreatePlayer(data_get($data, 'player_name'), data_get($data, 'team'));
         $signer = $player->signer;
 
         $existingMail = PostalMail::query()
@@ -128,14 +128,14 @@ class PostalMailImporter extends Importer
 
         $this->record->feeMaterials()->syncWithoutDetaching([$this->resolveFeeMaterial($data)->id]);
 
-        if (filled($data['manufacturer'] ?? null)) {
+        if (filled(data_get($data, 'manufacturer'))) {
             $this->record->cards()->create([
                 'user_id' => auth()->id(),
-                'manufacturer' => $data['manufacturer'],
-                'series' => $data['series'] ?? '',
-                'year' => $data['year'] ?? null,
-                'number' => filled($data['number'] ?? null) ? $data['number'] : null,
-                'variation' => $data['variation'] ?? null,
+                'manufacturer' => data_get($data, 'manufacturer'),
+                'series' => data_get($data, 'series', ''),
+                'year' => data_get($data, 'year'),
+                'number' => filled(data_get($data, 'number')) ? data_get($data, 'number') : null,
+                'variation' => data_get($data, 'variation'),
             ]);
         }
     }
@@ -150,7 +150,7 @@ class PostalMailImporter extends Importer
      */
     protected function resolveFeeMaterial(array $data): FeeMaterial
     {
-        return FeeMaterial::firstOrCreate(['name' => filled($data['item'] ?? null) ? $data['item'] : 'Card']);
+        return FeeMaterial::firstOrCreate(['name' => filled(data_get($data, 'item')) ? data_get($data, 'item') : 'Card']);
     }
 
     protected function findOrCreatePlayer(string $name, ?string $teamName): Player
@@ -183,19 +183,19 @@ class PostalMailImporter extends Importer
      */
     protected function cardAlreadyLogged(PostalMail $mail, array $data): bool
     {
-        if (blank($data['manufacturer'] ?? null)) {
+        if (blank(data_get($data, 'manufacturer'))) {
             return false;
         }
 
-        $year = filled($data['year'] ?? null) ? $data['year'] : null;
-        $number = filled($data['number'] ?? null) ? $data['number'] : null;
+        $year = filled(data_get($data, 'year')) ? data_get($data, 'year') : null;
+        $number = filled(data_get($data, 'number')) ? data_get($data, 'number') : null;
 
         return $mail->cards()
-            ->whereRaw('lower(manufacturer) = ?', [strtolower($data['manufacturer'])])
-            ->whereRaw('lower(series) = ?', [strtolower($data['series'] ?? '')])
+            ->whereRaw('lower(manufacturer) = ?', [strtolower(data_get($data, 'manufacturer'))])
+            ->whereRaw('lower(series) = ?', [strtolower(data_get($data, 'series', ''))])
             ->where('year', $year)
             ->where('number', $number)
-            ->whereRaw('lower(coalesce(variation, \'\')) = ?', [strtolower($data['variation'] ?? '')])
+            ->whereRaw('lower(coalesce(variation, \'\')) = ?', [strtolower(data_get($data, 'variation', ''))])
             ->exists();
     }
 }
