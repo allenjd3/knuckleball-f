@@ -11,6 +11,7 @@ use App\Support\Dtos\AddressDto;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Throwable;
 
 class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
 {
@@ -28,44 +29,58 @@ class ProcessPlayerData implements ShouldBeUnique, ShouldQueue
         ImportData::query()
             ->lazyById(100)
             ->each(function (ImportData $importData) {
-                $team = Team::firstWhere('name', data_get($importData->data, 'team'));
-                $user = User::firstWhere('name', data_get($importData->data, 'user'));
-                $lastTeam = Team::firstWhere('name', data_get($importData->data, 'lastTeam'));
+                // A single bad row (e.g. an unrecognized team or a
+                // malformed address) must not sink the rest of the batch —
+                // record the failure on the row itself and move on, the same
+                // way this job used to behave before it was refactored to
+                // firstOrCreate()/AddressDto without keeping that resilience.
+                try {
+                    $this->processRow($importData);
 
-                $retiredAtRaw = data_get($importData->data, 'retired_at');
-                $retiredAt = ParseDates::handle($retiredAtRaw);
-
-                $player = Player::firstOrCreate(
-                    [
-                        'name' => data_get($importData->data, 'name'),
-                        'team_id' => $team?->id ?? null,
-                    ],
-                    [
-                        'retired_at' => $retiredAt,
-                        'is_retired' => filled($retiredAtRaw),
-                        'user_id' => $user?->id ?? null,
-                        'published_at' => ParseDates::handle(data_get($importData->data, 'published_at')),
-                        'last_team_id' => $lastTeam?->id ?? null,
-                    ],
-                );
-
-                $address = data_get($importData->data, 'address');
-                $addressDto = AddressDto::make(explode("\n", $address));
-
-                $player->addresses()
-                    ->create([
-                        'address_1' => $addressDto->address1,
-                        'address_2' => $addressDto->address2,
-                        'signer_id' => $player->id,
-                        'city' => $addressDto->city,
-                        'state' => $addressDto->state,
-                        'postal_code' => $addressDto->zip,
-                        'published_at' => now()->subDay(),
-                    ]);
-
-                $this->importDataIds[] = $importData->id;
+                    $this->importDataIds[] = $importData->id;
+                } catch (Throwable $exception) {
+                    $importData->update(['errors' => $exception->getMessage()]);
+                }
             });
 
         ImportData::whereIn('id', $this->importDataIds)->delete();
+    }
+
+    protected function processRow(ImportData $importData): void
+    {
+        $team = Team::firstWhere('name', data_get($importData->data, 'team'));
+        $user = User::firstWhere('name', data_get($importData->data, 'user'));
+        $lastTeam = Team::firstWhere('name', data_get($importData->data, 'lastTeam'));
+
+        $retiredAtRaw = data_get($importData->data, 'retired_at');
+        $retiredAt = ParseDates::handle($retiredAtRaw);
+
+        $player = Player::firstOrCreate(
+            [
+                'name' => data_get($importData->data, 'name'),
+                'team_id' => $team?->id ?? null,
+            ],
+            [
+                'retired_at' => $retiredAt,
+                'is_retired' => filled($retiredAtRaw),
+                'user_id' => $user?->id ?? null,
+                'published_at' => ParseDates::handle(data_get($importData->data, 'published_at')),
+                'last_team_id' => $lastTeam?->id ?? null,
+            ],
+        );
+
+        $address = data_get($importData->data, 'address');
+        $addressDto = AddressDto::make(explode("\n", $address));
+
+        $player->addresses()
+            ->create([
+                'address_1' => $addressDto->address1,
+                'address_2' => $addressDto->address2,
+                'signer_id' => $player->id,
+                'city' => $addressDto->city,
+                'state' => $addressDto->state,
+                'postal_code' => $addressDto->zip,
+                'published_at' => now()->subDay(),
+            ]);
     }
 }
