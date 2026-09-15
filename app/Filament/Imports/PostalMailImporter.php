@@ -19,8 +19,6 @@ class PostalMailImporter extends Importer
 {
     protected static ?string $model = PostalMail::class;
 
-    protected int $feeMaterialId;
-
     public static function getColumns(): array
     {
         return [
@@ -109,9 +107,6 @@ class PostalMailImporter extends Importer
             throw new RowImportFailedException("Duplicate: you already have a return from {$player->name} on {$dateSent->toDateString()} with this card logged.");
         }
 
-        $feeMaterial = FeeMaterial::firstOrCreate(['name' => filled($data['item'] ?? null) ? $data['item'] : 'Card']);
-        $this->feeMaterialId = $feeMaterial->id;
-
         if ($existingMail) {
             return $existingMail;
         }
@@ -120,7 +115,7 @@ class PostalMailImporter extends Importer
             'user_id' => auth()->id(),
             'signer_id' => $signer->id,
             'date_sent' => $dateSent,
-            'fee_material_id' => $this->feeMaterialId,
+            'fee_material_id' => $this->resolveFeeMaterial($data)->id,
             'is_failed' => false,
         ]);
     }
@@ -129,9 +124,9 @@ class PostalMailImporter extends Importer
     {
         parent::saveRecord();
 
-        $this->record->feeMaterials()->syncWithoutDetaching([$this->feeMaterialId]);
-
         $data = $this->getData();
+
+        $this->record->feeMaterials()->syncWithoutDetaching([$this->resolveFeeMaterial($data)->id]);
 
         if (filled($data['manufacturer'] ?? null)) {
             $this->record->cards()->create([
@@ -148,6 +143,14 @@ class PostalMailImporter extends Importer
     public function getJobRetryUntil(): ?CarbonInterface
     {
         return null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function resolveFeeMaterial(array $data): FeeMaterial
+    {
+        return FeeMaterial::firstOrCreate(['name' => filled($data['item'] ?? null) ? $data['item'] : 'Card']);
     }
 
     protected function findOrCreatePlayer(string $name, ?string $teamName): Player
