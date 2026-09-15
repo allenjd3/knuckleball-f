@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Filament\Imports;
+
+use App\Models\FeeMaterial;
+use App\Models\Player;
+use App\Models\PostalMail;
+use App\Models\Team;
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Filament\Actions\Imports\Exceptions\RowImportFailedException;
+use Filament\Actions\Imports\ImportColumn;
+use Filament\Actions\Imports\Importer;
+use Filament\Actions\Imports\Models\Import;
+use Illuminate\Support\Str;
+use Throwable;
+
+class PostalMailImporter extends Importer
+{
+    protected static ?string $model = PostalMail::class;
+
+    public static function getColumns(): array
+    {
+        return [
+            // player_name, item, and the card columns below don't map to real
+            // `postal_mails` columns — they're read via getData() in
+            // resolveRecord()/saveRecord() instead, so they get a no-op
+            // fillRecordUsing to stop the default fill from writing them
+            // straight onto the PostalMail record (which would fail to save).
+            ImportColumn::make('player_name')
+                ->requiredMapping()
+                ->rules(['required'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('team')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('date_sent')
+                ->requiredMapping()
+                ->rules(['required', 'date']),
+            ImportColumn::make('returned_date')
+                ->ignoreBlankState()
+                ->rules(['nullable', 'date']),
+            ImportColumn::make('item')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('manufacturer')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('series')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('year')
+                ->integer()
+                ->rules(['nullable', 'integer'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('number')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('variation')
+                ->rules(['nullable'])
+                ->fillRecordUsing(fn () => null),
+            ImportColumn::make('comment')
+                ->ignoreBlankState()
+                ->rules(['nullable']),
+        ];
+    }
+
+    public static function getCompletedNotificationBody(Import $import): string
+    {
+        $body = 'Your return import has completed and ' . number_format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+
+        if ($failedRowsCount = $import->getFailedRowsCount()) {
+            $body .= ' ' . number_format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import (duplicates or errors).';
+        }
+
+        return $body;
+    }
+
+    public function resolveRecord(): ?PostalMail
+    {
+        $data = $this->getData();
+
+        if (blank(data_get($data, 'player_name'))) {
+            throw new RowImportFailedException('player_name is required.');
+        }
+
+        if (blank(data_get($data, 'date_sent'))) {
+            throw new RowImportFailedException('date_sent is required.');
+        }
+
+        try {
+            $dateSent = Carbon::parse(data_get($data, 'date_sent'));
+        } catch (Throwable) {
+            throw new RowImportFailedException("Could not parse date_sent \"{$data['date_sent']}\".");
+        }
+
+        $player = $this->findOrCreatePlayer(data_get($data, 'player_name'), data_get($data, 'team'));
+        $signer = $player->signer;
+
+        $existingMail = PostalMail::query()
+            ->where('signer_id', $signer->id)
+            ->where('user_id', auth()->id())
+            ->whereDate('date_sent', $dateSent)
+            ->first();
+
+        if ($existingMail && $this->cardAlreadyLogged($existingMail, $data)) {
+            throw new RowImportFailedException("Duplicate: you already have a return from {$player->name} on {$dateSent->toDateString()} with this card logged.");
+        }
+
+        if ($existingMail) {
+            return $existingMail;
+        }
+
+        return new PostalMail([
+            'user_id' => auth()->id(),
+            'signer_id' => $signer->id,
+            'date_sent' => $dateSent,
+            'fee_material_id' => $this->resolveFeeMaterial($data)->id,
+            'is_failed' => false,
+        ]);
+    }
+
+    public function saveRecord(): void
+    {
+        parent::saveRecord();
+
+        $data = $this->getData();
+
+        $this->record->feeMaterials()->syncWithoutDetaching([$this->resolveFeeMaterial($data)->id]);
+
+        if (filled(data_get($data, 'manufacturer'))) {
+            $this->record->cards()->create([
+                'user_id' => auth()->id(),
+                'manufacturer' => data_get($data, 'manufacturer'),
+                'series' => data_get($data, 'series', ''),
+                'year' => data_get($data, 'year'),
+                'number' => filled(data_get($data, 'number')) ? data_get($data, 'number') : null,
+                'variation' => data_get($data, 'variation'),
+            ]);
+        }
+    }
+
+    public function getJobRetryUntil(): ?CarbonInterface
+    {
+        return null;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function resolveFeeMaterial(array $data): FeeMaterial
+    {
+        return FeeMaterial::firstOrCreate(['name' => filled(data_get($data, 'item')) ? data_get($data, 'item') : 'Card']);
+    }
+
+    protected function findOrCreatePlayer(string $name, ?string $teamName): Player
+    {
+        $slug = Str::slug($name);
+
+        // `slug` is globally unique, so an exact match uniquely identifies the
+        // player. Anything less than exact (fuzzy matching, or stripping the
+        // numeric suffix spatie/laravel-sluggable adds for a genuine same-name
+        // collision) risks silently merging two different players who happen
+        // to share a name — a mistake that's much harder to undo later than a
+        // duplicate draft player, which the duplicate-player tool can catch.
+        if ($player = Player::where('slug', $slug)->first()) {
+            return $player;
+        }
+
+        $team = filled($teamName)
+            ? Team::whereRaw('lower(name) = ?', [strtolower($teamName)])->first()
+            : null;
+
+        return Player::create([
+            'name' => $name,
+            'team_id' => $team?->id,
+            'published_at' => null,
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function cardAlreadyLogged(PostalMail $mail, array $data): bool
+    {
+        if (blank(data_get($data, 'manufacturer'))) {
+            return false;
+        }
+
+        $year = filled(data_get($data, 'year')) ? data_get($data, 'year') : null;
+        $number = filled(data_get($data, 'number')) ? data_get($data, 'number') : null;
+
+        return $mail->cards()
+            ->whereRaw('lower(manufacturer) = ?', [strtolower(data_get($data, 'manufacturer'))])
+            ->whereRaw('lower(series) = ?', [strtolower(data_get($data, 'series', ''))])
+            ->where('year', $year)
+            ->where('number', $number)
+            ->whereRaw('lower(coalesce(variation, \'\')) = ?', [strtolower(data_get($data, 'variation', ''))])
+            ->exists();
+    }
+}
