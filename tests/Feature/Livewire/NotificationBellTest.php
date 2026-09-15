@@ -131,6 +131,40 @@ it('describes an event approved notification instead of a generic message', func
         ->assertDontSee('New notification');
 });
 
+it('describes a legacy watchlist signing alert missing the type key', function () {
+    $user = User::factory()->create();
+
+    ($this->rawNotification)($user, [
+        'event_id' => 1,
+        'event_name' => 'Spring TTM Tour',
+        'event_path' => '/events/1',
+        'player_name' => 'Ken Griffey Jr.',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(NotificationBell::class)
+        ->assertSee('Signing alert')
+        ->assertSee('Ken Griffey Jr.')
+        ->assertSee('Spring TTM Tour')
+        ->assertDontSee('New notification');
+});
+
+it('describes a legacy card show alert missing the type key', function () {
+    $user = User::factory()->create();
+
+    ($this->rawNotification)($user, [
+        'event_id' => 1,
+        'event_name' => 'Midwest Card Expo',
+        'event_path' => '/events/1',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(NotificationBell::class)
+        ->assertSee('Card show near you')
+        ->assertSee('Midwest Card Expo')
+        ->assertDontSee('New notification');
+});
+
 it('falls back to a notification\'s own message instead of the generic placeholder', function () {
     $user = User::factory()->create();
 
