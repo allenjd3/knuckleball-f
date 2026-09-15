@@ -67,6 +67,18 @@ test('starting a reply to a comment from another feed is rejected', function () 
         ->assertSet('replyBody', '');
 });
 
+test('starting a reply to a comment from a deleted author does not error', function () {
+    $commenter = User::factory()->create();
+    $feed = Feed::factory()->create();
+    $comment = Comment::factory()->create(['feed_id' => $feed->id, 'user_id' => $commenter->id]);
+    $commenter->delete();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(FeedComments::class, ['feed' => $feed])
+        ->call('startReply', $comment->id)
+        ->assertSet('replyBody', '@user ');
+});
+
 test('a user can reply to a comment', function () {
     $owner = User::factory()->create();
     $commenter = User::factory()->create();

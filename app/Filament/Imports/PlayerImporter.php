@@ -38,10 +38,7 @@ class PlayerImporter extends Importer
                     // silently fall back to "Active" — parse a year if we can,
                     // but always flag is_retired when anything was provided.
                     $record->retired_at = ParseDates::handle($state);
-
-                    if (filled($state)) {
-                        $record->is_retired = true;
-                    }
+                    $record->is_retired = filled($state);
                 }),
         ];
     }

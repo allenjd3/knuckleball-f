@@ -59,7 +59,7 @@ class FeedComments extends Component
         }
 
         $this->replyingTo = $commentId;
-        $this->replyBody = '@' . $comment->user->name . ' ';
+        $this->replyBody = '@' . ($comment->user?->name ?? 'user') . ' ';
         $this->resetErrorBag('replyBody');
     }
 
