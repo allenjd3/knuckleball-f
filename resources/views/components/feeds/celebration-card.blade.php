@@ -38,10 +38,17 @@
 
         @if ($heroPhoto)
             <div class="mt-3 ml-12">
-                <img src="{{ Storage::url($heroPhoto) }}"
-                     alt="Returned auto"
-                     class="w-full rounded-xl object-cover bg-gray-50"
-                     style="max-height: 260px;" />
+                <button
+                    type="button"
+                    class="flex items-center justify-center w-full rounded-xl bg-gray-50 cursor-zoom-in"
+                    style="max-height: 400px;"
+                    @click="$dispatch('open-lightbox', { src: '{{ Storage::url($heroPhoto) }}', alt: 'Returned auto' })"
+                >
+                    <img src="{{ Storage::url($heroPhoto) }}"
+                         alt="Returned auto"
+                         class="max-w-full rounded-xl object-contain"
+                         style="max-height: 400px;" />
+                </button>
             </div>
         @endif
 

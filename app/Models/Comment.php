@@ -36,9 +36,14 @@ class Comment extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function comments(): HasMany
+    public function replies(): HasMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->oldest();
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Comment::class, 'comment_id');
     }
 
     public function getFollowableId()

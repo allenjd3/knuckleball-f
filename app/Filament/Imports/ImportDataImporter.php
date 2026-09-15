@@ -47,6 +47,8 @@ class ImportDataImporter extends Importer
                     $record->data = $data;
                 }),
             ImportColumn::make('published_at')
+                ->label('Published At')
+                ->guess(['published_at', 'published', 'publish_date'])
                 ->rules(['nullable', 'string'])
                 ->fillRecordUsing(function ($record, ?string $state = null): void {
                     $data = $record->data;
@@ -61,6 +63,8 @@ class ImportDataImporter extends Importer
                     $record->data = $data;
                 }),
             ImportColumn::make('retired_at')
+                ->label('Retirement Year')
+                ->guess(['retired_at', 'retirement_year', 'RETIREMENT YEAR', 'retire_year', 'retirement', 'retired'])
                 ->rules([
                     'nullable',
                     'string',

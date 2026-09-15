@@ -17,6 +17,7 @@ class NewComment extends Notification implements ShouldQueue
         public readonly User $commenter,
         public readonly Feed $feed,
         public readonly string $body,
+        public readonly bool $isReply = false,
     ) {}
 
     public function via(object $notifiable): array
@@ -28,6 +29,7 @@ class NewComment extends Notification implements ShouldQueue
     {
         return [
             'type' => 'new_comment',
+            'is_reply' => $this->isReply,
             'commenter_name' => $this->commenter->name,
             'commenter_slug' => $this->commenter->slug,
             'commenter_photo' => $this->commenter->profile_photo_url,

@@ -22,6 +22,7 @@ class EventApprovedNotification extends Notification implements ShouldQueue
     public function toDatabase(object $notifiable): array
     {
         return [
+            'type' => 'event_approved',
             'event_id' => $this->event->id,
             'event_name' => $this->event->name,
             'event_type' => $this->event->type,

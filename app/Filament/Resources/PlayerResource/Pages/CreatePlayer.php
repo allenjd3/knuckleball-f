@@ -14,7 +14,7 @@ class CreatePlayer extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $data = collect($data);
-        $player = Player::create($data->only(['name', 'note', 'team_id', 'published_at', 'retired_at', 'deceased_at'])->toArray());
+        $player = Player::create($data->only(['name', 'note', 'team_id', 'published_at', 'retired_at', 'is_retired', 'deceased_at'])->toArray());
 
         if ($url = data_get($data, 'url')) {
             $player->media()->create(['url' => $url]);
