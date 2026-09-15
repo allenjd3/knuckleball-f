@@ -52,7 +52,7 @@ class FeedComments extends Component
 
     public function startReply(int $commentId): void
     {
-        $comment = Comment::where('feed_id', $this->feedId)->find($commentId);
+        $comment = Comment::where('feed_id', $this->feedId)->whereNull('comment_id')->find($commentId);
 
         if (! $comment) {
             return;
@@ -98,7 +98,7 @@ class FeedComments extends Component
 
         $this->validate(['replyBody' => 'required|max:500']);
 
-        $parent = Comment::where('feed_id', $this->feedId)->find($this->replyingTo);
+        $parent = Comment::where('feed_id', $this->feedId)->whereNull('comment_id')->find($this->replyingTo);
 
         if (! $parent) {
             $this->cancelReply();
