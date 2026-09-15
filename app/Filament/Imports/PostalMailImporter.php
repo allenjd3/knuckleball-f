@@ -113,8 +113,6 @@ class PostalMailImporter extends Importer
         $this->feeMaterialId = $feeMaterial->id;
 
         if ($existingMail) {
-            $existingMail->fee_material_id = $this->feeMaterialId;
-
             return $existingMail;
         }
 
@@ -141,7 +139,7 @@ class PostalMailImporter extends Importer
                 'manufacturer' => $data['manufacturer'],
                 'series' => $data['series'] ?? '',
                 'year' => $data['year'] ?? null,
-                'number' => $data['number'] ?? null,
+                'number' => filled($data['number'] ?? null) ? $data['number'] : null,
                 'variation' => $data['variation'] ?? null,
             ]);
         }
@@ -186,11 +184,14 @@ class PostalMailImporter extends Importer
             return false;
         }
 
+        $year = filled($data['year'] ?? null) ? $data['year'] : null;
+        $number = filled($data['number'] ?? null) ? $data['number'] : null;
+
         return $mail->cards()
             ->whereRaw('lower(manufacturer) = ?', [strtolower($data['manufacturer'])])
             ->whereRaw('lower(series) = ?', [strtolower($data['series'] ?? '')])
-            ->where('year', $data['year'] ?? null)
-            ->where('number', $data['number'] ?? null)
+            ->where('year', $year)
+            ->where('number', $number)
             ->whereRaw('lower(coalesce(variation, \'\')) = ?', [strtolower($data['variation'] ?? '')])
             ->exists();
     }

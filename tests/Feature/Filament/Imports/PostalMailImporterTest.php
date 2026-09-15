@@ -2,6 +2,7 @@
 
 use App\Filament\Imports\PostalMailImporter;
 use App\Models\Feed;
+use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\Team;
@@ -134,6 +135,30 @@ it('does not treat a different variation of the same card as a duplicate', funct
 
     expect(PostalMail::count())->toBe(1)
         ->and(PostalMail::first()->cards)->toHaveCount(2);
+});
+
+it('treats a blank number as a duplicate match, not a mismatch against null', function () {
+    Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => Str::slug('Ken Griffey Jr.')]);
+
+    $importer = ($this->importer)();
+    $row = ($this->row)(['manufacturer' => 'Topps', 'series' => '1', 'year' => 1989, 'number' => '']);
+
+    $importer($row);
+
+    expect(fn () => $importer($row))->toThrow(RowImportFailedException::class);
+
+    expect(PostalMail::count())->toBe(1)
+        ->and(PostalMail::first()->cards)->toHaveCount(1);
+});
+
+it('keeps the fee material set on the first card when a later duplicate-date row uses a different item', function () {
+    Player::factory()->create(['name' => 'Ken Griffey Jr.', 'slug' => Str::slug('Ken Griffey Jr.')]);
+
+    $importer = ($this->importer)();
+    $importer(($this->row)(['item' => 'Card', 'manufacturer' => 'Topps', 'series' => '1', 'year' => 1989, 'number' => '1']));
+    $importer(($this->row)(['item' => 'Ball', 'manufacturer' => 'Donruss', 'series' => '1', 'year' => 1990, 'number' => '2']));
+
+    expect(FeeMaterial::find(PostalMail::first()->fee_material_id)->name)->toBe('Card');
 });
 
 it('does not post imported returns to the feed', function () {

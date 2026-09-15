@@ -51,7 +51,7 @@ class GlobalSearch extends Component
         return view('livewire.global-search');
     }
 
-    protected function hasSearchableQuery(): bool
+    public function hasSearchableQuery(): bool
     {
         return strlen(trim($this->query)) >= 2;
     }

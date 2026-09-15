@@ -36,7 +36,7 @@
                 </button>
             </div>
 
-            @if (strlen(trim($query)) < 2)
+            @if (! $this->hasSearchableQuery())
                 <div class="px-4 py-10 text-center text-gray-400 text-sm">
                     Keep typing to search.
                 </div>
