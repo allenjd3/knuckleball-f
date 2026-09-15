@@ -46,3 +46,34 @@ it('still parses a real retirement year when one is given', function () {
         ->and($player->is_retired)->toBeTrue()
         ->and($player->retired_at->format('Y'))->toBe('1999');
 });
+
+it('records the error and keeps processing the rest of the batch when a row fails', function () {
+    Team::factory()->create(['name' => 'Free Agents']);
+
+    $badRow = ImportData::factory()->create([
+        'data' => [
+            'name' => null,
+            'address' => "123 Main St\nAnytown OH 45011",
+            'team' => 'Free Agents',
+        ],
+    ]);
+
+    ImportData::factory()->create([
+        'data' => [
+            'name' => 'Good Row',
+            'address' => "123 Main St\nAnytown OH 45011",
+            'team' => 'Free Agents',
+        ],
+    ]);
+
+    (new ProcessPlayerData)->handle();
+
+    expect(Player::where('name', 'Good Row')->exists())->toBeTrue();
+
+    $badRow->refresh();
+
+    expect($badRow->exists)->toBeTrue()
+        ->and($badRow->errors)->not->toBeNull();
+
+    expect(ImportData::where('data->name', 'Good Row')->exists())->toBeFalse();
+});
