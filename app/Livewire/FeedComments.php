@@ -52,10 +52,14 @@ class FeedComments extends Component
 
     public function startReply(int $commentId): void
     {
-        $comment = Comment::find($commentId);
+        $comment = Comment::where('feed_id', $this->feedId)->find($commentId);
+
+        if (! $comment) {
+            return;
+        }
 
         $this->replyingTo = $commentId;
-        $this->replyBody = $comment ? '@' . $comment->user->name . ' ' : '';
+        $this->replyBody = '@' . $comment->user->name . ' ';
         $this->resetErrorBag('replyBody');
     }
 
@@ -94,16 +98,22 @@ class FeedComments extends Component
 
         $this->validate(['replyBody' => 'required|max:500']);
 
-        $parent = Comment::find($this->replyingTo);
+        $parent = Comment::where('feed_id', $this->feedId)->find($this->replyingTo);
 
-        $reply = Comment::create([
+        if (! $parent) {
+            $this->cancelReply();
+
+            return;
+        }
+
+        Comment::create([
             'feed_id' => $this->feedId,
             'user_id' => auth()->id(),
             'comment_id' => $this->replyingTo,
             'body' => $this->replyBody,
         ]);
 
-        if ($parent && $parent->user_id !== auth()->id()) {
+        if ($parent->user_id !== auth()->id()) {
             $parent->user?->notify(new NewComment(auth()->user(), Feed::find($this->feedId), $this->replyBody, isReply: true));
         }
 

@@ -55,6 +55,18 @@ test('starting a reply prefills the input with an @mention of the comment author
         ->assertSet('replyBody', '@Jane Doe ');
 });
 
+test('starting a reply to a comment from another feed is rejected', function () {
+    $otherFeed = Feed::factory()->create();
+    $comment = Comment::factory()->create(['feed_id' => $otherFeed->id]);
+    $feed = Feed::factory()->create();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(FeedComments::class, ['feed' => $feed])
+        ->call('startReply', $comment->id)
+        ->assertSet('replyingTo', null)
+        ->assertSet('replyBody', '');
+});
+
 test('a user can reply to a comment', function () {
     $owner = User::factory()->create();
     $commenter = User::factory()->create();

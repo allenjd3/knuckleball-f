@@ -340,6 +340,7 @@ class ScrapeSignings extends Command
 
         foreach ($terms as $term) {
             $page = 1;
+            $termCount = 0;
 
             do {
                 sleep(1);
@@ -369,6 +370,7 @@ class ScrapeSignings extends Command
                     $signing = $this->parseEventbriteEvent($event);
                     if ($signing) {
                         $signings[] = $signing;
+                        $termCount++;
                     }
                 }
 
@@ -376,7 +378,7 @@ class ScrapeSignings extends Command
                 $page++;
             } while ($hasMore && $page <= 5);
 
-            $this->line("Eventbrite '{$term}': " . count($signings) . ' total so far');
+            $this->line("Eventbrite '{$term}': {$termCount} found");
         }
 
         return $signings;
