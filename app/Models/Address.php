@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\FlagStaleAddress;
 use App\Enums\AddressType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -82,6 +83,11 @@ class Address extends Model
         $builder->where(fn (Builder $q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()));
     }
 
+    public function rtsReportCount(): int
+    {
+        return FlagStaleAddress::reportCount($this);
+    }
+
     public function isExpired(): bool
     {
         return $this->expires_at !== null && $this->expires_at->isPast();
@@ -104,6 +110,7 @@ class Address extends Model
             'expires_at' => 'datetime',
             'reject' => 'boolean',
             'type' => AddressType::class,
+            'rts_flagged_at' => 'datetime',
         ];
     }
 }

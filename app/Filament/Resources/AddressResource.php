@@ -90,6 +90,10 @@ class AddressResource extends Resource
                     ->label('Expires At')
                     ->helperText('Optional. Once passed, the address drops off the player\'s public page but stays here for review/editing.')
                     ->nullable(),
+                DatePicker::make('rts_flagged_at')
+                    ->label('Flagged by RTS reports on')
+                    ->helperText('Set automatically when several collectors report return to sender. Clear it once the address is confirmed.')
+                    ->nullable(),
                 Checkbox::make('rejected')
                     ->label('Reject Address (hide it from review)')
                     ->default(false),
@@ -132,6 +136,12 @@ class AddressResource extends Resource
                     ->formatStateUsing(fn (Address $record) => $record->expires_at
                         ? $record->expires_at->format('M j, Y') . ($record->isExpired() ? ' (expired)' : '')
                         : 'Never'),
+                TextColumn::make('rts_flagged_at')
+                    ->label('RTS reports')
+                    ->badge()
+                    ->color('warning')
+                    ->placeholder('—')
+                    ->formatStateUsing(fn (Address $record) => $record->rtsReportCount() . ' RTS'),
                 CheckboxColumn::make('rejected'),
             ])
             ->recordActions([
@@ -139,6 +149,10 @@ class AddressResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('rejected'),
+                Filter::make('rts_flagged')
+                    ->label('Flagged by RTS reports')
+                    ->toggle()
+                    ->query(fn (Builder $query) => $query->whereNotNull('rts_flagged_at')),
                 Filter::make('expired')
                     ->label('Expired')
                     ->toggle()

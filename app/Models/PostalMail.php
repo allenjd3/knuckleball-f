@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Actions\FlagStaleAddress;
 use App\Actions\UpdateFeedItem;
 use App\Enums\FailureReason;
 use App\Events\PostalMailDeleted;
@@ -33,6 +34,17 @@ class PostalMail extends Model
 
             if ($postalMail->wasChanged('is_failed') && $postalMail->returned_date) {
                 GenerateReturnCard::dispatch($postalMail->id);
+            }
+        });
+
+        static::saved(function (PostalMail $postalMail) {
+            if (
+                $postalMail->is_failed
+                && $postalMail->failure_reason === FailureReason::ReturnToSender
+                && ($postalMail->wasRecentlyCreated || $postalMail->wasChanged(['is_failed', 'failure_reason']))
+                && $postalMail->signer
+            ) {
+                FlagStaleAddress::execute($postalMail->signer);
             }
         });
 

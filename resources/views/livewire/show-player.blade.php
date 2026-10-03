@@ -86,6 +86,12 @@
                             <p>{{ $this->address->address_2 }}</p>
                             <p>{{ $this->address->city }}, {{ $this->address->state }}</p>
                             <p>{{ $this->address->postal_code }}</p>
+                            @if ($this->address->rts_flagged_at)
+                                <p class="mt-2 flex items-start gap-1.5 text-sm font-semibold text-amber-600">
+                                    <x-heroicon-o-exclamation-triangle class="size-4 shrink-0 mt-0.5" />
+                                    {{ $this->address->rtsReportCount() }} collectors recently had mail to this address returned to sender. It may be outdated.
+                                </p>
+                            @endif
                         @else
                             <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                             <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
