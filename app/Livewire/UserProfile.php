@@ -61,6 +61,22 @@ class UserProfile extends Component implements HasActions, HasForms
         return ActivityFilter::tryFrom($this->activityFilter) ?? ActivityFilter::All;
     }
 
+    /**
+     * Number of the profile owner's sends in each status filter.
+     *
+     * @return array<string, int>
+     */
+    #[Computed]
+    public function activityFilterCounts(): array
+    {
+        return collect(ActivityFilter::cases())
+            ->reject(fn (ActivityFilter $filter) => $filter === ActivityFilter::All)
+            ->mapWithKeys(fn (ActivityFilter $filter) => [
+                $filter->value => $filter->apply(Feed::query()->where('followable_id', $this->user->id))->count(),
+            ])
+            ->all();
+    }
+
     #[Computed]
     public function user(): User
     {

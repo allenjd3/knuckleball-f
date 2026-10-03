@@ -150,3 +150,23 @@ test('an unknown activity filter falls back to showing all activity', function (
     expect($component->instance()->selectedActivityFilter)->toBe(ActivityFilter::All)
         ->and($component->instance()->feeds->pluck('id')->all())->toBe([$comment->id]);
 });
+
+test('activity filters show how many sends are in each status', function () {
+    $user = User::factory()->create();
+
+    foreach (['unReturned', 'unReturned', 'returned', 'failed'] as $state) {
+        Feed::factory()->create([
+            'feedable_id' => PostalMail::factory()->for($user)->{$state}()->create()->id,
+            'feedable_type' => PostalMail::class,
+            'followable_id' => $user->id,
+        ]);
+    }
+
+    $component = Livewire::test(UserProfile::class, ['user' => $user->slug]);
+
+    expect($component->instance()->activityFilterCounts)->toBe([
+        'pending' => 2,
+        'returns' => 1,
+        'failures' => 1,
+    ]);
+});
