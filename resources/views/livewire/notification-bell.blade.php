@@ -103,6 +103,12 @@
                                 Contact info you requested was added for
                                 <a href="{{ data_get($data, 'player_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'player_name') }}</a>.
                             </p>
+                        @elseif (data_get($data, 'type') === 'watchlist_contact_added')
+                            <p class="text-sm text-gray-800 leading-snug">
+                                <span class="font-semibold">Watchlist:</span>
+                                <a href="{{ data_get($data, 'player_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'player_name') }}</a>
+                                {{ data_get($data, 'contact_type') === 'email' ? 'now takes email requests.' : 'has a new mailing address.' }}
+                            </p>
                         {{-- Legacy fallback: notifications stored before the 'type' key was added. --}}
                         @elseif (isset($data['event_id']) && isset($data['player_name']))
                             <p class="text-sm text-gray-800 leading-snug">

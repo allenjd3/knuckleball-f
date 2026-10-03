@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Actions\FlagStaleAddress;
 use App\Enums\AddressType;
+use App\Notifications\WatchlistContactAdded;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,12 +28,37 @@ class Address extends Model
             }
 
             if ($address->wasRecentlyCreated || $address->wasChanged(['published_at', 'rejected'])) {
-                AddressRequest::query()
+                $requesterIds = AddressRequest::query()
                     ->open()
                     ->where('signer_id', $address->signer_id)
-                    ->each(fn (AddressRequest $addressRequest) => $addressRequest->fulfill());
+                    ->get()
+                    ->each(fn (AddressRequest $addressRequest) => $addressRequest->fulfill())
+                    ->pluck('user_id');
+
+                $address->notifyWatchers(except: $requesterIds->all());
             }
         });
+    }
+
+    /**
+     * Tell users watching this player that new contact info is available. Users who
+     * requested the address are skipped since they get their own notification.
+     *
+     * @param  array<int, int>  $except
+     */
+    public function notifyWatchers(array $except = []): void
+    {
+        $notification = WatchlistContactAdded::forAddress($this);
+
+        if (! $notification) {
+            return;
+        }
+
+        User::query()
+            ->whereHas('watchlist', fn (Builder $query) => $query->where('players.id', $notification->player->id))
+            ->whereNotIn('id', $except)
+            ->when($this->user_id, fn (Builder $query) => $query->where('id', '!=', $this->user_id))
+            ->chunkById(200, fn ($watchers) => $watchers->each->notify($notification));
     }
 
     public function isLive(): bool
