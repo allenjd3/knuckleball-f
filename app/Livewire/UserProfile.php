@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\ActivityFilter;
 use App\Filament\Imports\PostalMailImporter;
 use App\Models\CardSet;
 use App\Models\Feed;
@@ -24,6 +25,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -35,6 +37,9 @@ class UserProfile extends Component implements HasActions, HasForms
 
     public string $userSlug;
 
+    #[Url(as: 'activity', except: 'all')]
+    public string $activityFilter = 'all';
+
     public function mount(string $user): void
     {
         $this->userSlug = $user;
@@ -43,6 +48,17 @@ class UserProfile extends Component implements HasActions, HasForms
     public function render()
     {
         return view('livewire.user-profile');
+    }
+
+    public function updatedActivityFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    #[Computed]
+    public function selectedActivityFilter(): ActivityFilter
+    {
+        return ActivityFilter::tryFrom($this->activityFilter) ?? ActivityFilter::All;
     }
 
     #[Computed]
@@ -57,9 +73,13 @@ class UserProfile extends Component implements HasActions, HasForms
     public function feeds()
     {
         return Feed::query()
-            ->where(fn ($q) => $q
-                ->where('followable_id', $this->user->id)
-                ->orWhereHas('mentions', fn ($q) => $q->where('user_id', $this->user->id))
+            ->when(
+                $this->selectedActivityFilter === ActivityFilter::All,
+                fn ($q) => $q->where(fn ($q) => $q
+                    ->where('followable_id', $this->user->id)
+                    ->orWhereHas('mentions', fn ($q) => $q->where('user_id', $this->user->id))
+                ),
+                fn ($q) => $this->selectedActivityFilter->apply($q->where('followable_id', $this->user->id)),
             )
             ->orderByDesc('created_at')
             ->simplePaginate();
