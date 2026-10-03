@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\ActivityFilter;
+use App\Enums\FailureReason;
 use App\Livewire\UserProfile;
 use App\Models\Feed;
 use App\Models\PostalMail;
@@ -169,4 +170,33 @@ test('activity filters show how many sends are in each status', function () {
         'returns' => 1,
         'failures' => 1,
     ]);
+});
+
+test('owners are prompted to label failed sends that have no reason', function () {
+    $user = User::factory()->create();
+    $unlabeled = PostalMail::factory()->for($user)->failed()->create();
+    $labeled = PostalMail::factory()->for($user)->failed()->create(['failure_reason' => FailureReason::Declined]);
+
+    Livewire::actingAs($user)
+        ->test(UserProfile::class, ['user' => $user->slug])
+        ->assertSee("1 of your failed sends doesn't say what happened.")
+        ->assertActionVisible('labelFailures')
+        ->callAction('labelFailures', data: [
+            'reasons' => [$unlabeled->id => FailureReason::ReturnToSender->value],
+        ])
+        ->assertHasNoActionErrors()
+        ->assertActionHidden('labelFailures');
+
+    expect($unlabeled->fresh()->failure_reason)->toBe(FailureReason::ReturnToSender)
+        ->and($labeled->fresh()->failure_reason)->toBe(FailureReason::Declined);
+});
+
+test('other users do not see the label failures prompt', function () {
+    $owner = User::factory()->create();
+    PostalMail::factory()->for($owner)->failed()->create();
+
+    Livewire::actingAs(User::factory()->create())
+        ->test(UserProfile::class, ['user' => $owner->slug])
+        ->assertActionHidden('labelFailures')
+        ->assertDontSee('failed sends', false);
 });

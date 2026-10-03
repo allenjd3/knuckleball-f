@@ -126,6 +126,15 @@
 
         {{-- Activity tab --}}
         <div x-show="tab === 'activity'" x-cloak class="px-4 pt-6 pb-16 flex flex-col gap-3">
+            @if ($this->isOwner && $this->unlabeledFailures->isNotEmpty())
+                <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <span>
+                        <x-heroicon-o-tag class="inline size-4 -mt-0.5" />
+                        {{ $this->unlabeledFailures->count() }} of your failed sends {{ $this->unlabeledFailures->count() === 1 ? "doesn't" : "don't" }} say what happened.
+                    </span>
+                    {{ $this->labelFailures }}
+                </div>
+            @endif
             <div class="flex flex-wrap gap-2 mb-1">
                 @foreach (\App\Enums\ActivityFilter::cases() as $filter)
                     <button
