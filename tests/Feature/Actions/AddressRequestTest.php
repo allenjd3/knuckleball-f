@@ -63,7 +63,7 @@ test('a user can request an address for a player without one', function () {
         ->callAction('requestAddress', data: ['note' => 'Help!'])
         ->assertHasNoActionErrors()
         ->assertActionHidden('requestAddress')
-        ->assertSee("You've requested an address");
+        ->assertSee("You've requested an address", false);
 
     $addressRequest = AddressRequest::sole();
 
@@ -127,7 +127,7 @@ test('marking a send as return to sender can request a new address', function ()
         ])
         ->assertHasNoActionErrors();
 
-    $postalMail->refresh();
+    $postalMail = $postalMail->fresh();
     $addressRequest = AddressRequest::sole();
 
     expect($postalMail->failure_reason)->toBe(FailureReason::ReturnToSender)
@@ -190,7 +190,7 @@ test('logging a failed return from the composer records the reason and skips the
         ->assertHasNoActionErrors()
         ->assertSet('shareOpen', false);
 
-    $postalMail->refresh();
+    $postalMail = $postalMail->fresh();
 
     expect($postalMail->is_failed)->toBeTrue()
         ->and($postalMail->failure_reason)->toBe(FailureReason::ReturnToSender)

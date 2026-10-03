@@ -187,6 +187,8 @@ test('it can add an email for autograph requests instead of a mailing address', 
 
     $address = Address::sole();
 
+    $this->travel(1)->seconds();
+
     expect($address->type)->toBe(AddressType::Email)
         ->and($address->email)->toBe('fanmail@example.com')
         ->and($address->address_1)->toBeNull()
