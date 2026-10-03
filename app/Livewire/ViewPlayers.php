@@ -111,6 +111,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
                 $this->tagsFilter(),
                 $this->hasPhotoFilter(),
                 $this->recentlyActiveFilter(),
+                $this->takesEmailRequestsFilter(),
             ])
             ->columns([
                 ImageColumn::make('media.url')
@@ -384,6 +385,14 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
             ->label('Has a photo')
             ->toggle()
             ->query(fn (Builder $query) => $query->whereHas('media'));
+    }
+
+    protected function takesEmailRequestsFilter(): Filter
+    {
+        return Filter::make('takes_email_requests')
+            ->label('Takes email requests')
+            ->toggle()
+            ->query(fn (Builder $query) => $query->takesEmailRequests());
     }
 
     protected function recentlyActiveFilter(): Filter

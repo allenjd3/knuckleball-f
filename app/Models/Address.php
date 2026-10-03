@@ -47,6 +47,11 @@ class Address extends Model
         $builder->where('published_at', '<', now());
     }
 
+    public function scopeLive(Builder $builder): void
+    {
+        $builder->published()->notRejected()->notExpired();
+    }
+
     public function scopeMailing(Builder $builder): void
     {
         $builder->where('type', AddressType::Mail);

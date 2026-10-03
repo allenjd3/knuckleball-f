@@ -63,7 +63,12 @@
                                         @endauth
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $player->name }}</p>
+                                        <p class="text-sm font-semibold text-gray-900 truncate flex items-center gap-1.5">
+                                            <span class="truncate">{{ $player->name }}</span>
+                                            @if ($player->takes_email_requests && $player->is_not_deceased)
+                                                <x-heroicon-o-envelope class="size-4 shrink-0 text-[#CB504B]" title="Takes email requests" aria-label="Takes email requests" />
+                                            @endif
+                                        </p>
                                         @if ($player->team)
                                             <p class="text-xs text-gray-500 truncate">{{ $player->team->name }}</p>
                                         @endif

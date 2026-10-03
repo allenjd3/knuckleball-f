@@ -24,6 +24,7 @@ class GlobalSearch extends Component
             ->where('rejected', false)
             ->where('name', 'like', '%' . $this->query . '%')
             ->with(['team', 'media'])
+            ->withTakesEmailRequests()
             ->orderBy('name')
             ->limit(5)
             ->get();

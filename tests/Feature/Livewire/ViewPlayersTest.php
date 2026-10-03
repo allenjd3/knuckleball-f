@@ -3,6 +3,7 @@
 use App\Livewire\ViewPlayers;
 use App\Livewire\ViewPlayersFromCategory;
 use App\Livewire\ViewPlayersFromTeam;
+use App\Models\Address;
 use App\Models\Category;
 use App\Models\Fee;
 use App\Models\Player;
@@ -325,4 +326,23 @@ test('category tabs are hidden on category- and team-scoped player pages', funct
 
     Livewire::test(ViewPlayersFromTeam::class, ['team' => $team->id])
         ->assertDontSeeHtml('wire:click="setCategoryTab(null)"');
+});
+
+test('players can be filtered by whether they take email requests', function () {
+    $withEmail = Player::factory()->published()->create();
+    Address::factory()->published()->email()->create(['signer_id' => $withEmail->signer->id]);
+
+    $mailOnly = Player::factory()->published()->create();
+    Address::factory()->published()->create(['signer_id' => $mailOnly->signer->id]);
+
+    $unpublishedEmail = Player::factory()->published()->create();
+    Address::factory()->email()->create(['signer_id' => $unpublishedEmail->signer->id]);
+
+    $deceased = Player::factory()->published()->create(['deceased_at' => now()->subYear()]);
+    Address::factory()->published()->email()->create(['signer_id' => $deceased->signer->id]);
+
+    Livewire::test(ViewPlayers::class)
+        ->filterTable('takes_email_requests')
+        ->assertCanSeeTableRecords([$withEmail])
+        ->assertCanNotSeeTableRecords([$mailOnly, $unpublishedEmail, $deceased]);
 });
