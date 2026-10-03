@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Enums\SendMethod;
 use App\Enums\SetEntryStatus;
 use App\Forms\Schema\FailedReturnForm;
 use App\Http\Controllers\ReturnCardController;
@@ -16,6 +17,7 @@ use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -77,6 +79,12 @@ class FeedComposer extends Component implements HasActions, HasForms
                             ->pluck('name', 'id')
                     )
                     ->getOptionLabelUsing(fn ($value) => Player::find($value)?->name),
+                Radio::make('method')
+                    ->label('How did you send it?')
+                    ->options(SendMethod::options())
+                    ->default(SendMethod::Mail->value)
+                    ->inline()
+                    ->required(),
                 DatePicker::make('date_sent')
                     ->label('Date Sent')
                     ->required()
@@ -97,6 +105,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
                 $postalMail = auth()->user()->postalMails()->create([
                     'signer_id' => $player->signer->id,
+                    'method' => $data['method'] ?? SendMethod::Mail->value,
                     'date_sent' => $data['date_sent'],
                     'fee_material_id' => $data['fee_material_id'],
                     'comment' => $data['comment'] ?? null,

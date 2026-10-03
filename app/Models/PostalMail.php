@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Actions\FlagStaleAddress;
 use App\Actions\UpdateFeedItem;
 use App\Enums\FailureReason;
+use App\Enums\SendMethod;
 use App\Events\PostalMailDeleted;
 use App\Jobs\GenerateReturnCard;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,10 @@ class PostalMail extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $attributes = [
+        'method' => 'mail',
+    ];
 
     protected static function booted()
     {
@@ -124,6 +129,7 @@ class PostalMail extends Model
                 : null,
             'is_failed' => (bool) $this->is_failed,
             'failure_reason' => $this->failure_reason?->value,
+            'send_method' => ($this->method ?? SendMethod::Mail)->value,
             'card_photos' => $cardPhotos,
             'cards_count' => $cards->count(),
             ...$overrides,
@@ -145,6 +151,7 @@ class PostalMail extends Model
             'returned_date' => 'datetime',
             'is_failed' => 'boolean',
             'failure_reason' => FailureReason::class,
+            'method' => SendMethod::class,
         ];
     }
 }

@@ -5,7 +5,7 @@
             <div class="flex-1 min-w-0">
                 <p class="text-sm leading-snug">
                     <a href="{{ $userPath }}" class="font-semibold text-gray-900 hover:underline">{{ $user }}</a>
-                    <span class="text-gray-500"> sent mail to </span>
+                    <span class="text-gray-500"> {{ $sendMethod->feedVerb() }} </span>
                     <a href="{{ $playerPath }}" class="font-semibold text-gray-900 hover:underline">{{ $player }}</a>
                 </p>
                 <p class="text-xs text-gray-400 mt-0.5">

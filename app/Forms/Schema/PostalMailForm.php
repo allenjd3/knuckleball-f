@@ -3,11 +3,13 @@
 namespace App\Forms\Schema;
 
 use App\Actions\CreateFeedItem;
+use App\Enums\SendMethod;
 use App\Models\FeeMaterial;
 use App\Models\PostalMail;
 use App\Models\Signer;
 use App\Models\User;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -27,6 +29,12 @@ class PostalMailForm
     public static function schema(): array
     {
         return [
+            Radio::make('method')
+                ->label('How did you send it?')
+                ->options(SendMethod::options())
+                ->default(SendMethod::Mail->value)
+                ->inline()
+                ->required(),
             DatePicker::make('date_sent')->required(),
             DatePicker::make('returned_date'),
             Select::make('fee_material_id')

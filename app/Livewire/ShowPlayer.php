@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Actions\RequestAddress;
 use App\Enums\AddressRequestReason;
 use App\Enums\AddressType;
+use App\Enums\SendMethod;
 use App\Forms\Schema\FailedReturnForm;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
@@ -439,6 +440,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->columns([
                 TextColumn::make('user.name'),
                 TextColumn::make('date_sent')->date(),
+                TextColumn::make('method')
+                    ->label('Sent')
+                    ->badge()
+                    ->formatStateUsing(fn (SendMethod $state) => $state === SendMethod::Email ? 'Email' : 'Mail')
+                    ->color(fn (SendMethod $state) => $state === SendMethod::Email ? 'info' : 'gray'),
                 TextColumn::make('returned_date')->date(),
                 TextColumn::make('feeMaterials.name')->label('Item'),
                 ImageColumn::make('card.media.url'),

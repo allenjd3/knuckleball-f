@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Feeds;
 
+use App\Enums\SendMethod;
 use App\Models\Feed;
 use Carbon\Carbon;
 use Closure;
@@ -19,6 +20,7 @@ class SendCard extends Component
     public ?string $playerPhoto;
     public ?string $category;
     public int $cardsCount;
+    public SendMethod $sendMethod;
 
     public function __construct(public Feed $feed)
     {
@@ -31,6 +33,7 @@ class SendCard extends Component
         $this->playerPhoto = data_get($feed->meta, 'player_photo');
         $this->category = data_get($feed->meta, 'category');
         $this->cardsCount = (int) data_get($feed->meta, 'cards_count', 0);
+        $this->sendMethod = SendMethod::tryFrom((string) data_get($feed->meta, 'send_method')) ?? SendMethod::Mail;
     }
 
     public function render(): View|Closure|string
