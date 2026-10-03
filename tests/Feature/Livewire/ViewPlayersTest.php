@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FailureReason;
 use App\Livewire\ViewPlayers;
 use App\Livewire\ViewPlayersFromCategory;
 use App\Livewire\ViewPlayersFromTeam;
@@ -238,6 +239,21 @@ test('pending postal mails do not count against response rate', function () {
     $player = Player::factory()->published()->create();
     PostalMail::factory()->count(1)->create(['signer_id' => $player->signer->id, 'returned_date' => now(), 'is_failed' => false]);
     PostalMail::factory()->count(10)->create(['signer_id' => $player->signer->id, 'returned_date' => null, 'is_failed' => false]);
+
+    Livewire::test(ViewPlayers::class)
+        ->filterTable('response_rate', 'high')
+        ->assertCanSeeTableRecords([$player]);
+});
+
+test('return to sender failures do not count against response rate', function () {
+    $player = Player::factory()->published()->create();
+    PostalMail::factory()->count(1)->create(['signer_id' => $player->signer->id, 'returned_date' => now(), 'is_failed' => false]);
+    PostalMail::factory()->count(4)->create([
+        'signer_id' => $player->signer->id,
+        'returned_date' => null,
+        'is_failed' => true,
+        'failure_reason' => FailureReason::ReturnToSender,
+    ]);
 
     Livewire::test(ViewPlayers::class)
         ->filterTable('response_rate', 'high')

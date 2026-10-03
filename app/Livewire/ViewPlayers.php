@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\FailureReason;
 use App\Models\Category;
 use App\Models\Player;
 use App\Models\Tag;
@@ -428,7 +429,8 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
         return $query->addSelect([
             'ttm_resolved_count' => $baseSubquery()
                 ->selectRaw('count(*)')
-                ->where(fn ($q) => $q->whereNotNull('postal_mails.returned_date')->orWhere('postal_mails.is_failed', true)),
+                ->where(fn ($q) => $q->whereNotNull('postal_mails.returned_date')->orWhere('postal_mails.is_failed', true))
+                ->where(fn ($q) => $q->whereNull('postal_mails.failure_reason')->orWhere('postal_mails.failure_reason', '!=', FailureReason::ReturnToSender->value)),
             'ttm_success_count' => $baseSubquery()
                 ->selectRaw('count(*)')
                 ->whereNotNull('postal_mails.returned_date')
@@ -448,7 +450,7 @@ class ViewPlayers extends Component implements HasActions, HasForms, HasTable
     {
         $signableType = (new Player)->getMorphClass();
 
-        $resolved = "(select count(*) from postal_mails inner join signers on signers.id = postal_mails.signer_id where signers.signable_id = players.id and signers.signable_type = '{$signableType}' and (postal_mails.returned_date is not null or postal_mails.is_failed = 1))";
+        $resolved = "(select count(*) from postal_mails inner join signers on signers.id = postal_mails.signer_id where signers.signable_id = players.id and signers.signable_type = '{$signableType}' and (postal_mails.returned_date is not null or postal_mails.is_failed = 1) and (postal_mails.failure_reason is null or postal_mails.failure_reason != '" . FailureReason::ReturnToSender->value . "'))";
         $success = "(select count(*) from postal_mails inner join signers on signers.id = postal_mails.signer_id where signers.signable_id = players.id and signers.signable_type = '{$signableType}' and postal_mails.returned_date is not null and postal_mails.is_failed = 0)";
 
         return [$resolved, $success];
