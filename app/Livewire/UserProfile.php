@@ -2,10 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Enums\ActivityFilter;
+use App\Enums\FailureReason;
 use App\Filament\Imports\PostalMailImporter;
 use App\Models\CardSet;
 use App\Models\Feed;
 use App\Models\Pack;
+use App\Models\PostalMail;
 use App\Models\User;
 use App\Models\UserSnapshot;
 use App\Notifications\NewFollower;
@@ -23,7 +26,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -35,6 +40,9 @@ class UserProfile extends Component implements HasActions, HasForms
 
     public string $userSlug;
 
+    #[Url(as: 'activity', except: 'all')]
+    public string $activityFilter = 'all';
+
     public function mount(string $user): void
     {
         $this->userSlug = $user;
@@ -43,6 +51,33 @@ class UserProfile extends Component implements HasActions, HasForms
     public function render()
     {
         return view('livewire.user-profile');
+    }
+
+    public function updatedActivityFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    #[Computed]
+    public function selectedActivityFilter(): ActivityFilter
+    {
+        return ActivityFilter::tryFrom($this->activityFilter) ?? ActivityFilter::All;
+    }
+
+    /**
+     * Number of the profile owner's sends in each status filter.
+     *
+     * @return array<string, int>
+     */
+    #[Computed]
+    public function activityFilterCounts(): array
+    {
+        return collect(ActivityFilter::cases())
+            ->reject(fn (ActivityFilter $filter) => $filter === ActivityFilter::All)
+            ->mapWithKeys(fn (ActivityFilter $filter) => [
+                $filter->value => $filter->apply(Feed::query()->where('followable_id', $this->user->id))->count(),
+            ])
+            ->all();
     }
 
     #[Computed]
@@ -57,9 +92,13 @@ class UserProfile extends Component implements HasActions, HasForms
     public function feeds()
     {
         return Feed::query()
-            ->where(fn ($q) => $q
-                ->where('followable_id', $this->user->id)
-                ->orWhereHas('mentions', fn ($q) => $q->where('user_id', $this->user->id))
+            ->when(
+                $this->selectedActivityFilter === ActivityFilter::All,
+                fn ($q) => $q->where(fn ($q) => $q
+                    ->where('followable_id', $this->user->id)
+                    ->orWhereHas('mentions', fn ($q) => $q->where('user_id', $this->user->id))
+                ),
+                fn ($q) => $this->selectedActivityFilter->apply($q->where('followable_id', $this->user->id)),
             )
             ->orderByDesc('created_at')
             ->simplePaginate();
@@ -235,6 +274,58 @@ class UserProfile extends Component implements HasActions, HasForms
 
         auth()->user()->watchlist()->detach($playerId);
         unset($this->watchlist);
+    }
+
+    /**
+     * The owner's failed sends that were logged before failure reasons existed.
+     *
+     * @return Collection<int, PostalMail>
+     */
+    #[Computed]
+    public function unlabeledFailures(): Collection
+    {
+        if (! $this->isOwner) {
+            return new Collection;
+        }
+
+        return $this->user->postalMails()
+            ->where('is_failed', true)
+            ->whereNull('failure_reason')
+            ->with('signer.signable')
+            ->latest('date_sent')
+            ->limit(25)
+            ->get();
+    }
+
+    public function labelFailuresAction(): Action
+    {
+        return Action::make('labelFailures')
+            ->label('Label them')
+            ->link()
+            ->visible(fn () => $this->isOwner && $this->unlabeledFailures->isNotEmpty())
+            ->modalHeading('What happened to these sends?')
+            ->modalDescription('Pick a reason for each failed send. Leave any you are unsure about blank.')
+            ->modalSubmitActionLabel('Save')
+            ->schema(fn () => $this->unlabeledFailures
+                ->map(fn (PostalMail $postalMail) => Select::make("reasons.{$postalMail->id}")
+                    ->label(($postalMail->signer?->signable?->name ?? 'Unknown player') . ' · sent ' . ($postalMail->date_sent?->format('M j, Y') ?? '—'))
+                    ->options(FailureReason::options())
+                    ->placeholder('Not sure'))
+                ->all())
+            ->action(function (array $data) {
+                $reasons = collect(data_get($data, 'reasons', []))->filter();
+
+                $this->user->postalMails()
+                    ->where('is_failed', true)
+                    ->whereNull('failure_reason')
+                    ->whereIn('id', $reasons->keys())
+                    ->get()
+                    ->each(fn (PostalMail $postalMail) => $postalMail->update([
+                        'failure_reason' => $reasons->get($postalMail->id),
+                    ]));
+
+                unset($this->unlabeledFailures, $this->feeds);
+            });
     }
 
     public function importReturnsAction(): ImportAction

@@ -88,6 +88,10 @@
                 </div>
 
                 <x-leaderboard-card :entries="$this->entries" />
+                <a href="{{ route('addresses.wanted') }}" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#CB504B] hover:underline">
+                    <x-heroicon-o-map-pin class="size-4" />
+                    Help answer the most wanted address requests
+                </a>
             </main>
         </div>
     </div>

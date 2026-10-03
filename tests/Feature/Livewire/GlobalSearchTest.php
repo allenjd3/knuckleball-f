@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\GlobalSearch;
+use App\Models\Address;
 use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
@@ -91,4 +92,19 @@ it('shows a team logo to everyone, including guests', function () {
     Livewire::test(GlobalSearch::class)
         ->set('query', 'thunder')
         ->assertSee('teams/test.jpg');
+});
+
+it('flags players who take email requests in search results', function () {
+    $withEmail = Player::factory()->published()->create(['name' => 'Ken Griffey Jr.']);
+    Address::factory()->published()->email()->create(['signer_id' => $withEmail->signer->id]);
+    $mailOnly = Player::factory()->published()->create(['name' => 'Ken Griffey Sr.']);
+    Address::factory()->published()->create(['signer_id' => $mailOnly->signer->id]);
+
+    $component = Livewire::test(GlobalSearch::class)
+        ->set('query', 'griffey')
+        ->assertSeeHtml('aria-label="Takes email requests"');
+
+    $flags = $component->get('players')->mapWithKeys(fn (Player $player) => [$player->id => (bool) $player->takes_email_requests]);
+
+    expect($flags->all())->toBe([$withEmail->id => true, $mailOnly->id => false]);
 });

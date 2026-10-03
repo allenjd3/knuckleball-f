@@ -86,6 +86,12 @@
                             <p>{{ $this->address->address_2 }}</p>
                             <p>{{ $this->address->city }}, {{ $this->address->state }}</p>
                             <p>{{ $this->address->postal_code }}</p>
+                            @if ($this->address->rts_flagged_at)
+                                <p class="mt-2 flex items-start gap-1.5 text-sm font-semibold text-amber-600">
+                                    <x-heroicon-o-exclamation-triangle class="size-4 shrink-0 mt-0.5" />
+                                    {{ $this->address->rtsReportCount() }} collectors recently had mail to this address returned to sender. It may be outdated.
+                                </p>
+                            @endif
                         @else
                             <div class="border-4 border-dashed border-gray-200 mb-2 rounded-xl h-8 w-full">&nbsp;</div>
                             <div class="border-4 border-dashed border-gray-200 rounded-xl h-8 w-full">&nbsp;</div>
@@ -123,6 +129,43 @@
                             @endcan
                         @endguest
                     </div>
+                @endif
+
+                @if ($this->emailAddress && $this->player->is_not_deceased)
+                    <div class="mt-3">
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Email Requests</p>
+                        @can('viewAny', App\Models\Address::class)
+                            <a href="mailto:{{ $this->emailAddress->email }}" class="inline-flex items-center gap-1.5 font-semibold text-[#CB504B] hover:underline break-all">
+                                <x-heroicon-o-envelope class="size-4 shrink-0" />
+                                {{ $this->emailAddress->email }}
+                            </a>
+                        @else
+                            <p class="text-sm text-gray-500">This player takes email requests. Only authorized users can view it.
+                            @guest
+                                <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a>
+                            @endguest
+                            </p>
+                        @endcan
+                    </div>
+                @endif
+
+                @if ($this->player->is_not_deceased)
+                    @auth
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            @if ($this->hasRequestedAddress)
+                                <p class="text-sm font-semibold text-amber-600">You've requested an address. We'll let you know when one is added.</p>
+                                {{ $this->cancelAddressRequest }}
+                            @else
+                                {{ $this->requestAddress }}
+                            @endif
+                        </div>
+                    @endauth
+                    @if ($this->openAddressRequestCount > 0)
+                        <p class="mt-1 text-xs text-gray-500">
+                            {{ $this->openAddressRequestCount }} {{ Str::plural('collector', $this->openAddressRequestCount) }} looking for an address ·
+                            <a href="{{ route('addresses.wanted') }}" class="font-semibold hover:underline">See most wanted</a>
+                        </p>
+                    @endif
                 @endif
 
                 @if (isset($unpublishedAddress))

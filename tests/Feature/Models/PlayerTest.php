@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\FailureReason;
 use App\Models\Fee;
 use App\Models\InPersonAutograph;
 use App\Models\Player;
@@ -31,6 +32,16 @@ test('it shows when a response fails', function () {
     PostalMail::factory()->state(['signer_id' => $player->signer->id])->unReturned()->create();
 
     expect($player->response_rate)->toBe('50% successful. 1 is pending.');
+});
+
+test('return to sender failures do not count against the response rate', function () {
+    $player = Player::factory()->create();
+
+    PostalMail::factory()->state(['signer_id' => $player->signer->id])->failed()->create(['failure_reason' => FailureReason::ReturnToSender]);
+    PostalMail::factory()->state(['signer_id' => $player->signer->id])->failed()->create(['failure_reason' => FailureReason::Declined]);
+    PostalMail::factory()->state(['signer_id' => $player->signer->id])->returned()->create();
+
+    expect($player->response_rate)->toBe('50% successful. 0 are pending.');
 });
 
 test('it can show that fees are required', function () {

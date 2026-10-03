@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Address;
+use App\Models\AddressRequest;
 use App\Models\Card;
 use App\Models\CardSet;
 use App\Models\Pack;
@@ -51,9 +52,36 @@ class LeaderboardService
             'sends' => $this->topUser(PostalMail::query()->whereNotNull('date_sent'), 'Most Sends'),
             'returns' => $this->topUser(PostalMail::query()->whereNotNull('returned_date'), 'Most Returns'),
             'addresses' => $this->topUser(Address::query(), 'Most Addresses Added'),
+            'requests_answered' => $this->topRequestAnswerer(),
             'cards' => $this->topUser(Card::query(), 'Most Card Images Added'),
             'packs' => $this->topUser(Pack::query(), 'Most Packs'),
             'sets' => $this->topUser(CardSet::query(), 'Most Sets'),
+        ];
+    }
+
+    /**
+     * The contributor whose addresses have answered the most address requests.
+     *
+     * @return array{label: string, user_id: int, count: int}|null
+     */
+    private function topRequestAnswerer(): ?array
+    {
+        $row = AddressRequest::query()
+            ->join('addresses', 'addresses.id', '=', 'address_requests.fulfilled_by_address_id')
+            ->whereNotNull('addresses.user_id')
+            ->selectRaw('addresses.user_id as user_id, count(*) as total')
+            ->groupBy('addresses.user_id')
+            ->orderByDesc('total')
+            ->first();
+
+        if (! $row) {
+            return null;
+        }
+
+        return [
+            'label' => 'Most Address Requests Answered',
+            'user_id' => (int) $row->user_id,
+            'count' => (int) $row->total,
         ];
     }
 

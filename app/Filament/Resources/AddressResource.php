@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages\CreateAddress;
 use App\Filament\Resources\AddressResource\Pages\EditAddress;
 use App\Filament\Resources\AddressResource\Pages\ListAddresses;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,25 +38,40 @@ class AddressResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('address_1')
+                Select::make('type')
+                    ->options(AddressType::options())
+                    ->default(AddressType::Mail->value)
                     ->required()
+                    ->live(),
+                TextInput::make('address_1')
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('address_2')
                     ->nullable()
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('city')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('state')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('postal_code')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
+                    ->maxLength(255),
+                TextInput::make('email')
+                    ->required(fn (Get $get): bool => ! self::isMailing($get))
+                    ->visible(fn (Get $get): bool => ! self::isMailing($get))
+                    ->email()
                     ->maxLength(255),
                 Select::make('signer_id')
                     ->label('Signer')
@@ -73,6 +90,10 @@ class AddressResource extends Resource
                     ->label('Expires At')
                     ->helperText('Optional. Once passed, the address drops off the player\'s public page but stays here for review/editing.')
                     ->nullable(),
+                DatePicker::make('rts_flagged_at')
+                    ->label('Flagged by RTS reports on')
+                    ->helperText('Set automatically when several collectors report return to sender. Clear it once the address is confirmed.')
+                    ->nullable(),
                 Checkbox::make('rejected')
                     ->label('Reject Address (hide it from review)')
                     ->default(false),
@@ -83,6 +104,12 @@ class AddressResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('type')
+                    ->badge()
+                    ->formatStateUsing(fn (AddressType $state): string => $state === AddressType::Email ? 'Email' : 'Mail'),
+                TextColumn::make('email')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('address_1')
                     ->searchable()
                     ->label('Address 1'),
@@ -109,6 +136,12 @@ class AddressResource extends Resource
                     ->formatStateUsing(fn (Address $record) => $record->expires_at
                         ? $record->expires_at->format('M j, Y') . ($record->isExpired() ? ' (expired)' : '')
                         : 'Never'),
+                TextColumn::make('rts_flagged_at')
+                    ->label('RTS reports')
+                    ->badge()
+                    ->color('warning')
+                    ->placeholder('—')
+                    ->formatStateUsing(fn (Address $record) => $record->rtsReportCount() . ' RTS'),
                 CheckboxColumn::make('rejected'),
             ])
             ->recordActions([
@@ -116,6 +149,10 @@ class AddressResource extends Resource
             ])
             ->filters([
                 TernaryFilter::make('rejected'),
+                Filter::make('rts_flagged')
+                    ->label('Flagged by RTS reports')
+                    ->toggle()
+                    ->query(fn (Builder $query) => $query->whereNotNull('rts_flagged_at')),
                 Filter::make('expired')
                     ->label('Expired')
                     ->toggle()
@@ -144,5 +181,12 @@ class AddressResource extends Resource
             'create' => CreateAddress::route('/create'),
             'edit' => EditAddress::route('/{record}/edit'),
         ];
+    }
+
+    private static function isMailing(Get $get): bool
+    {
+        $type = $get('type');
+
+        return ($type instanceof AddressType ? $type : AddressType::tryFrom((string) $type)) !== AddressType::Email;
     }
 }

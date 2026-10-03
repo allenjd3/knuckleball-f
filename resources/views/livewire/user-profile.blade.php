@@ -126,10 +126,40 @@
 
         {{-- Activity tab --}}
         <div x-show="tab === 'activity'" x-cloak class="px-4 pt-6 pb-16 flex flex-col gap-3">
+            @if ($this->isOwner && $this->unlabeledFailures->isNotEmpty())
+                <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                    <span>
+                        <x-heroicon-o-tag class="inline size-4 -mt-0.5" />
+                        {{ $this->unlabeledFailures->count() }} of your failed sends {{ $this->unlabeledFailures->count() === 1 ? "doesn't" : "don't" }} say what happened.
+                    </span>
+                    {{ $this->labelFailures }}
+                </div>
+            @endif
+            <div class="flex flex-wrap gap-2 mb-1">
+                @foreach (\App\Enums\ActivityFilter::cases() as $filter)
+                    <button
+                        type="button"
+                        wire:click="$set('activityFilter', '{{ $filter->value }}')"
+                        @class([
+                            'px-3 py-1 rounded-full text-xs font-medium border transition-colors',
+                            'bg-[#CB504B] border-[#CB504B] text-white' => $this->selectedActivityFilter === $filter,
+                            'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300' => $this->selectedActivityFilter !== $filter,
+                        ])>
+                        {{ $filter->label() }}
+                        @isset ($this->activityFilterCounts[$filter->value])
+                            <span @class([
+                                'ml-1 tabular-nums',
+                                'text-white/80' => $this->selectedActivityFilter === $filter,
+                                'text-gray-400' => $this->selectedActivityFilter !== $filter,
+                            ])>{{ number_format($this->activityFilterCounts[$filter->value]) }}</span>
+                        @endisset
+                    </button>
+                @endforeach
+            </div>
             @forelse ($this->feeds as $feed)
                 <x-dynamic-component :component="$feed->componentName()" :$feed />
             @empty
-                <p class="text-gray-400 text-sm text-center py-8">No activity yet.</p>
+                <p class="text-gray-400 text-sm text-center py-8">{{ $this->selectedActivityFilter->emptyMessage() }}</p>
             @endforelse
             {{ $this->feeds->links() }}
         </div>

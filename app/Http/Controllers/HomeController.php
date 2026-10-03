@@ -21,7 +21,7 @@ class HomeController extends Controller
                     'slug' => basename(data_get($meta, 'user_path', '')),
                     'player' => data_get($meta, 'player', ''),
                     'days' => data_get($meta, 'turnaround_days'),
-                    'isReturn' => ! empty(data_get($meta, 'date_returned')),
+                    'isReturn' => ! empty(data_get($meta, 'date_returned')) && ! data_get($meta, 'is_failed'),
                 ];
             })
             ->filter(fn ($item) => $item['slug'] && $item['player'])

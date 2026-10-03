@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Actions\FlagStaleAddress;
 use App\Actions\UpdateFeedItem;
+use App\Enums\FailureReason;
+use App\Enums\SendMethod;
 use App\Events\PostalMailDeleted;
+use App\Jobs\GenerateReturnCard;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,10 +22,35 @@ class PostalMail extends Model
 
     protected $guarded = [];
 
+    protected $attributes = [
+        'method' => 'mail',
+    ];
+
     protected static function booted()
     {
+        static::saving(function (PostalMail $postalMail) {
+            if (! $postalMail->is_failed) {
+                $postalMail->failure_reason = null;
+            }
+        });
+
         static::updated(function (PostalMail $postalMail) {
             UpdateFeedItem::execute($postalMail, $postalMail->comment);
+
+            if ($postalMail->wasChanged('is_failed') && $postalMail->returned_date) {
+                GenerateReturnCard::dispatch($postalMail->id);
+            }
+        });
+
+        static::saved(function (PostalMail $postalMail) {
+            if (
+                $postalMail->is_failed
+                && $postalMail->failure_reason === FailureReason::ReturnToSender
+                && ($postalMail->wasRecentlyCreated || $postalMail->wasChanged(['is_failed', 'failure_reason']))
+                && $postalMail->signer
+            ) {
+                FlagStaleAddress::execute($postalMail->signer);
+            }
         });
 
         static::deleting(function (PostalMail $postalMail) {
@@ -98,15 +127,19 @@ class PostalMail extends Model
             'turnaround_days' => $this->returned_date && $this->date_sent
                 ? (int) $this->date_sent->diffInDays($this->returned_date)
                 : null,
+            'is_failed' => (bool) $this->is_failed,
+            'failure_reason' => $this->failure_reason?->value,
+            'send_method' => ($this->method ?? SendMethod::Mail)->value,
             'card_photos' => $cardPhotos,
             'cards_count' => $cards->count(),
             ...$overrides,
         ];
     }
 
-    public function fail(): bool
+    public function fail(?FailureReason $reason = null): bool
     {
         $this->is_failed = true;
+        $this->failure_reason = $reason ?? $this->failure_reason;
 
         return $this->save();
     }
@@ -117,6 +150,8 @@ class PostalMail extends Model
             'date_sent' => 'datetime',
             'returned_date' => 'datetime',
             'is_failed' => 'boolean',
+            'failure_reason' => FailureReason::class,
+            'method' => SendMethod::class,
         ];
     }
 }

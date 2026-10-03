@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\Collections\PlayerCollection;
 use App\Traits\Signable;
 use Illuminate\Database\Eloquent\Attributes\CollectedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -81,7 +82,35 @@ class Player extends Model
 
     public function address()
     {
-        return $this->addresses()->latest()->published()->notRejected()->notExpired()->first();
+        return $this->addresses()->mailing()->latest()->published()->notRejected()->notExpired()->first();
+    }
+
+    public function emailAddress(): ?Address
+    {
+        return $this->addresses()->email()->latest()->published()->notRejected()->notExpired()->first();
+    }
+
+    /**
+     * Living players with a published email for autograph requests.
+     */
+    public function scopeTakesEmailRequests(Builder $query): void
+    {
+        $query->whereNull('deceased_at')
+            ->whereHas('signer', fn (Builder $signer) => $signer->whereHas(
+                'addresses',
+                fn (Builder $address) => $address->email()->live(),
+            ));
+    }
+
+    /**
+     * Adds a boolean takes_email_requests attribute without an extra query per player.
+     */
+    public function scopeWithTakesEmailRequests(Builder $query): void
+    {
+        $query->withExists(['signer as takes_email_requests' => fn (Builder $signer) => $signer->whereHas(
+            'addresses',
+            fn (Builder $address) => $address->email()->live(),
+        )]);
     }
 
     public function path(): string

@@ -1,8 +1,10 @@
 <?php
 
+use App\Enums\FailureReason;
 use App\Livewire\ViewPlayers;
 use App\Livewire\ViewPlayersFromCategory;
 use App\Livewire\ViewPlayersFromTeam;
+use App\Models\Address;
 use App\Models\Category;
 use App\Models\Fee;
 use App\Models\Player;
@@ -243,6 +245,21 @@ test('pending postal mails do not count against response rate', function () {
         ->assertCanSeeTableRecords([$player]);
 });
 
+test('return to sender failures do not count against response rate', function () {
+    $player = Player::factory()->published()->create();
+    PostalMail::factory()->count(1)->create(['signer_id' => $player->signer->id, 'returned_date' => now(), 'is_failed' => false]);
+    PostalMail::factory()->count(4)->create([
+        'signer_id' => $player->signer->id,
+        'returned_date' => null,
+        'is_failed' => true,
+        'failure_reason' => FailureReason::ReturnToSender,
+    ]);
+
+    Livewire::test(ViewPlayers::class)
+        ->filterTable('response_rate', 'high')
+        ->assertCanSeeTableRecords([$player]);
+});
+
 test('players can be filtered by tag', function () {
     $tag = Tag::factory()->create(['label' => 'Fast Responder']);
     $tagged = Player::factory()->published()->create();
@@ -325,4 +342,23 @@ test('category tabs are hidden on category- and team-scoped player pages', funct
 
     Livewire::test(ViewPlayersFromTeam::class, ['team' => $team->id])
         ->assertDontSeeHtml('wire:click="setCategoryTab(null)"');
+});
+
+test('players can be filtered by whether they take email requests', function () {
+    $withEmail = Player::factory()->published()->create();
+    Address::factory()->published()->email()->create(['signer_id' => $withEmail->signer->id]);
+
+    $mailOnly = Player::factory()->published()->create();
+    Address::factory()->published()->create(['signer_id' => $mailOnly->signer->id]);
+
+    $unpublishedEmail = Player::factory()->published()->create();
+    Address::factory()->email()->create(['signer_id' => $unpublishedEmail->signer->id]);
+
+    $deceased = Player::factory()->published()->create(['deceased_at' => now()->subYear()]);
+    Address::factory()->published()->email()->create(['signer_id' => $deceased->signer->id]);
+
+    Livewire::test(ViewPlayers::class)
+        ->filterTable('takes_email_requests')
+        ->assertCanSeeTableRecords([$withEmail])
+        ->assertCanNotSeeTableRecords([$mailOnly, $unpublishedEmail, $deceased]);
 });

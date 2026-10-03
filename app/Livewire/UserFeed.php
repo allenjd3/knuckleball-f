@@ -56,6 +56,7 @@ class UserFeed extends Component
                 ->from('postal_mails')
                 ->whereColumn('postal_mails.id', 'feeds.feedable_id')
                 ->whereNotNull('postal_mails.returned_date')
+                ->where('postal_mails.is_failed', false)
             )
             ->withCount('reactions')
             ->where('feeds.created_at', '>=', now()->subDays(7))

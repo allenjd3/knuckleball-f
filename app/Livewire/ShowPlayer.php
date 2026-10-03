@@ -2,9 +2,15 @@
 
 namespace App\Livewire;
 
+use App\Actions\RequestAddress;
+use App\Enums\AddressRequestReason;
+use App\Enums\AddressType;
+use App\Enums\SendMethod;
+use App\Forms\Schema\FailedReturnForm;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
+use App\Models\AddressRequest;
 use App\Models\Fee;
 use App\Models\Pack;
 use App\Models\Player;
@@ -17,13 +23,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -41,6 +48,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     use InteractsWithTable;
 
     public Player $player;
+
+    private static function isMailing(Get $get): bool
+    {
+        $type = $get('type');
+
+        return ($type instanceof AddressType ? $type : AddressType::tryFrom((string) $type)) !== AddressType::Email;
+    }
 
     public function render()
     {
@@ -90,6 +104,12 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     }
 
     #[Computed]
+    public function emailAddress(): ?Address
+    {
+        return $this->player->emailAddress();
+    }
+
+    #[Computed]
     public function hasUnpublishedAddress()
     {
         return request()->user()
@@ -112,11 +132,33 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->model(Address::class)
             ->authorize(fn () => request()->user()?->can('create', Address::class))
             ->schema([
-                TextInput::make('address_1')->required(),
-                TextInput::make('address_2'),
-                TextInput::make('city')->required(),
-                TextInput::make('state')->required(),
-                TextInput::make('postal_code')->required(),
+                Radio::make('type')
+                    ->label('How do they take requests?')
+                    ->options(AddressType::options())
+                    ->default(AddressType::Mail->value)
+                    ->inline()
+                    ->required()
+                    ->live(),
+                TextInput::make('address_1')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('address_2')
+                    ->visible(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('city')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('state')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('postal_code')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('email')
+                    ->label('Email for autograph requests')
+                    ->email()
+                    ->maxLength(255)
+                    ->visible(fn (Get $get): bool => ! self::isMailing($get))
+                    ->required(fn (Get $get): bool => ! self::isMailing($get)),
                 DatePicker::make('expires_at')
                     ->label('Temporary — expires on')
                     ->helperText('Leave blank for a permanent address. Once this date passes, the address is archived automatically (still visible/editable in the admin panel).')
@@ -134,11 +176,97 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             'published_at' => request()->user()->isSuperAdmin() ? now() : null,
                         ]);
 
-                    unset($this->address);
+                    unset($this->address, $this->emailAddress);
 
                     return $address;
                 }
             );
+    }
+
+    #[Computed]
+    public function hasRequestedAddress(): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        return AddressRequest::query()
+            ->open()
+            ->where('user_id', auth()->id())
+            ->where('signer_id', $this->player->signer->id)
+            ->exists();
+    }
+
+    #[Computed]
+    public function openAddressRequestCount(): int
+    {
+        return AddressRequest::query()
+            ->open()
+            ->where('signer_id', $this->player->signer->id)
+            ->count();
+    }
+
+    public function requestAddressAction(): Action
+    {
+        return Action::make('requestAddress')
+            ->label(fn () => $this->address?->exists ? 'Request a New Address' : 'Request the Address')
+            ->icon('heroicon-o-map-pin')
+            ->color('gray')
+            ->outlined()
+            ->authorize(fn () => request()->user()?->can('create', AddressRequest::class))
+            ->visible(fn () => $this->player->is_not_deceased && ! $this->hasRequestedAddress)
+            ->modalHeading(fn () => $this->address?->exists ? 'Request a new address' : 'Request an address')
+            ->modalDescription('Your request is posted to the feed so other collectors can help. You\'ll be notified when an address is added.')
+            ->modalSubmitActionLabel('Post Request')
+            ->schema([
+                Select::make('reason')
+                    ->label('Why do you need a new one?')
+                    ->options([
+                        AddressRequestReason::ReturnToSender->value => AddressRequestReason::ReturnToSender->label(),
+                        AddressRequestReason::Outdated->value => AddressRequestReason::Outdated->label(),
+                    ])
+                    ->default(AddressRequestReason::ReturnToSender->value)
+                    ->visible(fn () => (bool) $this->address?->exists)
+                    ->required(fn () => (bool) $this->address?->exists),
+                Textarea::make('note')
+                    ->label('Note')
+                    ->placeholder('Anything that might help, e.g. "Heard he moved to Arizona"')
+                    ->maxLength(255),
+            ])
+            ->action(function (array $data) {
+                RequestAddress::execute(
+                    user: request()->user(),
+                    signer: $this->player->signer,
+                    reason: $this->address?->exists
+                        ? AddressRequestReason::from($data['reason'])
+                        : AddressRequestReason::MissingAddress,
+                    note: $data['note'] ?? null,
+                );
+
+                unset($this->hasRequestedAddress, $this->openAddressRequestCount);
+            });
+    }
+
+    public function cancelAddressRequestAction(): Action
+    {
+        return Action::make('cancelAddressRequest')
+            ->label('Cancel request')
+            ->link()
+            ->color('gray')
+            ->requiresConfirmation()
+            ->modalHeading('Cancel your address request?')
+            ->modalDescription('Your request will be removed from the feed.')
+            ->visible(fn () => $this->hasRequestedAddress)
+            ->action(function () {
+                AddressRequest::query()
+                    ->open()
+                    ->where('user_id', auth()->id())
+                    ->where('signer_id', $this->player->signer->id)
+                    ->get()
+                    ->each->delete();
+
+                unset($this->hasRequestedAddress, $this->openAddressRequestCount);
+            });
     }
 
     public function createFeeAction(): Action
@@ -318,11 +446,12 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->schema([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
-                        Toggle::make('is_failed')
-                            ->label('Failed to return'),
+                        ...FailedReturnForm::schema('Failed to return'),
                         Textarea::make('comment')->maxLength(255),
                     ])->using(function (array $data, Model $record) {
-                        $record->update($data);
+                        $record->update(FailedReturnForm::withoutFormOnlyFields($data));
+
+                        FailedReturnForm::handleAddressRequest($record, $data);
 
                         return $record;
                     }),
@@ -333,6 +462,11 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->columns([
                 TextColumn::make('user.name'),
                 TextColumn::make('date_sent')->date(),
+                TextColumn::make('method')
+                    ->label('Sent')
+                    ->badge()
+                    ->formatStateUsing(fn (SendMethod $state) => $state === SendMethod::Email ? 'Email' : 'Mail')
+                    ->color(fn (SendMethod $state) => $state === SendMethod::Email ? 'info' : 'gray'),
                 TextColumn::make('returned_date')->date(),
                 TextColumn::make('feeMaterials.name')->label('Item'),
                 ImageColumn::make('card.media.url'),
@@ -340,7 +474,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('is_failed')
                     ->label('Failed delivery')
                     ->badge()
-                    ->formatStateUsing(fn (bool $state) => $state ? 'Failed' : '')
+                    ->formatStateUsing(fn (bool $state, Model $record) => $state ? ($record->failure_reason?->label() ?? 'Failed') : '')
                     ->color(fn (bool $state) => $state ? 'danger' : 'success'),
             ])
             ->headerActions([

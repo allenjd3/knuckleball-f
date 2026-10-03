@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FailureReason;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,6 +24,11 @@ class Signer extends Model
     public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
+    }
+
+    public function addressRequests(): HasMany
+    {
+        return $this->hasMany(AddressRequest::class);
     }
 
     public function postalMails(): HasMany
@@ -50,6 +56,9 @@ class Signer extends Model
         $totalReturned = $this->postalMails()->where(function ($query) {
             $query->whereNotNull('returned_date')
                 ->orWhere('is_failed', true);
+        })->where(function ($query) {
+            $query->whereNull('failure_reason')
+                ->orWhere('failure_reason', '!=', FailureReason::ReturnToSender);
         })->count();
 
         $returned = $this->postalMails()->whereNotNull('returned_date')->where('is_failed', false)->count();

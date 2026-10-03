@@ -3,7 +3,9 @@
 namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
+use App\Enums\SendMethod;
 use App\Enums\SetEntryStatus;
+use App\Forms\Schema\FailedReturnForm;
 use App\Http\Controllers\ReturnCardController;
 use App\Jobs\GenerateReturnCard;
 use App\Models\FeeMaterial;
@@ -15,10 +17,12 @@ use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Utilities\Get;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -75,6 +79,12 @@ class FeedComposer extends Component implements HasActions, HasForms
                             ->pluck('name', 'id')
                     )
                     ->getOptionLabelUsing(fn ($value) => Player::find($value)?->name),
+                Radio::make('method')
+                    ->label('How did you send it?')
+                    ->options(SendMethod::options())
+                    ->default(SendMethod::Mail->value)
+                    ->inline()
+                    ->required(),
                 DatePicker::make('date_sent')
                     ->label('Date Sent')
                     ->required()
@@ -95,6 +105,7 @@ class FeedComposer extends Component implements HasActions, HasForms
 
                 $postalMail = auth()->user()->postalMails()->create([
                     'signer_id' => $player->signer->id,
+                    'method' => $data['method'] ?? SendMethod::Mail->value,
                     'date_sent' => $data['date_sent'],
                     'fee_material_id' => $data['fee_material_id'],
                     'comment' => $data['comment'] ?? null,
@@ -136,8 +147,9 @@ class FeedComposer extends Component implements HasActions, HasForms
                     }),
                 DatePicker::make('returned_date')
                     ->label('Date Returned')
-                    ->required()
+                    ->required(fn (Get $get): bool => ! $get('is_failed'))
                     ->default(now()),
+                ...FailedReturnForm::schema('This one failed'),
                 Textarea::make('comment')
                     ->label('Note')
                     ->placeholder('Anything worth sharing about the return…')
@@ -148,6 +160,21 @@ class FeedComposer extends Component implements HasActions, HasForms
                 $postalMail = auth()->user()
                     ->postalMails()
                     ->findOrFail($data['postal_mail_id']);
+
+                if (data_get($data, 'is_failed')) {
+                    $postalMail->update([
+                        'returned_date' => $data['returned_date'] ?? null,
+                        'is_failed' => true,
+                        'failure_reason' => $data['failure_reason'],
+                        'comment' => $data['comment'] ?? $postalMail->comment,
+                    ]);
+
+                    FailedReturnForm::handleAddressRequest($postalMail, $data);
+
+                    $this->dispatch('feed-updated');
+
+                    return;
+                }
 
                 $postalMail->update([
                     'returned_date' => $data['returned_date'],
