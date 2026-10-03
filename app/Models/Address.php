@@ -32,7 +32,7 @@ class Address extends Model
                     ->open()
                     ->where('signer_id', $address->signer_id)
                     ->get()
-                    ->each(fn (AddressRequest $addressRequest) => $addressRequest->fulfill())
+                    ->each(fn (AddressRequest $addressRequest) => $addressRequest->fulfill($address))
                     ->pluck('user_id');
 
                 $address->notifyWatchers(except: $requesterIds->all());

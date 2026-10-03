@@ -58,13 +58,21 @@ class AddressRequest extends Model
         return $this->fulfilled_at !== null;
     }
 
-    public function fulfill(): void
+    public function fulfilledByAddress(): BelongsTo
+    {
+        return $this->belongsTo(Address::class, 'fulfilled_by_address_id');
+    }
+
+    public function fulfill(?Address $address = null): void
     {
         if ($this->isFulfilled()) {
             return;
         }
 
-        $this->update(['fulfilled_at' => now()]);
+        $this->update([
+            'fulfilled_at' => now(),
+            'fulfilled_by_address_id' => $address?->id,
+        ]);
 
         $this->user?->notify(new AddressRequestFulfilled($this));
     }

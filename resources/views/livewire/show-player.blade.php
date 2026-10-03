@@ -162,7 +162,8 @@
                     @endauth
                     @if ($this->openAddressRequestCount > 0)
                         <p class="mt-1 text-xs text-gray-500">
-                            {{ $this->openAddressRequestCount }} {{ Str::plural('collector', $this->openAddressRequestCount) }} looking for an address
+                            {{ $this->openAddressRequestCount }} {{ Str::plural('collector', $this->openAddressRequestCount) }} looking for an address ·
+                            <a href="{{ route('addresses.wanted') }}" class="font-semibold hover:underline">See most wanted</a>
                         </p>
                     @endif
                 @endif

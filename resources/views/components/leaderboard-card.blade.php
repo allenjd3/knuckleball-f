@@ -28,6 +28,9 @@
                         @case('addresses')
                             <x-heroicon-o-map-pin class="size-4 sm:size-5 text-white/70 shrink-0" />
                             @break
+                        @case('requests_answered')
+                            <x-heroicon-o-hand-raised class="size-4 sm:size-5 text-white/70 shrink-0" />
+                            @break
                         @case('cards')
                             <x-heroicon-o-photo class="size-4 sm:size-5 text-white/70 shrink-0" />
                             @break

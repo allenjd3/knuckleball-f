@@ -26,6 +26,11 @@ class Signer extends Model
         return $this->hasMany(Address::class);
     }
 
+    public function addressRequests(): HasMany
+    {
+        return $this->hasMany(AddressRequest::class);
+    }
+
     public function postalMails(): HasMany
     {
         return $this->hasMany(PostalMail::class);

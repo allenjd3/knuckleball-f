@@ -34,6 +34,7 @@
                     <x-heroicon-o-plus-circle class="size-4" />
                     Know it? Add the address
                 </a>
+                <a href="{{ route('addresses.wanted') }}" class="ml-2 text-xs font-semibold text-gray-400 hover:text-gray-600 hover:underline">More wanted addresses</a>
             @endif
         </div>
     </div>
