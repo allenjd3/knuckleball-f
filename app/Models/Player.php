@@ -81,7 +81,12 @@ class Player extends Model
 
     public function address()
     {
-        return $this->addresses()->latest()->published()->notRejected()->notExpired()->first();
+        return $this->addresses()->mailing()->latest()->published()->notRejected()->notExpired()->first();
+    }
+
+    public function emailAddress(): ?Address
+    {
+        return $this->addresses()->email()->latest()->published()->notRejected()->notExpired()->first();
     }
 
     public function path(): string

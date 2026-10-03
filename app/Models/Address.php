@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AddressType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +13,10 @@ class Address extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $attributes = [
+        'type' => 'mail',
+    ];
 
     protected static function booted(): void
     {
@@ -40,6 +45,21 @@ class Address extends Model
     public function scopePublished(Builder $builder)
     {
         $builder->where('published_at', '<', now());
+    }
+
+    public function scopeMailing(Builder $builder): void
+    {
+        $builder->where('type', AddressType::Mail);
+    }
+
+    public function scopeEmail(Builder $builder): void
+    {
+        $builder->where('type', AddressType::Email);
+    }
+
+    public function isEmail(): bool
+    {
+        return $this->type === AddressType::Email;
     }
 
     public function scopeUnpublished(Builder $builder)
@@ -78,6 +98,7 @@ class Address extends Model
             'published_at' => 'datetime',
             'expires_at' => 'datetime',
             'reject' => 'boolean',
+            'type' => AddressType::class,
         ];
     }
 }

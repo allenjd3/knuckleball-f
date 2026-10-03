@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AddressType;
 use App\Models\Address;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -21,6 +22,19 @@ class AddressFactory extends Factory
             'state' => $this->faker->word(),
             'postal_code' => $this->faker->postcode(),
         ];
+    }
+
+    public function email(): static
+    {
+        return $this->state([
+            'type' => AddressType::Email,
+            'address_1' => null,
+            'address_2' => null,
+            'city' => null,
+            'state' => null,
+            'postal_code' => null,
+            'email' => $this->faker->safeEmail(),
+        ]);
     }
 
     public function published()

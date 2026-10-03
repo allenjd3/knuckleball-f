@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Actions\RequestAddress;
 use App\Enums\AddressRequestReason;
+use App\Enums\AddressType;
 use App\Forms\Schema\FailedReturnForm;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
@@ -21,12 +22,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -44,6 +47,13 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     use InteractsWithTable;
 
     public Player $player;
+
+    private static function isMailing(Get $get): bool
+    {
+        $type = $get('type');
+
+        return ($type instanceof AddressType ? $type : AddressType::tryFrom((string) $type)) !== AddressType::Email;
+    }
 
     public function render()
     {
@@ -93,6 +103,12 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
     }
 
     #[Computed]
+    public function emailAddress(): ?Address
+    {
+        return $this->player->emailAddress();
+    }
+
+    #[Computed]
     public function hasUnpublishedAddress()
     {
         return request()->user()
@@ -115,11 +131,33 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             ->model(Address::class)
             ->authorize(fn () => request()->user()?->can('create', Address::class))
             ->schema([
-                TextInput::make('address_1')->required(),
-                TextInput::make('address_2'),
-                TextInput::make('city')->required(),
-                TextInput::make('state')->required(),
-                TextInput::make('postal_code')->required(),
+                Radio::make('type')
+                    ->label('How do they take requests?')
+                    ->options(AddressType::options())
+                    ->default(AddressType::Mail->value)
+                    ->inline()
+                    ->required()
+                    ->live(),
+                TextInput::make('address_1')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('address_2')
+                    ->visible(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('city')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('state')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('postal_code')
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
+                    ->required(fn (Get $get): bool => self::isMailing($get)),
+                TextInput::make('email')
+                    ->label('Email for autograph requests')
+                    ->email()
+                    ->maxLength(255)
+                    ->visible(fn (Get $get): bool => ! self::isMailing($get))
+                    ->required(fn (Get $get): bool => ! self::isMailing($get)),
                 DatePicker::make('expires_at')
                     ->label('Temporary — expires on')
                     ->helperText('Leave blank for a permanent address. Once this date passes, the address is archived automatically (still visible/editable in the admin panel).')
@@ -137,7 +175,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                             'published_at' => request()->user()->isSuperAdmin() ? now() : null,
                         ]);
 
-                    unset($this->address);
+                    unset($this->address, $this->emailAddress);
 
                     return $address;
                 }

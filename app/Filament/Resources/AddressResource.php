@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource\Pages\CreateAddress;
 use App\Filament\Resources\AddressResource\Pages\EditAddress;
 use App\Filament\Resources\AddressResource\Pages\ListAddresses;
@@ -17,6 +18,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -36,25 +38,40 @@ class AddressResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('address_1')
+                Select::make('type')
+                    ->options(AddressType::options())
+                    ->default(AddressType::Mail->value)
                     ->required()
+                    ->live(),
+                TextInput::make('address_1')
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('address_2')
                     ->nullable()
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('city')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('state')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
                     ->maxLength(255),
                 TextInput::make('postal_code')
-                    ->required()
+                    ->required(fn (Get $get): bool => self::isMailing($get))
+                    ->visible(fn (Get $get): bool => self::isMailing($get))
                     ->string()
+                    ->maxLength(255),
+                TextInput::make('email')
+                    ->required(fn (Get $get): bool => ! self::isMailing($get))
+                    ->visible(fn (Get $get): bool => ! self::isMailing($get))
+                    ->email()
                     ->maxLength(255),
                 Select::make('signer_id')
                     ->label('Signer')
@@ -83,6 +100,12 @@ class AddressResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('type')
+                    ->badge()
+                    ->formatStateUsing(fn (AddressType $state): string => $state === AddressType::Email ? 'Email' : 'Mail'),
+                TextColumn::make('email')
+                    ->searchable()
+                    ->toggleable(),
                 TextColumn::make('address_1')
                     ->searchable()
                     ->label('Address 1'),
@@ -144,5 +167,12 @@ class AddressResource extends Resource
             'create' => CreateAddress::route('/create'),
             'edit' => EditAddress::route('/{record}/edit'),
         ];
+    }
+
+    private static function isMailing(Get $get): bool
+    {
+        $type = $get('type');
+
+        return ($type instanceof AddressType ? $type : AddressType::tryFrom((string) $type)) !== AddressType::Email;
     }
 }

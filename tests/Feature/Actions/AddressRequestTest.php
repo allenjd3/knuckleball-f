@@ -196,3 +196,15 @@ test('logging a failed return from the composer records the reason and skips the
         ->and($postalMail->failure_reason)->toBe(FailureReason::ReturnToSender)
         ->and(AddressRequest::where('postal_mail_id', $postalMail->id)->exists())->toBeTrue();
 });
+
+test('publishing an email contact also fulfills open address requests', function () {
+    Notification::fake();
+
+    $user = User::factory()->create();
+    $player = Player::factory()->create();
+    $addressRequest = RequestAddress::execute($user, $player->signer, AddressRequestReason::MissingAddress);
+
+    Address::factory()->published()->email()->create(['signer_id' => $player->signer->id]);
+
+    expect($addressRequest->fresh()->isFulfilled())->toBeTrue();
+});

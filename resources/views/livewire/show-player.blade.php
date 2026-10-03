@@ -125,6 +125,24 @@
                     </div>
                 @endif
 
+                @if ($this->emailAddress && $this->player->is_not_deceased)
+                    <div class="mt-3">
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Email Requests</p>
+                        @can('viewAny', App\Models\Address::class)
+                            <a href="mailto:{{ $this->emailAddress->email }}" class="inline-flex items-center gap-1.5 font-semibold text-[#CB504B] hover:underline break-all">
+                                <x-heroicon-o-envelope class="size-4 shrink-0" />
+                                {{ $this->emailAddress->email }}
+                            </a>
+                        @else
+                            <p class="text-sm text-gray-500">This player takes email requests. Only authorized users can view it.
+                            @guest
+                                <a href="{{ route('login') }}" class="font-bold hover:underline">Login</a>
+                            @endguest
+                            </p>
+                        @endcan
+                    </div>
+                @endif
+
                 @if ($this->player->is_not_deceased)
                     @auth
                         <div class="mt-3 flex flex-wrap items-center gap-2">

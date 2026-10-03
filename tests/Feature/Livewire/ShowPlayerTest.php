@@ -1,8 +1,10 @@
 <?php
 
 use App\Actions\CreateFeedItem;
+use App\Enums\AddressType;
 use App\Enums\FailureReason;
 use App\Livewire\ShowPlayer;
+use App\Models\Address;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
@@ -170,4 +172,58 @@ it('requires a reason when marking a postal mail as failed', function () {
             'is_failed' => true,
         ])
         ->assertHasActionErrors(['failure_reason' => 'required']);
+});
+
+test('it can add an email for autograph requests instead of a mailing address', function () {
+    $user = User::factory()->isSuperAdmin()->create();
+    $player = Player::factory()->create();
+
+    Livewire::actingAs($user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction('createAddress', data: [
+            'type' => AddressType::Email->value,
+            'email' => 'fanmail@example.com',
+        ])
+        ->assertHasNoActionErrors();
+
+    $address = Address::sole();
+
+    expect($address->type)->toBe(AddressType::Email)
+        ->and($address->email)->toBe('fanmail@example.com')
+        ->and($address->address_1)->toBeNull()
+        ->and($player->emailAddress()?->is($address))->toBeTrue()
+        ->and($player->address())->toBeNull();
+});
+
+test('an email contact requires a valid email', function () {
+    $user = User::factory()->isSuperAdmin()->create();
+    $player = Player::factory()->create();
+
+    Livewire::actingAs($user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction('createAddress', data: [
+            'type' => AddressType::Email->value,
+            'email' => 'not-an-email',
+        ])
+        ->assertHasActionErrors(['email' => 'email']);
+});
+
+test('the player page shows both the mailing address and the email contact', function () {
+    $user = User::factory()->create();
+    $player = Player::factory()->published()->create();
+    Address::factory()->published()->create(['signer_id' => $player->signer->id, 'address_1' => '123 Main St']);
+    Address::factory()->published()->email()->create(['signer_id' => $player->signer->id, 'email' => 'fanmail@example.com']);
+
+    $this->actingAs($user)
+        ->get(route('players.show', $player->slug))
+        ->assertSee('123 Main St')
+        ->assertSee('fanmail@example.com')
+        ->assertSee('mailto:fanmail@example.com', false);
+});
+
+test('guests are told a player takes email requests without seeing the email', function () {
+    $player = Player::factory()->published()->create();
+    Address::factory()->published()->email()->create(['signer_id' => $player->signer->id, 'email' => 'fanmail@example.com']);
+
+    $this->get(route('players.show', $player->slug))
+        ->assertSee('This player takes email requests')
+        ->assertDontSee('fanmail@example.com');
 });

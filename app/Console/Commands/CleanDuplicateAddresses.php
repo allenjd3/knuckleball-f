@@ -15,9 +15,17 @@ class CleanDuplicateAddresses extends Command
     {
         $this->withProgressBar(
             Player::lazyById(),
-            fn (Player $player) => $player->addresses()
-                ->where('addresses.id', '!=', $player->address()?->id)
-                ->delete(),
+            function (Player $player) {
+                $player->addresses()
+                    ->mailing()
+                    ->where('addresses.id', '!=', $player->address()?->id)
+                    ->delete();
+
+                $player->addresses()
+                    ->email()
+                    ->where('addresses.id', '!=', $player->emailAddress()?->id)
+                    ->delete();
+            },
         );
     }
 }
