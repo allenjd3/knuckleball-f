@@ -154,6 +154,7 @@
                         <div class="mt-3 flex flex-wrap items-center gap-2">
                             @if ($this->hasRequestedAddress)
                                 <p class="text-sm font-semibold text-amber-600">You've requested an address. We'll let you know when one is added.</p>
+                                {{ $this->cancelAddressRequest }}
                             @else
                                 {{ $this->requestAddress }}
                             @endif

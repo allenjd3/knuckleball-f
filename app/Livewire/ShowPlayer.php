@@ -247,6 +247,28 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
             });
     }
 
+    public function cancelAddressRequestAction(): Action
+    {
+        return Action::make('cancelAddressRequest')
+            ->label('Cancel request')
+            ->link()
+            ->color('gray')
+            ->requiresConfirmation()
+            ->modalHeading('Cancel your address request?')
+            ->modalDescription('Your request will be removed from the feed.')
+            ->visible(fn () => $this->hasRequestedAddress)
+            ->action(function () {
+                AddressRequest::query()
+                    ->open()
+                    ->where('user_id', auth()->id())
+                    ->where('signer_id', $this->player->signer->id)
+                    ->get()
+                    ->each->delete();
+
+                unset($this->hasRequestedAddress, $this->openAddressRequestCount);
+            });
+    }
+
     public function createFeeAction(): Action
     {
         return CreateAction::make('createFee')

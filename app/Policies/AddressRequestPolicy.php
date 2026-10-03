@@ -10,6 +10,16 @@ class AddressRequestPolicy
 {
     use HandlesAuthorization;
 
+    public function viewAny(User $user): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
+
+    public function update(User $user, AddressRequest $addressRequest): bool
+    {
+        return $user->isSuperAdmin() || $user->isEditor();
+    }
+
     public function create(User $user): bool
     {
         return $user->isPublished();
