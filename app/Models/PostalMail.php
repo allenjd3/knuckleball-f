@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\UpdateFeedItem;
+use App\Enums\FailureReason;
 use App\Events\PostalMailDeleted;
 use App\Jobs\GenerateReturnCard;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +22,12 @@ class PostalMail extends Model
 
     protected static function booted()
     {
+        static::saving(function (PostalMail $postalMail) {
+            if (! $postalMail->is_failed) {
+                $postalMail->failure_reason = null;
+            }
+        });
+
         static::updated(function (PostalMail $postalMail) {
             UpdateFeedItem::execute($postalMail, $postalMail->comment);
 
@@ -104,15 +111,17 @@ class PostalMail extends Model
                 ? (int) $this->date_sent->diffInDays($this->returned_date)
                 : null,
             'is_failed' => (bool) $this->is_failed,
+            'failure_reason' => $this->failure_reason?->value,
             'card_photos' => $cardPhotos,
             'cards_count' => $cards->count(),
             ...$overrides,
         ];
     }
 
-    public function fail(): bool
+    public function fail(?FailureReason $reason = null): bool
     {
         $this->is_failed = true;
+        $this->failure_reason = $reason ?? $this->failure_reason;
 
         return $this->save();
     }
@@ -123,6 +132,7 @@ class PostalMail extends Model
             'date_sent' => 'datetime',
             'returned_date' => 'datetime',
             'is_failed' => 'boolean',
+            'failure_reason' => FailureReason::class,
         ];
     }
 }

@@ -2,9 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Actions\RequestAddress;
+use App\Enums\AddressRequestReason;
+use App\Forms\Schema\FailedReturnForm;
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
 use App\Models\Address;
+use App\Models\AddressRequest;
 use App\Models\Fee;
 use App\Models\Pack;
 use App\Models\Player;
@@ -21,7 +25,6 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\ImageColumn;
@@ -139,6 +142,70 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     return $address;
                 }
             );
+    }
+
+    #[Computed]
+    public function hasRequestedAddress(): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        return AddressRequest::query()
+            ->open()
+            ->where('user_id', auth()->id())
+            ->where('signer_id', $this->player->signer->id)
+            ->exists();
+    }
+
+    #[Computed]
+    public function openAddressRequestCount(): int
+    {
+        return AddressRequest::query()
+            ->open()
+            ->where('signer_id', $this->player->signer->id)
+            ->count();
+    }
+
+    public function requestAddressAction(): Action
+    {
+        return Action::make('requestAddress')
+            ->label(fn () => $this->address?->exists ? 'Request a New Address' : 'Request the Address')
+            ->icon('heroicon-o-map-pin')
+            ->color('gray')
+            ->outlined()
+            ->authorize(fn () => request()->user()?->can('create', AddressRequest::class))
+            ->visible(fn () => $this->player->is_not_deceased && ! $this->hasRequestedAddress)
+            ->modalHeading(fn () => $this->address?->exists ? 'Request a new address' : 'Request an address')
+            ->modalDescription('Your request is posted to the feed so other collectors can help. You\'ll be notified when an address is added.')
+            ->modalSubmitActionLabel('Post Request')
+            ->schema([
+                Select::make('reason')
+                    ->label('Why do you need a new one?')
+                    ->options([
+                        AddressRequestReason::ReturnToSender->value => AddressRequestReason::ReturnToSender->label(),
+                        AddressRequestReason::Outdated->value => AddressRequestReason::Outdated->label(),
+                    ])
+                    ->default(AddressRequestReason::ReturnToSender->value)
+                    ->visible(fn () => (bool) $this->address?->exists)
+                    ->required(fn () => (bool) $this->address?->exists),
+                Textarea::make('note')
+                    ->label('Note')
+                    ->placeholder('Anything that might help, e.g. "Heard he moved to Arizona"')
+                    ->maxLength(255),
+            ])
+            ->action(function (array $data) {
+                RequestAddress::execute(
+                    user: request()->user(),
+                    signer: $this->player->signer,
+                    reason: $this->address?->exists
+                        ? AddressRequestReason::from($data['reason'])
+                        : AddressRequestReason::MissingAddress,
+                    note: $data['note'] ?? null,
+                );
+
+                unset($this->hasRequestedAddress, $this->openAddressRequestCount);
+            });
     }
 
     public function createFeeAction(): Action
@@ -318,11 +385,12 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                     ->schema([
                         DatePicker::make('date_sent'),
                         DatePicker::make('returned_date'),
-                        Toggle::make('is_failed')
-                            ->label('Failed to return'),
+                        ...FailedReturnForm::schema('Failed to return'),
                         Textarea::make('comment')->maxLength(255),
                     ])->using(function (array $data, Model $record) {
-                        $record->update($data);
+                        $record->update(FailedReturnForm::withoutFormOnlyFields($data));
+
+                        FailedReturnForm::handleAddressRequest($record, $data);
 
                         return $record;
                     }),
@@ -340,7 +408,7 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                 TextColumn::make('is_failed')
                     ->label('Failed delivery')
                     ->badge()
-                    ->formatStateUsing(fn (bool $state) => $state ? 'Failed' : '')
+                    ->formatStateUsing(fn (bool $state, Model $record) => $state ? ($record->failure_reason?->label() ?? 'Failed') : '')
                     ->color(fn (bool $state) => $state ? 'danger' : 'success'),
             ])
             ->headerActions([

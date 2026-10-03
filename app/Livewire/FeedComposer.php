@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Actions\CreateFeedItem;
 use App\Enums\SetEntryStatus;
+use App\Forms\Schema\FailedReturnForm;
 use App\Http\Controllers\ReturnCardController;
 use App\Jobs\GenerateReturnCard;
 use App\Models\FeeMaterial;
@@ -19,6 +20,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Components\Utilities\Get;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -136,8 +138,9 @@ class FeedComposer extends Component implements HasActions, HasForms
                     }),
                 DatePicker::make('returned_date')
                     ->label('Date Returned')
-                    ->required()
+                    ->required(fn (Get $get): bool => ! $get('is_failed'))
                     ->default(now()),
+                ...FailedReturnForm::schema('This one failed'),
                 Textarea::make('comment')
                     ->label('Note')
                     ->placeholder('Anything worth sharing about the return…')
@@ -148,6 +151,21 @@ class FeedComposer extends Component implements HasActions, HasForms
                 $postalMail = auth()->user()
                     ->postalMails()
                     ->findOrFail($data['postal_mail_id']);
+
+                if (data_get($data, 'is_failed')) {
+                    $postalMail->update([
+                        'returned_date' => $data['returned_date'] ?? null,
+                        'is_failed' => true,
+                        'failure_reason' => $data['failure_reason'],
+                        'comment' => $data['comment'] ?? $postalMail->comment,
+                    ]);
+
+                    FailedReturnForm::handleAddressRequest($postalMail, $data);
+
+                    $this->dispatch('feed-updated');
+
+                    return;
+                }
 
                 $postalMail->update([
                     'returned_date' => $data['returned_date'],

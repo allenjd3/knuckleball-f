@@ -31,6 +31,7 @@ class TrendingFeed extends Component
                 ->from('postal_mails')
                 ->whereColumn('postal_mails.id', 'feeds.feedable_id')
                 ->whereNotNull('postal_mails.returned_date')
+                ->where('postal_mails.is_failed', false)
             )
             ->where('feeds.created_at', '>=', now()->subDays(30))
             ->withCount('reactions', 'feedComments');

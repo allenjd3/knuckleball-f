@@ -98,6 +98,12 @@
                                 <a href="{{ data_get($data, 'event_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'event_name') }}</a>
                                 was approved and is now live.
                             </p>
+                        @elseif (data_get($data, 'type') === 'address_request_fulfilled')
+                            <p class="text-sm text-gray-800 leading-snug">
+                                An address was added for
+                                <a href="{{ data_get($data, 'player_path', '#') }}" class="font-semibold hover:underline">{{ data_get($data, 'player_name') }}</a>
+                                — the one you requested.
+                            </p>
                         {{-- Legacy fallback: notifications stored before the 'type' key was added. --}}
                         @elseif (isset($data['event_id']) && isset($data['player_name']))
                             <p class="text-sm text-gray-800 leading-snug">

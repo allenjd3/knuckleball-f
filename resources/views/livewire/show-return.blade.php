@@ -3,11 +3,12 @@
     $ogDays    = data_get($meta, 'turnaround_days');
     $ogUser    = data_get($meta, 'user', '');
     $ogFailed  = (bool) data_get($meta, 'is_failed');
+    $ogFailureReason = \App\Enums\FailureReason::tryFrom((string) data_get($meta, 'failure_reason'));
     $ogTitle   = $ogFailed
         ? $ogPlayer . ' — Failed Return'
         : $ogPlayer . ($ogDays !== null ? " — {$ogDays} Day Return" : ' — TTM Return');
     $ogDesc    = $ogFailed
-        ? $ogUser . ' got a failed return from ' . $ogPlayer . '. Track your own returns on Knuckleball.'
+        ? $ogUser . ' got a failed return from ' . $ogPlayer . ($ogFailureReason ? ' (' . $ogFailureReason->label() . ')' : '') . '. Track your own returns on Knuckleball.'
         : $ogUser . ' got a TTM return from ' . $ogPlayer . ($ogDays !== null ? " in {$ogDays} days" : '') . '. Track your own returns on Knuckleball.';
     $ogUrl     = route('returns.show', $mail);
     $ogImage   = $this->ogImageUrl();
@@ -99,7 +100,7 @@
                 <img src="{{ data_get($meta, 'photo') }}" alt="{{ data_get($meta, 'user') }}"
                      class="size-9 rounded-full object-cover" />
                 <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">{{ $ogFailed ? 'Got a failed return' : 'Got it back!' }}</span></p>
+                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">{{ $ogFailed ? 'Got a failed return' . ($ogFailureReason ? ' · ' . $ogFailureReason->label() : '') : 'Got it back!' }}</span></p>
                     @if (data_get($meta, 'date_returned'))
                         @php
                             $sentDate     = data_get($meta, 'date_sent');

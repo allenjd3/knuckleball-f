@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Models\AddressRequest;
 use App\Models\Comment;
 use App\Models\Feed;
 use App\Models\InPersonAutograph;
@@ -12,7 +13,7 @@ class UpdateFeedItem
 {
     use ProcessLastLinkable;
 
-    public static function execute(PostalMail|Comment|InPersonAutograph $feedItem, ?string $comment)
+    public static function execute(PostalMail|Comment|InPersonAutograph|AddressRequest $feedItem, ?string $comment)
     {
         // feedable_id alone isn't unique across feedable types — PostalMail,
         // Comment, and InPersonAutograph all auto-increment independently,

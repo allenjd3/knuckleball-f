@@ -2,6 +2,7 @@
 
 namespace App\View\Components\Feeds;
 
+use App\Enums\FailureReason;
 use App\Models\Feed;
 use Carbon\Carbon;
 use Closure;
@@ -18,6 +19,7 @@ class FailedReturnCard extends Component
     public string $dateSent;
     public ?string $dateReturned;
     public ?string $category;
+    public ?FailureReason $failureReason;
 
     public function __construct(public Feed $feed)
     {
@@ -31,6 +33,7 @@ class FailedReturnCard extends Component
             ? Carbon::parse(data_get($feed->meta, 'date_returned'))->format('M j, Y')
             : null;
         $this->category = data_get($feed->meta, 'category');
+        $this->failureReason = FailureReason::tryFrom((string) data_get($feed->meta, 'failure_reason'));
     }
 
     public function render(): View|Closure|string

@@ -13,6 +13,30 @@ class Address extends Model
 
     protected $guarded = [];
 
+    protected static function booted(): void
+    {
+        static::saved(function (Address $address) {
+            if (! $address->isLive()) {
+                return;
+            }
+
+            if ($address->wasRecentlyCreated || $address->wasChanged(['published_at', 'rejected'])) {
+                AddressRequest::query()
+                    ->open()
+                    ->where('signer_id', $address->signer_id)
+                    ->each(fn (AddressRequest $addressRequest) => $addressRequest->fulfill());
+            }
+        });
+    }
+
+    public function isLive(): bool
+    {
+        return $this->published_at !== null
+            && $this->published_at->lte(now())
+            && ! $this->rejected
+            && ! $this->isExpired();
+    }
+
     public function scopePublished(Builder $builder)
     {
         $builder->where('published_at', '<', now());

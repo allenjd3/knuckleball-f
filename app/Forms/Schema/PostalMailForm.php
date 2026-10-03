@@ -11,7 +11,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Illuminate\Support\Facades\DB;
 
 class PostalMailForm
@@ -41,8 +40,7 @@ class PostalMailForm
                     TextInput::make('name'),
                 ])
                 ->createOptionUsing(fn (array $data) => FeeMaterial::create($data)->id),
-            Toggle::make('is_failed')
-                ->label('Failed to return?'),
+            ...FailedReturnForm::schema(),
             Textarea::make('comment')->maxLength(255),
         ];
     }
@@ -61,11 +59,13 @@ class PostalMailForm
         return DB::transaction(function () use ($data) {
             $postalMail = request()->user()
                 ->postalMails()
-                ->create(array_merge($data, ['signer_id' => $this->signer->id]));
+                ->create(array_merge(FailedReturnForm::withoutFormOnlyFields($data), ['signer_id' => $this->signer->id]));
 
             $postalMail->feeMaterials()->attach(data_get($data, 'fee_material_id'));
 
             CreateFeedItem::execute(feedItem: $postalMail, comment: $postalMail->comment);
+
+            FailedReturnForm::handleAddressRequest($postalMail, $data);
 
             return $postalMail;
         });

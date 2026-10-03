@@ -125,6 +125,23 @@
                     </div>
                 @endif
 
+                @if ($this->player->is_not_deceased)
+                    @auth
+                        <div class="mt-3 flex flex-wrap items-center gap-2">
+                            @if ($this->hasRequestedAddress)
+                                <p class="text-sm font-semibold text-amber-600">You've requested an address. We'll let you know when one is added.</p>
+                            @else
+                                {{ $this->requestAddress }}
+                            @endif
+                        </div>
+                    @endauth
+                    @if ($this->openAddressRequestCount > 0)
+                        <p class="mt-1 text-xs text-gray-500">
+                            {{ $this->openAddressRequestCount }} {{ Str::plural('collector', $this->openAddressRequestCount) }} looking for an address
+                        </p>
+                    @endif
+                @endif
+
                 @if (isset($unpublishedAddress))
                     <p class="font-bold text-green-500">There is an unpublished address for your review. <a href="{{ route('filament.cp.resources.addresses.edit', ['record' => data_get($unpublishedAddress, 'id')]) }}" class="text-black hover:underline">Review It</a></p>
                 @endif

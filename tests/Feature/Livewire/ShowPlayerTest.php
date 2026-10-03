@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\CreateFeedItem;
+use App\Enums\FailureReason;
 use App\Livewire\ShowPlayer;
 use App\Models\FeeMaterial;
 use App\Models\Player;
@@ -150,8 +151,23 @@ it('can mark a postal mail as failed', function () {
     Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $postalMail->player])
         ->callAction(TestAction::make('edit')->table($postalMail), [
             'is_failed' => true,
+            'failure_reason' => FailureReason::ReturnedUnsigned->value,
         ])
         ->assertHasNoActionErrors();
 
     $this->assertTrue($postalMail->fresh()->is_failed);
+    expect($postalMail->fresh()->failure_reason)->toBe(FailureReason::ReturnedUnsigned);
+});
+
+it('requires a reason when marking a postal mail as failed', function () {
+    $player = Player::factory()->create();
+    $postalMail = PostalMail::factory()->unReturned()->create(['signer_id' => $player->signer->id]);
+
+    CreateFeedItem::execute($postalMail, $postalMail->comment);
+
+    Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction(TestAction::make('edit')->table($postalMail), [
+            'is_failed' => true,
+        ])
+        ->assertHasActionErrors(['failure_reason' => 'required']);
 });

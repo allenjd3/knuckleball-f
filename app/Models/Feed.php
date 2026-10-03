@@ -38,6 +38,7 @@ class Feed extends Model
             $this->feedable_type === Comment::class => 'feeds.comment',
             $this->feedable_type === Event::class => 'feeds.event-card',
             $this->feedable_type === CardShop::class => 'feeds.shop-spotlight',
+            $this->feedable_type === AddressRequest::class => 'feeds.address-request-card',
             default => 'feeds.send-card',
         };
     }
