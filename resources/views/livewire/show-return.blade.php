@@ -2,8 +2,13 @@
     $ogPlayer  = data_get($meta, 'player', 'TTM Return');
     $ogDays    = data_get($meta, 'turnaround_days');
     $ogUser    = data_get($meta, 'user', '');
-    $ogTitle   = $ogPlayer . ($ogDays !== null ? " — {$ogDays} Day Return" : ' — TTM Return');
-    $ogDesc    = $ogUser . ' got a TTM return from ' . $ogPlayer . ($ogDays !== null ? " in {$ogDays} days" : '') . '. Track your own returns on Knuckleball.';
+    $ogFailed  = (bool) data_get($meta, 'is_failed');
+    $ogTitle   = $ogFailed
+        ? $ogPlayer . ' — Failed Return'
+        : $ogPlayer . ($ogDays !== null ? " — {$ogDays} Day Return" : ' — TTM Return');
+    $ogDesc    = $ogFailed
+        ? $ogUser . ' got a failed return from ' . $ogPlayer . '. Track your own returns on Knuckleball.'
+        : $ogUser . ' got a TTM return from ' . $ogPlayer . ($ogDays !== null ? " in {$ogDays} days" : '') . '. Track your own returns on Knuckleball.';
     $ogUrl     = route('returns.show', $mail);
     $ogImage   = $this->ogImageUrl();
 @endphp
@@ -94,7 +99,7 @@
                 <img src="{{ data_get($meta, 'photo') }}" alt="{{ data_get($meta, 'user') }}"
                      class="size-9 rounded-full object-cover" />
                 <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">Got it back!</span></p>
+                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">{{ $ogFailed ? 'Got a failed return' : 'Got it back!' }}</span></p>
                     @if (data_get($meta, 'date_returned'))
                         @php
                             $sentDate     = data_get($meta, 'date_sent');

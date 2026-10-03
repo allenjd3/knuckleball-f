@@ -116,6 +116,7 @@ class ReturnCardService
             'turnaroundDays' => $turnaroundDays,
             'feeText' => $feeText,
             'userName' => $mail->user->name ?? 'Unknown',
+            'headline' => $mail->is_failed ? 'Got a failed return' : 'Got it back!',
         ];
     }
 
@@ -164,7 +165,7 @@ class ReturnCardService
         $this->drawBadges($canvas, $d, 718, 200, 160, 16, 22, 17);
 
         // "got it back" line
-        $canvas->text($d['userName'] . ' Got it back!', 540, 843, fn (FontFactory $f) => $f
+        $canvas->text($d['userName'] . ' ' . $d['headline'], 540, 843, fn (FontFactory $f) => $f
             ->filename($this->regularFont)->size(24)->color(self::MUTED)->align('center')->valign('middle'));
 
         // Accent line
@@ -212,7 +213,7 @@ class ReturnCardService
         $this->drawBadges($canvas, $d, 1270, 240, 196, 20, 26, 20, 72);
 
         // "got it back" line
-        $canvas->text($d['userName'] . ' Got it back!', 540, 1450, fn (FontFactory $f) => $f
+        $canvas->text($d['userName'] . ' ' . $d['headline'], 540, 1450, fn (FontFactory $f) => $f
             ->filename($this->regularFont)->size(30)->color(self::MUTED)->align('center')->valign('middle'));
 
         // Accent line
