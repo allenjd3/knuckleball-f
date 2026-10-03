@@ -50,6 +50,17 @@
                 <span class="text-sm font-semibold text-right">{{ data_get($stats, 'longest_wait.player_name') }} · {{ data_get($stats, 'longest_wait.days') }} days</span>
             </div>
         @endif
+        @if (data_get($stats, 'total_failures', 0) > 0)
+            <div class="flex justify-between items-start text-sm font-medium gap-2">
+                <div class="flex items-center gap-3 shrink-0">
+                    <x-heroicon-o-x-circle class="size-4 sm:size-5 text-white/70 shrink-0" />
+                    Failures
+                </div>
+                <span class="text-sm font-semibold text-right">
+                    {{ collect(data_get($stats, 'failures_by_reason', []))->map(fn ($count, $label) => "{$count} {$label}")->implode(' · ') }}
+                </span>
+            </div>
+        @endif
         @if (data_get($stats, 'favorite_team'))
             <div class="flex justify-between items-center text-sm font-medium gap-2">
                 <div class="flex items-center gap-3 shrink-0">

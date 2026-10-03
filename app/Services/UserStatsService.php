@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FailureReason;
 use App\Models\Feed;
 use App\Models\Player;
 use App\Models\PostalMail;
@@ -27,7 +28,20 @@ class UserStatsService
             ->where('postal_mails.user_id', $user->id)
             ->whereNotNull('postal_mails.date_sent');
 
-        $withReturns = (clone $base)->whereNotNull('postal_mails.returned_date');
+        $withReturns = (clone $base)
+            ->whereNotNull('postal_mails.returned_date')
+            ->where('postal_mails.is_failed', false);
+
+        $failuresByReason = (clone $base)
+            ->where('postal_mails.is_failed', true)
+            ->selectRaw('postal_mails.failure_reason as reason, COUNT(*) as cnt')
+            ->groupBy('postal_mails.failure_reason')
+            ->orderByDesc('cnt')
+            ->toBase()
+            ->get()
+            ->mapWithKeys(fn ($row) => [
+                (FailureReason::tryFrom((string) $row->reason)?->label() ?? 'Unlabeled') => (int) $row->cnt,
+            ]);
 
         // ── headline numbers ──────────────────────────────────────────────────
         $totalSends = (clone $base)->count();
@@ -103,6 +117,8 @@ class UserStatsService
             'total_sends' => $totalSends,
             'total_returns' => $totalReturns,
             'success_rate' => $successRate,
+            'total_failures' => $failuresByReason->sum(),
+            'failures_by_reason' => $failuresByReason->all(),
             'unique_players' => $uniquePlayers,
             'first_send' => $firstSend,
             'most_recent_return' => $mostRecentReturn,
