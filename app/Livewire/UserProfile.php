@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\ActivityFilter;
 use App\Filament\Imports\PostalMailImporter;
 use App\Models\CardSet;
 use App\Models\Feed;
@@ -23,7 +24,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -35,14 +40,53 @@ class UserProfile extends Component implements HasActions, HasForms
 
     public string $userSlug;
 
+    #[Url(as: 'activity', except: 'all')]
+    public string $activityFilter = 'all';
+
     public function mount(string $user): void
     {
         $this->userSlug = $user;
     }
 
-    public function render()
+    public function render(): View
     {
-        return view('livewire.user-profile');
+        return view('livewire.user-profile', [
+            'activityFilters' => ActivityFilter::cases(),
+        ]);
+    }
+
+    public function updatedActivityFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    #[Computed]
+    public function selectedActivityFilter(): ActivityFilter
+    {
+        return ActivityFilter::tryFrom($this->activityFilter) ?? ActivityFilter::All;
+    }
+
+    /**
+     * Number of the profile owner's sends in each status filter.
+     *
+     * @return array<string, int>
+     */
+    #[Computed]
+    public function activityFilterCounts(): array
+    {
+        $counts = $this->user->postalMails()
+            ->whereHas('feeds')
+            ->toBase()
+            ->selectRaw('SUM(CASE WHEN returned_date IS NULL AND is_failed = 0 THEN 1 ELSE 0 END) AS pending')
+            ->selectRaw('SUM(CASE WHEN returned_date IS NOT NULL AND is_failed = 0 THEN 1 ELSE 0 END) AS returns')
+            ->selectRaw('SUM(CASE WHEN is_failed = 1 THEN 1 ELSE 0 END) AS failures')
+            ->first();
+
+        return [
+            ActivityFilter::Pending->value => (int) ($counts->pending ?? 0),
+            ActivityFilter::Returns->value => (int) ($counts->returns ?? 0),
+            ActivityFilter::Failures->value => (int) ($counts->failures ?? 0),
+        ];
     }
 
     #[Computed]
@@ -54,13 +98,20 @@ class UserProfile extends Component implements HasActions, HasForms
     }
 
     #[Computed]
-    public function feeds()
+    public function feeds(): Paginator
     {
         return Feed::query()
-            ->where(fn ($q) => $q
-                ->where('followable_id', $this->user->id)
-                ->orWhereHas('mentions', fn ($q) => $q->where('user_id', $this->user->id))
+            ->when(
+                $this->selectedActivityFilter === ActivityFilter::All,
+                fn (Builder $query): Builder => $query->where(fn (Builder $query): Builder => $query
+                    ->where('followable_id', $this->user->id)
+                    ->orWhereHas('mentions', fn (Builder $mentions): Builder => $mentions->where('user_id', $this->user->id))
+                ),
+                fn (Builder $query): Builder => $query->where('followable_id', $this->user->id),
             )
+            ->when($this->selectedActivityFilter === ActivityFilter::Pending, fn (Builder $query): Builder => $query->pendingSends())
+            ->when($this->selectedActivityFilter === ActivityFilter::Returns, fn (Builder $query): Builder => $query->returnedSends())
+            ->when($this->selectedActivityFilter === ActivityFilter::Failures, fn (Builder $query): Builder => $query->failedSends())
             ->orderByDesc('created_at')
             ->simplePaginate();
     }
