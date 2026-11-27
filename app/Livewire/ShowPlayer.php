@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Forms\Schema\FeeForm;
 use App\Forms\Schema\PostalMailForm;
+use App\Jobs\GenerateReturnCard;
 use App\Models\Address;
 use App\Models\Fee;
 use App\Models\Pack;
@@ -323,6 +324,10 @@ class ShowPlayer extends Component implements HasActions, HasForms, HasTable
                         Textarea::make('comment')->maxLength(255),
                     ])->using(function (array $data, Model $record) {
                         $record->update($data);
+
+                        if ($record->wasChanged('is_failed') && $record->returned_date) {
+                            GenerateReturnCard::dispatch($record->id);
+                        }
 
                         return $record;
                     }),

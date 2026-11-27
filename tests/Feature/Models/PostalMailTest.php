@@ -20,3 +20,12 @@ it('can be marked as failed', function () {
 
     $this->assertTrue($postalMail->is_failed);
 });
+
+it('includes whether it failed in its feed meta', function (bool $isFailed) {
+    $postalMail = PostalMail::factory()->create(['is_failed' => $isFailed]);
+
+    expect($postalMail->generateMeta())->toHaveKey('is_failed', $isFailed);
+})->with([
+    'failed' => true,
+    'not failed' => false,
+]);

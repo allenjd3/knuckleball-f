@@ -64,12 +64,16 @@ class PostalMail extends Model
         return $this->morphMany(Feed::class, 'feedable');
     }
 
-    public function getFollowableId()
+    public function getFollowableId(): int
     {
         return $this->user_id;
     }
 
-    public function generateMeta(array $overrides = [])
+    /**
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    public function generateMeta(array $overrides = []): array
     {
         $user = $this->user;
         $player = $this->player;
@@ -98,6 +102,7 @@ class PostalMail extends Model
             'turnaround_days' => $this->returned_date && $this->date_sent
                 ? (int) $this->date_sent->diffInDays($this->returned_date)
                 : null,
+            'is_failed' => (bool) $this->is_failed,
             'card_photos' => $cardPhotos,
             'cards_count' => $cards->count(),
             ...$overrides,

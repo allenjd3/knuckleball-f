@@ -77,7 +77,48 @@ class ShowReturn extends Component
         return view('livewire.show-return', [
             'player' => $player,
             'meta' => $meta,
+            'headline' => $this->headline(),
+            'ogTitle' => $this->ogTitle($meta),
+            'ogDescription' => $this->ogDescription($meta),
             'publicUrl' => route('returns.show', $this->mail),
         ])->layout('layouts.app');
+    }
+
+    private function headline(): string
+    {
+        return $this->mail->is_failed ? 'Got a failed return' : 'Got it back!';
+    }
+
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    private function ogTitle(array $meta): string
+    {
+        $player = data_get($meta, 'player', 'TTM Return');
+        $days = data_get($meta, 'turnaround_days');
+
+        return match (true) {
+            $this->mail->is_failed => "{$player} — Failed Return",
+            $days !== null => "{$player} — {$days} Day Return",
+            default => "{$player} — TTM Return",
+        };
+    }
+
+    /**
+     * @param  array<string, mixed>  $meta
+     */
+    private function ogDescription(array $meta): string
+    {
+        $player = data_get($meta, 'player', 'TTM Return');
+        $user = data_get($meta, 'user', '');
+        $days = data_get($meta, 'turnaround_days');
+
+        $summary = match (true) {
+            $this->mail->is_failed => "{$user} got a failed return from {$player}",
+            $days !== null => "{$user} got a TTM return from {$player} in {$days} days",
+            default => "{$user} got a TTM return from {$player}",
+        };
+
+        return "{$summary}. Track your own returns on Knuckleball.";
     }
 }

@@ -113,3 +113,14 @@ test('setFilter resets offset and perPage', function () {
     expect($component->get('offset'))->toBe(0);
     expect($component->get('perPage'))->toBe(15);
 });
+
+it('leaves failed returns out of trending', function () {
+    $returned = Feed::factory()->returnedPostalMail()->create();
+    $failed = Feed::factory()->returnedPostalMail()->create();
+    PostalMail::find($failed->feedable_id)->updateQuietly(['is_failed' => true]);
+
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(UserFeed::class);
+
+    expect($component->instance()->trendingStrip->pluck('id')->all())->toBe([$returned->id]);
+});

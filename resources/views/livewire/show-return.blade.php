@@ -1,9 +1,4 @@
 @php
-    $ogPlayer  = data_get($meta, 'player', 'TTM Return');
-    $ogDays    = data_get($meta, 'turnaround_days');
-    $ogUser    = data_get($meta, 'user', '');
-    $ogTitle   = $ogPlayer . ($ogDays !== null ? " — {$ogDays} Day Return" : ' — TTM Return');
-    $ogDesc    = $ogUser . ' got a TTM return from ' . $ogPlayer . ($ogDays !== null ? " in {$ogDays} days" : '') . '. Track your own returns on Knuckleball.';
     $ogUrl     = route('returns.show', $mail);
     $ogImage   = $this->ogImageUrl();
 @endphp
@@ -14,7 +9,7 @@
     <meta property="og:type"        content="website" />
     <meta property="og:url"         content="{{ $ogUrl }}" />
     <meta property="og:title"       content="{{ $ogTitle }}" />
-    <meta property="og:description" content="{{ $ogDesc }}" />
+    <meta property="og:description" content="{{ $ogDescription }}" />
     @if ($ogImage)
     <meta property="og:image"       content="{{ $ogImage }}" />
     <meta property="og:image:width" content="1080" />
@@ -25,7 +20,7 @@
 
     <meta name="twitter:card"        content="summary_large_image" />
     <meta name="twitter:title"       content="{{ $ogTitle }}" />
-    <meta name="twitter:description" content="{{ $ogDesc }}" />
+    <meta name="twitter:description" content="{{ $ogDescription }}" />
     @if ($ogImage)
     <meta name="twitter:image"       content="{{ $ogImage }}" />
     @endif
@@ -94,7 +89,7 @@
                 <img src="{{ data_get($meta, 'photo') }}" alt="{{ data_get($meta, 'user') }}"
                      class="size-9 rounded-full object-cover" />
                 <div>
-                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">Got it back!</span></p>
+                    <p class="text-sm font-semibold text-gray-900">{{ data_get($meta, 'user') }} <span class="font-normal text-gray-500">{{ $headline }}</span></p>
                     @if (data_get($meta, 'date_returned'))
                         @php
                             $sentDate     = data_get($meta, 'date_sent');
