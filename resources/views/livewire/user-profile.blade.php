@@ -138,7 +138,7 @@
                             'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:border-gray-300' => $this->selectedActivityFilter !== $filter,
                         ])>
                         {{ $filter->label() }}
-                        @isset ($this->activityFilterCounts[$filter->value])
+                        @isset($this->activityFilterCounts[$filter->value])
                             <span @class([
                                 'ml-1 tabular-nums',
                                 'text-white/80' => $this->selectedActivityFilter === $filter,
