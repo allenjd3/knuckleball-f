@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\CreateFeedItem;
+use App\Models\Comment;
 use App\Models\Feed;
 use App\Models\PostalMail;
 
@@ -71,4 +72,23 @@ it('leaves the date off a failed return card with no sent date', function () {
     $this->blade('<x-dynamic-component :component="$feed->componentName()" :$feed />', ['feed' => $feed])
         ->assertSee('got a failed return from')
         ->assertDontSee(now()->format('M j, Y'));
+});
+
+it('scopes feeds to pending, returned and failed sends', function () {
+    $pending = feedFor(PostalMail::factory()->unReturned()->create());
+    $returned = feedFor(PostalMail::factory()->returned()->create());
+    $failed = feedFor(PostalMail::factory()->failed()->create());
+    $failedWithReturnDate = feedFor(PostalMail::factory()->failed()->create(['returned_date' => now()->subDay()]));
+
+    expect(Feed::query()->pendingSends()->pluck('id')->all())->toEqualCanonicalizing([$pending->id])
+        ->and(Feed::query()->returnedSends()->pluck('id')->all())->toEqualCanonicalizing([$returned->id])
+        ->and(Feed::query()->failedSends()->pluck('id')->all())->toEqualCanonicalizing([$failed->id, $failedWithReturnDate->id]);
+});
+
+it('leaves non postal mail feeds out of the send scopes', function () {
+    Feed::factory()->create(['feedable_type' => Comment::class, 'feedable_id' => 1]);
+
+    expect(Feed::query()->pendingSends()->count())->toBe(0)
+        ->and(Feed::query()->returnedSends()->count())->toBe(0)
+        ->and(Feed::query()->failedSends()->count())->toBe(0);
 });

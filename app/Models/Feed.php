@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\FeedFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,6 +41,41 @@ class Feed extends Model
             $this->feedable_type === CardShop::class => 'feeds.shop-spotlight',
             default => 'feeds.send-card',
         };
+    }
+
+    /**
+     * Postal mail feeds whose send is still out.
+     *
+     * @param  Builder<Feed>  $query
+     */
+    public function scopePendingSends(Builder $query): void
+    {
+        $query->whereHasMorph('feedable', [PostalMail::class], fn (Builder $postalMail): Builder => $postalMail
+            ->whereNull('returned_date')
+            ->where('is_failed', false));
+    }
+
+    /**
+     * Postal mail feeds whose send came back successfully.
+     *
+     * @param  Builder<Feed>  $query
+     */
+    public function scopeReturnedSends(Builder $query): void
+    {
+        $query->whereHasMorph('feedable', [PostalMail::class], fn (Builder $postalMail): Builder => $postalMail
+            ->whereNotNull('returned_date')
+            ->where('is_failed', false));
+    }
+
+    /**
+     * Postal mail feeds whose send was marked failed.
+     *
+     * @param  Builder<Feed>  $query
+     */
+    public function scopeFailedSends(Builder $query): void
+    {
+        $query->whereHasMorph('feedable', [PostalMail::class], fn (Builder $postalMail): Builder => $postalMail
+            ->where('is_failed', true));
     }
 
     public function reactions(): HasMany
