@@ -138,3 +138,14 @@ it('shows the trending players ranked by send count', function () {
     expect($players->first()->id)->toBe($topPlayer->id)
         ->and((int) $players->first()->send_count)->toBe(5);
 });
+
+it('leaves failed returns out of trending', function () {
+    $returned = Feed::factory()->returnedPostalMail()->create();
+    $failed = Feed::factory()->returnedPostalMail()->create();
+    PostalMail::find($failed->feedable_id)->updateQuietly(['is_failed' => true]);
+
+    $component = Livewire::actingAs(User::factory()->create())
+        ->test(TrendingFeed::class);
+
+    expect($component->instance()->trendingReturns->pluck('id')->all())->toBe([$returned->id]);
+});

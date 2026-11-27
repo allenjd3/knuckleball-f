@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Actions\UpdateFeedItem;
 use App\Events\PostalMailDeleted;
+use App\Jobs\GenerateReturnCard;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,10 @@ class PostalMail extends Model
     {
         static::updated(function (PostalMail $postalMail) {
             UpdateFeedItem::execute($postalMail, $postalMail->comment);
+
+            if ($postalMail->returned_date && $postalMail->wasChanged(['is_failed', 'returned_date', 'date_sent'])) {
+                GenerateReturnCard::dispatch($postalMail->id);
+            }
         });
 
         static::deleting(function (PostalMail $postalMail) {
@@ -64,12 +69,16 @@ class PostalMail extends Model
         return $this->morphMany(Feed::class, 'feedable');
     }
 
-    public function getFollowableId()
+    public function getFollowableId(): int
     {
         return $this->user_id;
     }
 
-    public function generateMeta(array $overrides = [])
+    /**
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    public function generateMeta(array $overrides = []): array
     {
         $user = $this->user;
         $player = $this->player;
@@ -98,6 +107,7 @@ class PostalMail extends Model
             'turnaround_days' => $this->returned_date && $this->date_sent
                 ? (int) $this->date_sent->diffInDays($this->returned_date)
                 : null,
+            'is_failed' => (bool) $this->is_failed,
             'card_photos' => $cardPhotos,
             'cards_count' => $cards->count(),
             ...$overrides,

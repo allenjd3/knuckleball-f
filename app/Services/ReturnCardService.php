@@ -116,6 +116,8 @@ class ReturnCardService
             'turnaroundDays' => $turnaroundDays,
             'feeText' => $feeText,
             'userName' => $mail->user->name ?? 'Unknown',
+            'isFailed' => (bool) $mail->is_failed,
+            'headline' => $mail->is_failed ? 'Got a failed return' : 'Got it back!',
         ];
     }
 
@@ -164,7 +166,7 @@ class ReturnCardService
         $this->drawBadges($canvas, $d, 718, 200, 160, 16, 22, 17);
 
         // "got it back" line
-        $canvas->text($d['userName'] . ' Got it back!', 540, 843, fn (FontFactory $f) => $f
+        $canvas->text($d['userName'] . ' ' . $d['headline'], 540, 843, fn (FontFactory $f) => $f
             ->filename($this->regularFont)->size(24)->color(self::MUTED)->align('center')->valign('middle'));
 
         // Accent line
@@ -212,7 +214,7 @@ class ReturnCardService
         $this->drawBadges($canvas, $d, 1270, 240, 196, 20, 26, 20, 72);
 
         // "got it back" line
-        $canvas->text($d['userName'] . ' Got it back!', 540, 1450, fn (FontFactory $f) => $f
+        $canvas->text($d['userName'] . ' ' . $d['headline'], 540, 1450, fn (FontFactory $f) => $f
             ->filename($this->regularFont)->size(30)->color(self::MUTED)->align('center')->valign('middle'));
 
         // Accent line
@@ -273,7 +275,11 @@ class ReturnCardService
         $totalW = $daysWidth + $gap + $feeWidth;
         $startX = (int) ((1080 - $totalW) / 2);
 
-        $daysText = $d['turnaroundDays'] !== null ? "{$d['turnaroundDays']} DAYS" : '— DAYS';
+        $daysText = match (true) {
+            $d['isFailed'] => 'FAILED',
+            $d['turnaroundDays'] !== null => "{$d['turnaroundDays']} DAYS",
+            default => '— DAYS',
+        };
 
         // Turnaround badge (red)
         $canvas->drawRectangle($startX, $y, fn (RectangleFactory $r) => $r->size($daysWidth, $badgeH)->background(self::RED));

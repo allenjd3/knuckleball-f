@@ -14,6 +14,7 @@ class HomeController extends Controller
             ->latest()
             ->limit(20)
             ->get()
+            ->reject(fn (Feed $feed): bool => (bool) data_get($feed->meta, 'is_failed'))
             ->map(function (Feed $feed) {
                 $meta = $feed->meta;
 

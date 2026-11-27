@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Actions\CreateFeedItem;
 use App\Enums\SetEntryStatus;
 use App\Http\Controllers\ReturnCardController;
-use App\Jobs\GenerateReturnCard;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
@@ -154,14 +153,13 @@ class FeedComposer extends Component implements HasActions, HasForms
                     'comment' => $data['comment'] ?? $postalMail->comment,
                 ]);
 
-                // PostalMail::booted() updated hook calls UpdateFeedItem automatically,
-                // which upgrades the feed card from send-card to celebration-card.
+                // PostalMail::booted() updated hook calls UpdateFeedItem and queues
+                // GenerateReturnCard, upgrading the feed card and building the share image.
                 $this->dispatch('feed-updated');
 
                 // Trigger the share prompt
                 $this->shareMailId = $postalMail->id;
                 $this->shareOpen = true;
-                GenerateReturnCard::dispatch($postalMail->id);
 
                 // Check if this player is in any Need It set entries
                 $postalMail->load('signer.signable');

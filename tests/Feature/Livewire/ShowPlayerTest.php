@@ -1,13 +1,16 @@
 <?php
 
 use App\Actions\CreateFeedItem;
+use App\Jobs\GenerateReturnCard;
 use App\Livewire\ShowPlayer;
+use App\Models\Feed;
 use App\Models\FeeMaterial;
 use App\Models\Player;
 use App\Models\PostalMail;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 
 test('guests cannot see a player photo', function () {
@@ -154,4 +157,49 @@ it('can mark a postal mail as failed', function () {
         ->assertHasNoActionErrors();
 
     $this->assertTrue($postalMail->fresh()->is_failed);
+});
+
+it('shows a returned postal mail as failed and regenerates its share card when marked failed', function () {
+    Queue::fake();
+
+    $player = Player::factory()->create();
+    $postalMail = PostalMail::factory()->returned()->create([
+        'signer_id' => $player->signer->id,
+    ]);
+
+    CreateFeedItem::execute($postalMail, $postalMail->comment);
+
+    Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction(TestAction::make('edit')->table($postalMail), [
+            'is_failed' => true,
+        ])
+        ->assertHasNoActionErrors();
+
+    $feed = Feed::query()
+        ->where('feedable_type', PostalMail::class)
+        ->where('feedable_id', $postalMail->id)
+        ->firstOrFail();
+
+    expect($feed->componentName())->toBe('feeds.failed-return-card');
+
+    Queue::assertPushed(GenerateReturnCard::class, fn (GenerateReturnCard $job) => $job->postalMailId === $postalMail->id);
+});
+
+it('does not regenerate a share card when an unreturned postal mail is marked failed', function () {
+    Queue::fake();
+
+    $player = Player::factory()->create();
+    $postalMail = PostalMail::factory()->unReturned()->create([
+        'signer_id' => $player->signer->id,
+    ]);
+
+    CreateFeedItem::execute($postalMail, $postalMail->comment);
+
+    Livewire::actingAs($postalMail->user)->test(ShowPlayer::class, ['player' => $player])
+        ->callAction(TestAction::make('edit')->table($postalMail), [
+            'is_failed' => true,
+        ])
+        ->assertHasNoActionErrors();
+
+    Queue::assertNotPushed(GenerateReturnCard::class);
 });
