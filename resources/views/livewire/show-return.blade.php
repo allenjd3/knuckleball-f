@@ -56,13 +56,18 @@
         {{-- Info card --}}
         <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6 space-y-4">
             <div class="flex items-center gap-2 mb-1">
-                <span class="text-xs font-bold uppercase tracking-widest text-[#D93C3F]">TTM Return</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#D93C3F]">{{ $mail->is_failed ? 'Failed Return' : 'TTM Return' }}</span>
             </div>
 
             <h1 class="text-3xl font-bold text-gray-900">{{ data_get($meta, 'player') }}</h1>
 
             <div class="flex items-center flex-wrap gap-3">
-                @if (data_get($meta, 'turnaround_days') !== null)
+                @if ($mail->is_failed)
+                    <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-red-600 bg-red-50">
+                        <x-heroicon-o-x-circle class="size-4" />
+                        Failed
+                    </span>
+                @elseif (data_get($meta, 'turnaround_days') !== null)
                     <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-bold text-white"
                           style="background-color:#D93C3F;">
                         {{ data_get($meta, 'turnaround_days') }} Days

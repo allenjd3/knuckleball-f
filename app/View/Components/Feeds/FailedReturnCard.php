@@ -15,9 +15,13 @@ class FailedReturnCard extends Component
     public string $userPath;
     public string $player;
     public string $playerPath;
-    public string $dateSent;
+    public ?string $dateSent;
     public ?string $dateReturned;
     public ?string $category;
+
+    /** @var array<int, string> */
+    public array $cardPhotos;
+    public ?string $heroPhoto;
 
     public function __construct(public Feed $feed)
     {
@@ -26,11 +30,15 @@ class FailedReturnCard extends Component
         $this->userPath = data_get($feed->meta, 'user_path', '');
         $this->player = data_get($feed->meta, 'player', '');
         $this->playerPath = data_get($feed->meta, 'player_path', '');
-        $this->dateSent = Carbon::parse(data_get($feed->meta, 'date_sent'))->format('M j, Y');
+        $this->dateSent = data_get($feed->meta, 'date_sent')
+            ? Carbon::parse(data_get($feed->meta, 'date_sent'))->format('M j, Y')
+            : null;
         $this->dateReturned = data_get($feed->meta, 'date_returned')
             ? Carbon::parse(data_get($feed->meta, 'date_returned'))->format('M j, Y')
             : null;
         $this->category = data_get($feed->meta, 'category');
+        $this->cardPhotos = data_get($feed->meta, 'card_photos', []);
+        $this->heroPhoto = $this->cardPhotos[0] ?? null;
     }
 
     public function render(): View|Closure|string

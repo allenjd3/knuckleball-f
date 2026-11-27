@@ -30,5 +30,7 @@ it('describes a failed return as failed', function () {
         ->assertSee('Failed Return')
         ->assertSee('got a failed return from')
         ->assertDontSee('Got it back!')
-        ->assertDontSee('Day Return');
+        ->assertDontSee('Day Return')
+        ->assertDontSee('TTM Return')
+        ->assertDontSee($mail->date_sent->diffInDays($mail->returned_date) . ' Days');
 });

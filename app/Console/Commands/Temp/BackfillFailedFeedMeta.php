@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Temp;
 
+use App\Jobs\GenerateReturnCard;
 use App\Models\Feed;
 use App\Models\PostalMail;
 use Illuminate\Console\Attributes\Description;
@@ -10,27 +11,34 @@ use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 
 #[Signature('operation:backfill-failed-feed-meta')]
-#[Description('One off command to flag existing failed postal mail feeds so they render as failed returns')]
+#[Description('One off command to flag existing failed postal mail feeds and rebuild their share cards')]
 class BackfillFailedFeedMeta extends Command
 {
     public function handle(): int
     {
-        $updated = 0;
+        $flagged = 0;
+        $regenerated = 0;
 
         Feed::query()
             ->where('feedable_type', PostalMail::class)
             ->whereIn('feedable_id', PostalMail::query()->where('is_failed', true)->select('id'))
-            ->chunkById(500, function (Collection $feeds) use (&$updated) {
+            ->with('feedable')
+            ->chunkById(500, function (Collection $feeds) use (&$flagged, &$regenerated): void {
                 $feeds
-                    ->reject(fn (Feed $feed) => data_get($feed->meta, 'is_failed') === true)
-                    ->each(function (Feed $feed) use (&$updated) {
-                        $feed->meta = [...$feed->meta, 'is_failed' => true];
+                    ->reject(fn (Feed $feed): bool => data_get($feed->meta, 'is_failed') === true)
+                    ->each(function (Feed $feed) use (&$flagged, &$regenerated): void {
+                        $feed->meta = [...($feed->meta ?? []), 'is_failed' => true];
                         $feed->saveQuietly();
-                        $updated++;
+                        $flagged++;
+
+                        if ($feed->feedable?->returned_date) {
+                            GenerateReturnCard::dispatch($feed->feedable_id);
+                            $regenerated++;
+                        }
                     });
             });
 
-        $this->info("Flagged {$updated} failed feed " . str('item')->plural($updated) . '.');
+        $this->info("Flagged {$flagged} failed feed " . str('item')->plural($flagged) . " and queued {$regenerated} share " . str('card')->plural($regenerated) . ' to rebuild.');
 
         return self::SUCCESS;
     }

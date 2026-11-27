@@ -116,6 +116,7 @@ class ReturnCardService
             'turnaroundDays' => $turnaroundDays,
             'feeText' => $feeText,
             'userName' => $mail->user->name ?? 'Unknown',
+            'isFailed' => (bool) $mail->is_failed,
             'headline' => $mail->is_failed ? 'Got a failed return' : 'Got it back!',
         ];
     }
@@ -274,7 +275,11 @@ class ReturnCardService
         $totalW = $daysWidth + $gap + $feeWidth;
         $startX = (int) ((1080 - $totalW) / 2);
 
-        $daysText = $d['turnaroundDays'] !== null ? "{$d['turnaroundDays']} DAYS" : '— DAYS';
+        $daysText = match (true) {
+            $d['isFailed'] => 'FAILED',
+            $d['turnaroundDays'] !== null => "{$d['turnaroundDays']} DAYS",
+            default => '— DAYS',
+        };
 
         // Turnaround badge (red)
         $canvas->drawRectangle($startX, $y, fn (RectangleFactory $r) => $r->size($daysWidth, $badgeH)->background(self::RED));

@@ -43,3 +43,32 @@ it('shows the failed return card in the feed', function () {
         ->assertSee('Failed')
         ->assertDontSee('got a return from');
 });
+
+it('shows card photos on a failed return card', function () {
+    $feed = Feed::factory()->create([
+        'feedable_type' => PostalMail::class,
+        'feedable_id' => PostalMail::factory()->failed()->create()->id,
+        'meta' => [
+            'user' => 'Collector',
+            'player' => 'Some Player',
+            'date_sent' => now()->subWeek(),
+            'is_failed' => true,
+            'card_photos' => ['cards/unsigned-card.jpg'],
+        ],
+    ]);
+
+    $this->blade('<x-dynamic-component :component="$feed->componentName()" :$feed />', ['feed' => $feed])
+        ->assertSee('cards/unsigned-card.jpg');
+});
+
+it('leaves the date off a failed return card with no sent date', function () {
+    $feed = Feed::factory()->create([
+        'feedable_type' => PostalMail::class,
+        'feedable_id' => PostalMail::factory()->failed()->create()->id,
+        'meta' => ['user' => 'Collector', 'player' => 'Some Player', 'is_failed' => true],
+    ]);
+
+    $this->blade('<x-dynamic-component :component="$feed->componentName()" :$feed />', ['feed' => $feed])
+        ->assertSee('got a failed return from')
+        ->assertDontSee(now()->format('M j, Y'));
+});

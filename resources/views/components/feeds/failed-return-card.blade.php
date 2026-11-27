@@ -13,13 +13,31 @@
                         <x-heroicon-o-x-circle class="size-3.5" />
                         Failed
                     </span>
-                    <span class="mx-1">·</span>{{ $dateSent }}@if ($dateReturned) – {{ $dateReturned }}@endif
+                    @if ($dateSent)
+                        <span class="mx-1">·</span>{{ $dateSent }}@if ($dateReturned) – {{ $dateReturned }}@endif
+                    @endif
                     @if ($category)
                         <span class="mx-1">·</span>{{ $category }}
                     @endif
                 </p>
             </div>
         </div>
+
+        @if ($heroPhoto)
+            <div class="mt-3 ml-12">
+                <button
+                    type="button"
+                    class="flex items-center justify-center w-full rounded-xl bg-gray-50 cursor-zoom-in"
+                    style="max-height: 400px;"
+                    @click="$dispatch('open-lightbox', { src: '{{ Storage::url($heroPhoto) }}', alt: 'Returned item' })"
+                >
+                    <img src="{{ Storage::url($heroPhoto) }}"
+                         alt="Returned item"
+                         class="max-w-full rounded-xl object-contain"
+                         style="max-height: 400px;" />
+                </button>
+            </div>
+        @endif
 
         @if ($feed->comment)
             <p class="text-sm text-gray-600 mt-2 ml-12">{{ $feed->comment }}</p>

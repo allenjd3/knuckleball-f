@@ -14,6 +14,7 @@ class HomeController extends Controller
             ->latest()
             ->limit(20)
             ->get()
+            ->reject(fn (Feed $feed): bool => (bool) data_get($feed->meta, 'is_failed'))
             ->map(function (Feed $feed) {
                 $meta = $feed->meta;
 
@@ -21,7 +22,7 @@ class HomeController extends Controller
                     'slug' => basename(data_get($meta, 'user_path', '')),
                     'player' => data_get($meta, 'player', ''),
                     'days' => data_get($meta, 'turnaround_days'),
-                    'isReturn' => ! empty(data_get($meta, 'date_returned')) && ! data_get($meta, 'is_failed'),
+                    'isReturn' => ! empty(data_get($meta, 'date_returned')),
                 ];
             })
             ->filter(fn ($item) => $item['slug'] && $item['player'])

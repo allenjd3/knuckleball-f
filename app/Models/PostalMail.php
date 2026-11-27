@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Actions\UpdateFeedItem;
 use App\Events\PostalMailDeleted;
+use App\Jobs\GenerateReturnCard;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,10 @@ class PostalMail extends Model
     {
         static::updated(function (PostalMail $postalMail) {
             UpdateFeedItem::execute($postalMail, $postalMail->comment);
+
+            if ($postalMail->returned_date && $postalMail->wasChanged(['is_failed', 'returned_date', 'date_sent'])) {
+                GenerateReturnCard::dispatch($postalMail->id);
+            }
         });
 
         static::deleting(function (PostalMail $postalMail) {

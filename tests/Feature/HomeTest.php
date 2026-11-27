@@ -23,12 +23,12 @@ it('shows ttm database link instead of login buttons when authenticated', functi
         ->assertDontSee('Log In');
 });
 
-it('does not show a failed return as a mail day in the ticker', function () {
+it('leaves failed returns out of the ticker', function () {
     $postalMail = PostalMail::factory()->failed()->create(['returned_date' => now()->subDay()]);
     CreateFeedItem::execute($postalMail, $postalMail->comment);
 
     $this->get(route('home'))
         ->assertSuccessful()
         ->assertDontSee('Mail day for @' . basename($postalMail->user->path()))
-        ->assertSee('@' . basename($postalMail->user->path()) . ' sent:', false);
+        ->assertDontSee('@' . basename($postalMail->user->path()) . ' sent:', false);
 });
